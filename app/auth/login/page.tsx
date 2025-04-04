@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser } from "@/app/api/auth";
+import { loginUser } from "@/app/api/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,13 +28,28 @@ export default function LoginPage() {
 
     try {
       await loginUser(email, password);
-      router.push("/dashboard");
+      router.push("/admin/dashboard");
     } catch {
       setError("Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const checkAuthStatus = () => {
+    // Check if running in browser environment
+    if (typeof window !== "undefined") {
+      const authToken = localStorage.getItem("authToken");
+      if (authToken) {
+        router.replace("/admin/dashboard");
+      }
+    }
+  };
+
+  // Call the function when component mounts
+  useState(() => {
+    checkAuthStatus();
+  });
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">

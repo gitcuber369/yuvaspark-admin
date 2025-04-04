@@ -49,7 +49,7 @@ export default function RegisterPage() {
       console.log(localStorage.getItem("authToken"));
       console.log(localStorage.getItem("userRole"));
 
-      router.push("/dashboard"); // Redirect to dashboard
+      router.push("/admin/dashboard"); // Redirect to dashboard
     } catch (err: any) {
       setError(err.response?.data?.error || "Something went wrong");
     } finally {

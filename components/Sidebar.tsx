@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   School,
   GraduationCap,
@@ -25,6 +25,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import { useAuthStore } from "@/app/store/authStore";
+import Link from "next/link";
 
 const adminNav = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/admin/dashboard" },
@@ -42,6 +43,7 @@ export function AdminSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
+  const pathname = usePathname();
   const { userName, logout } = useAuthStore();
   return (
     <Sidebar {...props}>
@@ -68,13 +70,13 @@ export function AdminSidebar({
             {adminNav.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
+                  className={pathname === item.url ? "bg-gray-200" : ""}
                   asChild
-                  className={router.pathname === item.url ? "bg-gray-200" : ""}
                 >
-                  <a href={item.url} className="flex items-center gap-2">
+                  <Link href={item.url} className="flex items-center gap-2">
                     <item.icon className="size-4" />
                     <span className="font-medium">{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
