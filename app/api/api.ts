@@ -22,7 +22,6 @@ export const logoutUser = () => {
   window.location.href = "/auth/login"; // Redirect to login page
 };
 
-
 export const createTeacher = async (
   name: string,
   phone: string,
@@ -55,7 +54,10 @@ export const assignTeacherToCohort = async (
   teacherId: string,
   cohortId: string
 ) => {
-  const res = await API.post("/teachers/assign-cohort", { teacherId, cohortId });
+  const res = await API.post("/teachers/assign-cohort", {
+    teacherId,
+    cohortId,
+  });
   return res.data;
 };
 
@@ -154,3 +156,67 @@ export const assignToAnganwadi = async ({
   });
   return res.data;
 };
+
+
+// ✅ Create Cohort
+
+export const createStudent = async ({
+  name,
+  age,
+  cohortId,
+  gender,
+  status,
+  anganwadiId,
+}: {
+  name: string;
+  age: number;
+  cohortId: string;
+  gender?: string;
+  status?: string;
+  anganwadiId?: string;
+}) => {
+  const res = await API.post("/students", {
+    name,
+    age,
+    cohortId,
+    gender,
+    status,
+    anganwadiId,
+  });
+  return res.data;
+};
+
+// ✅ Get All Students
+export const getAllStudents = async () => {
+  const res = await API.get("/students");
+  return res.data;
+};
+
+// ✅ Delete a Student by ID
+export const deleteStudent = async (id: string) => {
+  const res = await API.delete(`/students/${id}`);
+  return res.data;
+};
+
+// ✅ Assign Student to Anganwadi (PATCH)
+export const assignStudentToAnganwadi = async ({
+  studentId,
+  anganwadiId,
+}: {
+  studentId: string;
+  anganwadiId: string;
+}) => {
+  const res = await API.patch("/students/assign-anganwadi", {
+    studentId,
+    anganwadiId,
+  });
+  return res.data;
+};
+
+// ✅ Get Students by Anganwadi ID (GET)
+export const getStudentsByAnganwadi = async (anganwadiId: string) => {
+  const res = await API.get(`/students/anganwadi/${anganwadiId}`);
+  return res.data;
+};
+
+

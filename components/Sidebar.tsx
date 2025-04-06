@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { LogOut, Settings, Users, LayoutDashboard } from "lucide-react";
+import { LogOut, Settings, Users, LayoutDashboard, HomeIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -31,12 +31,11 @@ const adminNav = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/admin/dashboard" },
   { title: "Teachers", icon: School, url: "/admin/teachers" },
   { title: "Students", icon: GraduationCap, url: "/admin/students" },
+  { title: "Anganwadi", icon: HomeIcon, url: "/admin/anganwadi" },
   { title: "Evaluation", icon: ClipboardCheck, url: "/admin/evaluation" },
   { title: "Cohorts", icon: Cohorts, url: "/admin/cohorts" },
   { title: "Questions", icon: MessagesSquare, url: "/admin/questions" },
-  { title: "Reports", icon: FileBarChart2, url: "/admin/reports" },
-  { title: "Settings", icon: Settings, url: "/admin/settings" },
-  { title: "Profile", icon: UserCircle, url: "/admin/profile" },
+
 ];
 
 export function AdminSidebar({

@@ -1,6 +1,6 @@
 import React from "react";
 
-function StudentsLayout({
+function DashbaordLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -14,4 +14,4 @@ function StudentsLayout({
   );
 }
 
-export default StudentsLayout;
+export default DashbaordLayout;

@@ -1,86 +1,122 @@
 import { create } from "zustand";
-import {
-  getAllAnganwadis,
-  createAnganwadi as apiCreateAnganwadi,
-  deleteAnganwadi as apiDeleteAnganwadi,
-  updateAnganwadi as apiUpdateAnganwadi,
-  getAnganwadiById as apiGetAnganwadiById,
-  assignToAnganwadi as apiAssignToAnganwadi,
-} from "@/app/api/api";
+import axios from "axios";
 
-type Anganwadi = {
+export interface Anganwadi {
   id: string;
   name: string;
   location: string;
   district: string;
-  teachers?: { id: string; name: string }[];
-  students?: { id: string; name: string }[];
-};
+  teachers: { id: string; name: string }[]; // adjust based on backend response
+  students: { id: string; name: string }[];
+}
 
-type AnganwadiStore = {
+interface AnganwadiState {
   anganwadis: Anganwadi[];
   loading: boolean;
-  fetchAnganwadis: () => Promise<void>;
+  error: string | null;
+
+  fetchAnganwadis: (search?: string) => Promise<void>;
+  getAnganwadiById: (id: string) => Promise<Anganwadi | null>;
   createAnganwadi: (
-    name: string,
-    location: string,
-    district: string,
-    teacherIds?: string[],
-    studentIds?: string[]
-  ) => Promise<void>;
-  deleteAnganwadi: (id: string) => Promise<void>;
-  updateAnganwadi: (
-    id: string,
-    data: Partial<Omit<Anganwadi, "id">> & {
+    data: Partial<Anganwadi> & {
       teacherIds?: string[];
       studentIds?: string[];
     }
   ) => Promise<void>;
-  getAnganwadiById: (id: string) => Promise<Anganwadi | null>;
+  updateAnganwadi: (
+    id: string,
+    data: Partial<Anganwadi> & {
+      teacherIds?: string[];
+      studentIds?: string[];
+    }
+  ) => Promise<void>;
+  deleteAnganwadi: (id: string) => Promise<void>;
   assignToAnganwadi: (
     anganwadiId: string,
     teacherId?: string,
     studentId?: string
   ) => Promise<void>;
-};
+}
 
-export const useAnganwadiStore = create<AnganwadiStore>((set) => ({
+export const useAnganwadiStore = create<AnganwadiState>((set, get) => ({
   anganwadis: [],
   loading: false,
+  error: null,
 
-  fetchAnganwadis: async () => {
-    set({ loading: true });
-    const data = await getAllAnganwadis();
-    set({ anganwadis: data, loading: false });
-  },
-
-  createAnganwadi: async (name, location, district, teacherIds, studentIds) => {
-    await apiCreateAnganwadi(name, location, district, teacherIds, studentIds);
-    await useAnganwadiStore.getState().fetchAnganwadis();
-  },
-
-  deleteAnganwadi: async (id) => {
-    await apiDeleteAnganwadi(id);
-    await useAnganwadiStore.getState().fetchAnganwadis();
-  },
-
-  updateAnganwadi: async (id, data) => {
-    await apiUpdateAnganwadi(id, data);
-    await useAnganwadiStore.getState().fetchAnganwadis();
+  fetchAnganwadis: async (search?: string) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await axios.get("http://localhost:3000/api/anganwadis", {
+        params: search ? { search } : {},
+      });
+      set({ anganwadis: res.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    } finally {
+      set({ loading: false });
+    }
   },
 
   getAnganwadiById: async (id) => {
     try {
-      const anganwadi = await apiGetAnganwadiById(id);
-      return anganwadi;
+      const res = await axios.get(`http://localhost:3000/api/anganwadis/${id}`);
+      return res.data;
     } catch (error) {
-      console.error("Error fetching Anganwadi by ID", error);
+      console.error("Error fetching Anganwadi by ID:", error);
       return null;
     }
   },
 
+  createAnganwadi: async (data) => {
+    try {
+      set({ loading: true });
+      await axios.post("http://localhost:3000/api/anganwadis", data);
+      await get().fetchAnganwadis();
+    } catch (error: any) {
+      console.error("Error creating Anganwadi:", error);
+      set({ error: error.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  updateAnganwadi: async (id, data) => {
+    try {
+      set({ loading: true });
+      await axios.put(`http://localhost:3000/api/anganwadis/${id}`, data);
+      await get().fetchAnganwadis();
+    } catch (error: any) {
+      console.error("Error updating Anganwadi:", error);
+      set({ error: error.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  deleteAnganwadi: async (id) => {
+    try {
+      set({ loading: true });
+      await axios.delete(`http://localhost:3000/api/anganwadis/${id}`);
+      await get().fetchAnganwadis();
+    } catch (error: any) {
+      console.error("Error deleting Anganwadi:", error);
+      set({ error: error.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   assignToAnganwadi: async (anganwadiId, teacherId, studentId) => {
-    await apiAssignToAnganwadi(anganwadiId, teacherId, studentId);
-    await useAnganwadiStore.getState().fetchAnganwadis();
+    try {
+      await axios.post(`http://localhost:3000/api/anganwadi/assign`, {
+        anganwadiId,
+        teacherId,
+        studentId,
+      });
+      await get().fetchAnganwadis();
+    } catch (error: any) {
+      console.error("Error assigning to Anganwadi:", error);
+      set({ error: error.message });
+    }
   },
 }));
