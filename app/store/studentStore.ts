@@ -10,8 +10,6 @@ import {
 interface Student {
   _id: string;
   name: string;
-  age: number;
-  cohortId: string;
   gender?: string;
   status?: string;
   anganwadiId?: string;

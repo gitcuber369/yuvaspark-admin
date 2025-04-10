@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kanasu - Admin",
-  description: "Kanasu Admin Dashboard",
+  title: "Yuva Spark Admin Dashboard",
+  description:
+    "Yuva Spark Admin Dashboard for managing student responses and evaluations",
+  icons: {
+    icon: "/logo-yuvaspark.png",
+    apple: "/logo-yuvaspark.png",
+  },
 };
 
 export default function RootLayout({

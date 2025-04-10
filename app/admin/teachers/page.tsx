@@ -30,6 +30,7 @@ import {
   Phone,
   School,
   Search,
+  FileText,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -170,80 +171,90 @@ export default function TeachersPage() {
             <CardTitle className="text-xl font-medium flex items-center gap-2 text-gray-800">
               <School className="h-5 w-5 text-gray-600" /> Teachers Dashboard
             </CardTitle>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="flex items-center gap-1 h-9 bg-gray-800 hover:bg-gray-700 text-white"
-                >
-                  <Plus className="h-3.5 w-3.5" /> Add Teacher
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[400px] rounded-lg bg-white">
-                <DialogHeader>
-                  <DialogTitle className="text-lg font-medium text-gray-800">
-                    New Teacher
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="name"
-                      className="text-sm font-medium text-gray-600"
-                    >
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Full name"
-                      className="w-full border-gray-200 focus:border-gray-300"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="phone"
-                      className="text-sm font-medium text-gray-600"
-                    >
-                      Phone Number
-                    </Label>
-                    <Input
-                      id="phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Phone number"
-                      className="w-full border-gray-200 focus:border-gray-300"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 h-9"
+                onClick={() => window.location.href = "/admin/teachers/student-responses"}
+              >
+                <FileText className="h-3.5 w-3.5" /> Student Responses
+              </Button>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
                   <Button
-                    onClick={handleSubmit}
+                    variant="default"
                     size="sm"
-                    className="w-full bg-gray-800 hover:bg-gray-700 text-white"
-                    disabled={creating}
+                    className="flex items-center gap-1 h-9 bg-gray-800 hover:bg-gray-700 text-white"
                   >
-                    {creating ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : null}
-                    Add Teacher
+                    <Plus className="h-3.5 w-3.5" /> Add Teacher
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="mt-4 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[400px] rounded-lg bg-white">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg font-medium text-gray-800">
+                      New Teacher
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="name"
+                        className="text-sm font-medium text-gray-600"
+                      >
+                        Name
+                      </Label>
+                      <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Full name"
+                        className="w-full border-gray-200 focus:border-gray-300"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="phone"
+                        className="text-sm font-medium text-gray-600"
+                      >
+                        Phone Number
+                      </Label>
+                      <Input
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="Phone number"
+                        className="w-full border-gray-200 focus:border-gray-300"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      onClick={handleSubmit}
+                      size="sm"
+                      className="w-full bg-gray-800 hover:bg-gray-700 text-white"
+                      disabled={creating}
+                    >
+                      {creating ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : null}
+                      Add Teacher
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-            <Input
-              placeholder="Search by name or phone number"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full border-gray-200 focus:border-gray-300"
-            />
+            <div className="mt-4 relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
+              <Input
+                placeholder="Search by name or phone number"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full border-gray-200 focus:border-gray-300"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">

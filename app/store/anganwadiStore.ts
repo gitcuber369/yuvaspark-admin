@@ -1,122 +1,137 @@
 import { create } from "zustand";
-import axios from "axios";
+import {
+  createAnganwadi,
+  getAllAnganwadis,
+  getAnganwadiById,
+  updateAnganwadi,
+  deleteAnganwadi,
+  assignToAnganwadi,
+} from "@/app/api/api"; // update path as needed
+
+interface Teacher {
+  name: string;
+  phone: string;
+}
 
 export interface Anganwadi {
-  id: string;
+  _id: string;
   name: string;
   location: string;
   district: string;
-  teachers: { id: string; name: string }[]; // adjust based on backend response
-  students: { id: string; name: string }[];
+  teacher: Teacher;
+  studentIds?: string[];
 }
 
-interface AnganwadiState {
+interface AnganwadiStore {
   anganwadis: Anganwadi[];
   loading: boolean;
   error: string | null;
 
-  fetchAnganwadis: (search?: string) => Promise<void>;
-  getAnganwadiById: (id: string) => Promise<Anganwadi | null>;
-  createAnganwadi: (
-    data: Partial<Anganwadi> & {
-      teacherIds?: string[];
-      studentIds?: string[];
-    }
+  fetchAnganwadis: () => Promise<void>;
+  fetchAnganwadiById: (id: string) => Promise<Anganwadi | null>;
+  addAnganwadi: (
+    name: string,
+    location: string,
+    district: string,
+    teacher: Teacher,
+    studentIds?: string[]
   ) => Promise<void>;
   updateAnganwadi: (
     id: string,
-    data: Partial<Anganwadi> & {
-      teacherIds?: string[];
+    data: Partial<Omit<Anganwadi, "_id" | "teacher">> & {
       studentIds?: string[];
     }
   ) => Promise<void>;
-  deleteAnganwadi: (id: string) => Promise<void>;
-  assignToAnganwadi: (
-    anganwadiId: string,
-    teacherId?: string,
-    studentId?: string
-  ) => Promise<void>;
+  removeAnganwadi: (id: string) => Promise<void>;
+  assignStudent: (studentId: string, anganwadiId: string) => Promise<void>;
 }
 
-export const useAnganwadiStore = create<AnganwadiState>((set, get) => ({
+export const useAnganwadiStore = create<AnganwadiStore>((set, get) => ({
   anganwadis: [],
   loading: false,
   error: null,
 
-  fetchAnganwadis: async (search?: string) => {
+  fetchAnganwadis: async () => {
+    set({ loading: true, error: null });
     try {
-      set({ loading: true, error: null });
-      const res = await axios.get("http://localhost:3000/api/anganwadis", {
-        params: search ? { search } : {},
-      });
-      set({ anganwadis: res.data });
-    } catch (error: any) {
-      set({ error: error.message });
-    } finally {
-      set({ loading: false });
+      const data = await getAllAnganwadis();
+      set({ anganwadis: data, loading: false });
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
     }
   },
 
-  getAnganwadiById: async (id) => {
+  fetchAnganwadiById: async (id) => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/anganwadis/${id}`);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching Anganwadi by ID:", error);
+      const anganwadi = await getAnganwadiById(id);
+      return anganwadi;
+    } catch (err: any) {
+      set({ error: err.message });
       return null;
     }
   },
 
-  createAnganwadi: async (data) => {
+  addAnganwadi: async (name, location, district, teacher, studentIds) => {
+    set({ loading: true, error: null });
     try {
-      set({ loading: true });
-      await axios.post("http://localhost:3000/api/anganwadis", data);
-      await get().fetchAnganwadis();
-    } catch (error: any) {
-      console.error("Error creating Anganwadi:", error);
-      set({ error: error.message });
-    } finally {
-      set({ loading: false });
+      const newAnganwadi = await createAnganwadi(
+        name,
+        location,
+        district,
+        teacher,
+        studentIds
+      );
+      set((state) => ({
+        anganwadis: [...state.anganwadis, newAnganwadi],
+        loading: false,
+      }));
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
     }
   },
 
   updateAnganwadi: async (id, data) => {
+    set({ loading: true, error: null });
     try {
-      set({ loading: true });
-      await axios.put(`http://localhost:3000/api/anganwadis/${id}`, data);
-      await get().fetchAnganwadis();
-    } catch (error: any) {
-      console.error("Error updating Anganwadi:", error);
-      set({ error: error.message });
-    } finally {
-      set({ loading: false });
+      const updated = await updateAnganwadi(id, data);
+      set((state) => ({
+        anganwadis: state.anganwadis.map((a) =>
+          a._id === id ? { ...a, ...updated } : a
+        ),
+        loading: false,
+      }));
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
     }
   },
 
-  deleteAnganwadi: async (id) => {
+  removeAnganwadi: async (id) => {
+    set({ loading: true, error: null });
     try {
-      set({ loading: true });
-      await axios.delete(`http://localhost:3000/api/anganwadis/${id}`);
-      await get().fetchAnganwadis();
-    } catch (error: any) {
-      console.error("Error deleting Anganwadi:", error);
-      set({ error: error.message });
-    } finally {
-      set({ loading: false });
+      await deleteAnganwadi(id);
+      set((state) => ({
+        anganwadis: state.anganwadis.filter((a) => a._id !== id),
+        loading: false,
+      }));
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
     }
   },
 
-  assignToAnganwadi: async (anganwadiId, teacherId, studentId) => {
+  assignStudent: async (studentId, anganwadiId) => {
+    set({ loading: true, error: null });
     try {
-      await axios.post(`http://localhost:3000/api/anganwadi/assign`, {
-        anganwadiId,
-        teacherId,
-        studentId,
-      });
-      await get().fetchAnganwadis();
-    } catch (error: any) {
-      console.error("Error assigning to Anganwadi:", error);
-      set({ error: error.message });
+      const updated = await assignToAnganwadi({ studentId, anganwadiId });
+      set((state) => ({
+        anganwadis: state.anganwadis.map((a) =>
+          a._id === anganwadiId
+            ? { ...a, studentIds: [...(a.studentIds || []), studentId] }
+            : a
+        ),
+        loading: false,
+      }));
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
     }
   },
 }));

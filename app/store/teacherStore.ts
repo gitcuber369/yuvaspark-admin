@@ -3,8 +3,6 @@ import {
   getAllTeachers,
   createTeacher as apiCreateTeacher,
   deleteTeacher as apiDeleteTeacher,
-  assignTeacherToCohort,
-  assignTeacherToAnganwadi,
   getTeachersByAnganwadi,
 } from "@/app/api/api";
 
@@ -27,9 +25,6 @@ type TeacherStore = {
     anganwadiId?: string
   ) => Promise<void>;
   deleteTeacher: (id: string) => Promise<void>;
-  assignToCohort: (teacherId: string, cohortId: string) => Promise<void>;
-  assignToAnganwadi: (teacherId: string, anganwadiId: string) => Promise<void>;
-
   getByAnganwadi: (params: { id?: string; name?: string }) => Promise<void>;
 };
 
@@ -50,16 +45,6 @@ export const useTeacherStore = create<TeacherStore>((set) => ({
 
   deleteTeacher: async (id) => {
     await apiDeleteTeacher(id);
-    await useTeacherStore.getState().fetchTeachers();
-  },
-
-  assignToCohort: async (teacherId, cohortId) => {
-    await assignTeacherToCohort(teacherId, cohortId);
-    await useTeacherStore.getState().fetchTeachers();
-  },
-
-  assignToAnganwadi: async (teacherId, anganwadiId) => {
-    await assignTeacherToAnganwadi(teacherId, anganwadiId);
     await useTeacherStore.getState().fetchTeachers();
   },
 

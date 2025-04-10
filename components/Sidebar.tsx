@@ -1,6 +1,18 @@
 "use client";
 import { useEffect } from "react";
-import { LogOut, Settings, Users, LayoutDashboard, HomeIcon } from "lucide-react";
+import {
+  LogOut,
+  Settings,
+  Users,
+  LayoutDashboard,
+  HomeIcon,
+  PanelTopInactive,
+  FileQuestion,
+  ClipboardList,
+  ShieldCheck,
+  MessageSquareText,
+  FileBarChart2,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,22 +32,38 @@ import {
   ClipboardCheck,
   Users as Cohorts,
   MessagesSquare,
-  FileBarChart2,
   SettingsIcon,
   UserCircle,
 } from "lucide-react";
 import { useAuthStore } from "@/app/store/authStore";
 import Link from "next/link";
+import Image from "next/image";
 
 const adminNav = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/admin/dashboard" },
+  { title: "Users", icon: ShieldCheck, url: "/admin/users" },
   { title: "Teachers", icon: School, url: "/admin/teachers" },
   { title: "Students", icon: GraduationCap, url: "/admin/students" },
   { title: "Anganwadi", icon: HomeIcon, url: "/admin/anganwadi" },
-  { title: "Evaluation", icon: ClipboardCheck, url: "/admin/evaluation" },
   { title: "Cohorts", icon: Cohorts, url: "/admin/cohorts" },
+  { title: "Topics", icon: PanelTopInactive, url: "/admin/topic" },
   { title: "Questions", icon: MessagesSquare, url: "/admin/questions" },
-
+  { title: "Evaluation", icon: ClipboardCheck, url: "/admin/evaluations" },
+  {
+    title: "Global Assessments",
+    icon: ClipboardList,
+    url: "/admin/global-assessments",
+  },
+  {
+    title: "Assessment Sessions",
+    icon: FileBarChart2,
+    url: "/admin/assessment-sessions",
+  },
+  {
+    title: "Student Responses",
+    icon: MessageSquareText,
+    url: "/admin/student-responses",
+  },
 ];
 
 export function AdminSidebar({
@@ -51,11 +79,17 @@ export function AdminSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/admin/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <LayoutDashboard className="size-4" />
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+                  <Image
+                    src="/logo-yuvaspark.png"
+                    alt="Yuva Spark Logo"
+                    width={30}
+                    height={30}
+                    className="object-contain"
+                  />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Admin Panel</span>
+                  <span className="font-semibold">Yuvspark-Kanasu-Admin</span>
                 </div>
               </a>
             </SidebarMenuButton>
