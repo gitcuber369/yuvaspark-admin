@@ -8,11 +8,15 @@ import {
 } from "@/app/api/api";
 
 interface Student {
-  _id: string;
+  id: string;
   name: string;
   gender?: string;
   status?: string;
   anganwadiId?: string;
+  anganwadi?: {
+    id: string;
+    name: string;
+  };
 }
 
 interface StudentStore {
@@ -21,7 +25,7 @@ interface StudentStore {
   error: string | null;
 
   fetchStudents: () => Promise<void>;
-  addStudent: (data: Omit<Student, "_id">) => Promise<void>;
+  addStudent: (data: Omit<Student, "id">) => Promise<void>;
   removeStudent: (id: string) => Promise<void>;
   assignToAnganwadi: (studentId: string, anganwadiId: string) => Promise<void>;
   fetchByAnganwadi: (anganwadiId: string) => Promise<void>;
@@ -60,7 +64,7 @@ export const useStudentStore = create<StudentStore>((set) => ({
     try {
       await deleteStudent(id);
       set((state) => ({
-        students: state.students.filter((student) => student._id !== id),
+        students: state.students.filter((student) => student.id !== id),
         loading: false,
       }));
     } catch (err: any) {
@@ -77,7 +81,7 @@ export const useStudentStore = create<StudentStore>((set) => ({
       });
       set((state) => ({
         students: state.students.map((s) =>
-          s._id === studentId ? { ...s, anganwadiId: updated.anganwadiId } : s
+          s.id === studentId ? { ...s, anganwadiId: updated.anganwadiId } : s
         ),
         loading: false,
       }));

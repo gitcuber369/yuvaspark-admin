@@ -298,143 +298,6 @@ export const createQuestion = async (formData: FormData) => {
 //   }
 // };
 
-// ===== EVALUATION ENDPOINTS =====
-
-// Create a new evaluation
-export const createEvaluation = async (formData: FormData) => {
-  try {
-    const res = await API.post("/evaluations", formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return res.data;
-  } catch (error: any) {
-    console.error("Error creating evaluation:", error);
-    if (error.response) {
-      throw {
-        message: error.response.data?.error || "Failed to create evaluation",
-        status: error.response.status,
-        details: error.response.data
-      };
-    } else if (error.request) {
-      throw { message: "No response from server. Please check your connection." };
-    } else {
-      throw { message: "Error preparing request: " + error.message };
-    }
-  }
-};
-
-// Get all evaluations
-export const getAllEvaluations = async () => {
-  try {
-    const res = await API.get("/evaluations");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching evaluations:", error);
-    throw error;
-  }
-};
-
-// Get evaluation by ID
-export const getEvaluationById = async (id: string) => {
-  try {
-    const res = await API.get(`/evaluations/${id}`);
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching evaluation:", error);
-    throw error;
-  }
-};
-
-// Get evaluations by status
-export const getEvaluationsByStatus = async (status: string) => {
-  try {
-    const res = await API.get(`/evaluations/status/${status}`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching evaluations with status ${status}:`, error);
-    throw error;
-  }
-};
-
-// Get evaluations by Anganwadi
-export const getEvaluationsByAnganwadi = async (anganwadiId: string) => {
-  try {
-    const res = await API.get(`/evaluations/anganwadi/${anganwadiId}`);
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching evaluations by anganwadi:", error);
-    throw error;
-  }
-};
-
-// Get evaluations by session
-export const getEvaluationsBySession = async (sessionId: string) => {
-  try {
-    const res = await API.get(`/evaluations/session/${sessionId}`);
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching evaluations by session:", error);
-    throw error;
-  }
-};
-
-// Grade a student response
-export const gradeStudentResponse = async (
-  responseId: string,
-  score: number
-) => {
-  try {
-    const res = await API.post(`/evaluations/response/${responseId}/grade`, {
-      score,
-    });
-    return res.data;
-  } catch (error) {
-    console.error("Error grading student response:", error);
-    throw error;
-  }
-};
-
-// Mark an evaluation as completely graded
-export const completeEvaluationGrading = async (evaluationId: string) => {
-  try {
-    const res = await API.put(`/evaluations/${evaluationId}/complete-grading`);
-    return res.data;
-  } catch (error) {
-    console.error("Error completing evaluation grading:", error);
-    throw error;
-  }
-};
-
-// Submit an evaluation (change status from DRAFT to SUBMITTED)
-export const submitEvaluation = async (id: string) => {
-  try {
-    const res = await API.put(`/evaluations/${id}/submit`);
-    return res.data;
-  } catch (error: any) {
-    console.error("Error submitting evaluation:", error);
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.error("Error response data:", error.response.data);
-      console.error("Error response status:", error.response.status);
-      throw {
-        message: error.response.data?.message || "Failed to submit evaluation",
-        status: error.response.status,
-        details: error.response.data
-      };
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error("No response received:", error.request);
-      throw { message: "No response from server. Please check your connection." };
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      throw { message: "Error preparing request: " + error.message };
-    }
-  }
-};
-
 // Assessment Session API functions
 
 // Create a new assessment session
@@ -637,6 +500,50 @@ export const completeGlobalAssessment = async (id: string) => {
     return res.data;
   } catch (error) {
     console.error("Error completing global assessment:", error);
+    throw error;
+  }
+};
+
+// Get details of a specific submission
+export const getSubmissionById = async (assessmentId: string, submissionId: string) => {
+  try {
+    const res = await API.get(`global-assessments/${assessmentId}/submissions/${submissionId}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching submission details:", error);
+    throw error;
+  }
+};
+
+// Score a single student response
+export const scoreStudentResponse = async (responseId: string, score: number) => {
+  try {
+    const res = await API.post(`/student-responses/${responseId}/score`, { score });
+    return res.data;
+  } catch (error) {
+    console.error("Error scoring response:", error);
+    throw error;
+  }
+};
+
+// Batch score multiple responses
+export const batchScoreResponses = async (scores: { responseId: string; score: number }[]) => {
+  try {
+    const res = await API.post("/student-responses/batch-score", { scores });
+    return res.data;
+  } catch (error) {
+    console.error("Error batch scoring responses:", error);
+    throw error;
+  }
+};
+
+// Get student responses for assessment
+export const getStudentResponses = async (assessmentId: string) => {
+  try {
+    const res = await API.get(`/student-responses/evaluation/${assessmentId}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching student responses:", error);
     throw error;
   }
 };

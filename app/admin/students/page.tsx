@@ -42,6 +42,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CsvImportForm from "@/components/CsvImportForm";
 import Link from "next/link";
 
+interface Student {
+  id: string;
+  name: string;
+  gender?: string;
+  status?: string;
+  anganwadiId?: string;
+  anganwadi?: {
+    id: string;
+    name: string;
+  };
+}
+
 export default function StudentDashboard() {
   const { students, loading, error, fetchStudents, addStudent, removeStudent } =
     useStudentStore();
@@ -277,7 +289,7 @@ export default function StudentDashboard() {
                   <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {sortedStudents.map((student) => (
                       <li
-                        key={student._id}
+                        key={student.id}
                         className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex justify-between items-center mb-2">
@@ -285,7 +297,7 @@ export default function StudentDashboard() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            onClick={() => removeStudent(student._id)}
+                            onClick={() => removeStudent(student.id)}
                           >
                             <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
                           </Button>

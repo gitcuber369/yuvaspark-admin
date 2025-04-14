@@ -29,7 +29,7 @@ export default function DashboardLayout({
   useEffect(() => {
     // Check if running in browser environment
     if (typeof window !== "undefined") {
-      const storedToken = localStorage.getItem("authToken");
+      const storedToken = localStorage.getItem("token");
 
       if (!storedToken) {
         router.push("/auth/login");

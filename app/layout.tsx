@@ -13,9 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Yuva Spark Admin Dashboard",
-  description:
-    "Yuva Spark Admin Dashboard for managing student responses and evaluations",
+  title: "Yuva Spark Admin",
+  description: "Yuva Spark Admin Dashboard for managing student responses",
   icons: {
     icon: "/logo-yuvaspark.png",
     apple: "/logo-yuvaspark.png",

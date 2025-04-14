@@ -128,7 +128,9 @@ export default function GlobalAssessmentDetailPage() {
 
   const [assessment, setAssessment] = useState<GlobalAssessment | null>(null);
   const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
-  const [selectedAnganwadiId, setSelectedAnganwadiId] = useState<string | null>(null);
+  const [selectedAnganwadiId, setSelectedAnganwadiId] = useState<string | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
@@ -155,7 +157,7 @@ export default function GlobalAssessmentDetailPage() {
   // Fetch student submissions for selected anganwadi
   const fetchSubmissions = async (anganwadiId: string) => {
     if (!anganwadiId) return;
-    
+
     setSubmissionsLoading(true);
     try {
       const data = await getAnganwadiSubmissions(id, anganwadiId);
@@ -180,7 +182,7 @@ export default function GlobalAssessmentDetailPage() {
 
   const handlePublish = async () => {
     if (!assessment) return;
-    
+
     try {
       await publishGlobalAssessment(id);
       toast.success("Assessment published successfully");
@@ -193,7 +195,7 @@ export default function GlobalAssessmentDetailPage() {
 
   const handleComplete = async () => {
     if (!assessment) return;
-    
+
     try {
       await completeGlobalAssessment(id);
       toast.success("Assessment marked as completed");
@@ -231,9 +233,17 @@ export default function GlobalAssessmentDetailPage() {
   const getSubmissionStatusBadge = (status: string) => {
     switch (status) {
       case "NOT_STARTED":
-        return <Badge variant="outline" className="bg-gray-100">Not Started</Badge>;
+        return (
+          <Badge variant="outline" className="bg-gray-100">
+            Not Started
+          </Badge>
+        );
       case "IN_PROGRESS":
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800">In Progress</Badge>;
+        return (
+          <Badge variant="outline" className="bg-blue-100 text-blue-800">
+            In Progress
+          </Badge>
+        );
       case "COMPLETED":
         return <Badge className="bg-green-100 text-green-800">Completed</Badge>;
       default:
@@ -242,9 +252,10 @@ export default function GlobalAssessmentDetailPage() {
   };
 
   // Filter anganwadis by search term
-  const filteredAnganwadis = assessment?.anganwadiAssessments.filter((a) =>
-    a.anganwadi.name.toLowerCase().includes(anganwadiSearch.toLowerCase())
-  ) || [];
+  const filteredAnganwadis =
+    assessment?.anganwadiAssessments.filter((a) =>
+      a.anganwadi.name.toLowerCase().includes(anganwadiSearch.toLowerCase())
+    ) || [];
 
   // Filter submissions by student search term
   const filteredSubmissions = submissions.filter((s) =>
@@ -278,7 +289,8 @@ export default function GlobalAssessmentDetailPage() {
             <AlertCircle className="h-10 w-10 text-amber-500 mb-4" />
             <h3 className="text-lg font-medium">Assessment not found</h3>
             <p className="text-muted-foreground mt-2 text-center max-w-md">
-              The assessment you're looking for could not be found or may have been deleted.
+              The assessment you're looking for could not be found or may have
+              been deleted.
             </p>
             <Button
               className="mt-4"
@@ -331,14 +343,17 @@ export default function GlobalAssessmentDetailPage() {
       <div className="bg-blue-50 p-4 rounded-md border border-blue-100 mb-6">
         <div className="flex items-start">
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-blue-800">Mobile App Integration</h3>
+            <h3 className="text-sm font-medium text-blue-800">
+              Mobile App Integration
+            </h3>
             <p className="text-sm text-blue-700 mt-1">
-              Teachers can submit student responses to this assessment through the mobile app. Student records will
-              appear in the system after submission.
+              Teachers can submit student responses to this assessment through
+              the mobile app. Student records will appear in the system after
+              submission.
             </p>
           </div>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="text-blue-600 border-blue-200 hover:bg-blue-100"
             onClick={() => router.push("/admin/global-assessments/api-docs")}
           >
@@ -355,19 +370,21 @@ export default function GlobalAssessmentDetailPage() {
             <div>
               <p className="text-sm font-medium">Assessment Period</p>
               <p className="text-lg">
-                {formatDate(assessment.startDate)} - {formatDate(assessment.endDate)}
+                {formatDate(assessment.startDate)} -{" "}
+                {formatDate(assessment.endDate)}
               </p>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6 flex items-center gap-4">
             <School className="h-10 w-10 text-primary/70" />
             <div>
               <p className="text-sm font-medium">Anganwadis</p>
               <p className="text-lg">
-                {assessment.stats.completedAnganwadis} / {assessment.stats.totalAnganwadis} completed
+                {assessment.stats.completedAnganwadis} /{" "}
+                {assessment.stats.totalAnganwadis} completed
                 <span className="text-sm text-muted-foreground ml-2">
                   ({assessment.stats.anganwadiCompletionPercentage}%)
                 </span>
@@ -375,14 +392,15 @@ export default function GlobalAssessmentDetailPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6 flex items-center gap-4">
             <Users className="h-10 w-10 text-primary/70" />
             <div>
               <p className="text-sm font-medium">Students</p>
               <p className="text-lg">
-                {assessment.stats.completedStudents} / {assessment.stats.totalStudents} evaluated
+                {assessment.stats.completedStudents} /{" "}
+                {assessment.stats.totalStudents} evaluated
                 <span className="text-sm text-muted-foreground ml-2">
                   ({assessment.stats.studentCompletionPercentage}%)
                 </span>
@@ -414,16 +432,20 @@ export default function GlobalAssessmentDetailPage() {
                         {assessment.stats.anganwadiCompletionPercentage}%
                       </span>
                     </div>
-                    <Progress value={assessment.stats.anganwadiCompletionPercentage} />
+                    <Progress
+                      value={assessment.stats.anganwadiCompletionPercentage}
+                    />
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span>Student Evaluations</span>
+                      <span>Student Completion</span>
                       <span className="font-medium">
                         {assessment.stats.studentCompletionPercentage}%
                       </span>
                     </div>
-                    <Progress value={assessment.stats.studentCompletionPercentage} />
+                    <Progress
+                      value={assessment.stats.studentCompletionPercentage}
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -465,7 +487,9 @@ export default function GlobalAssessmentDetailPage() {
                       <School className="h-5 w-5 text-muted-foreground mr-2" />
                       <span>Total Topics</span>
                     </div>
-                    <span className="font-medium">{assessment.topics.length}</span>
+                    <span className="font-medium">
+                      {assessment.topics.length}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -475,10 +499,13 @@ export default function GlobalAssessmentDetailPage() {
 
         <TabsContent value="anganwadis">
           <div className="mb-4 p-4 bg-blue-50 rounded-md border border-blue-100">
-            <h3 className="text-sm font-medium text-blue-800 mb-1">Important Information</h3>
+            <h3 className="text-sm font-medium text-blue-800 mb-1">
+              Important Information
+            </h3>
             <p className="text-sm text-blue-700">
-              Student-level tracking only appears after teachers submit responses through the mobile app. 
-              Until then, you'll only see anganwadi-level tracking showing the expected number of students.
+              Student-level tracking only appears after teachers submit
+              responses through the mobile app. Until then, you'll only see
+              anganwadi-level tracking showing the expected number of students.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
@@ -529,13 +556,16 @@ export default function GlobalAssessmentDetailPage() {
                               <Clock className="h-4 w-4 text-amber-500" />
                             )}
                             <span className="text-sm">
-                              {item.completedStudentCount} / {item.totalStudentCount}
+                              {item.completedStudentCount} /{" "}
+                              {item.totalStudentCount}
                             </span>
                           </div>
                           <Progress
                             value={
                               item.totalStudentCount
-                                ? (item.completedStudentCount / item.totalStudentCount) * 100
+                                ? (item.completedStudentCount /
+                                    item.totalStudentCount) *
+                                  100
                                 : 0
                             }
                             className="w-20 h-1 mt-1"
@@ -591,19 +621,25 @@ export default function GlobalAssessmentDetailPage() {
                 {!selectedAnganwadiId ? (
                   <div className="text-center py-10 text-muted-foreground">
                     <School className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                    <p>Select an anganwadi from the list to view student submissions</p>
+                    <p>
+                      Select an anganwadi from the list to view student
+                      submissions
+                    </p>
                   </div>
                 ) : submissionsLoading ? (
                   <div className="text-center py-10">
                     <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
-                    <p className="text-muted-foreground">Loading submissions...</p>
+                    <p className="text-muted-foreground">
+                      Loading submissions...
+                    </p>
                   </div>
                 ) : filteredSubmissions.length === 0 ? (
                   <div className="text-center py-10 text-muted-foreground">
                     <User className="h-10 w-10 mx-auto mb-2 opacity-20" />
                     <p>No student submissions found</p>
                     <p className="text-sm mt-2">
-                      Student records will appear here only after teachers submit responses through the mobile app.
+                      Student records will appear here only after teachers
+                      submit responses through the mobile app.
                     </p>
                   </div>
                 ) : (
@@ -627,7 +663,9 @@ export default function GlobalAssessmentDetailPage() {
                             </TableCell>
                             <TableCell>{submission.teacher.name}</TableCell>
                             <TableCell>
-                              {getSubmissionStatusBadge(submission.submissionStatus)}
+                              {getSubmissionStatusBadge(
+                                submission.submissionStatus
+                              )}
                             </TableCell>
                             <TableCell>
                               {submission.submittedAt
@@ -635,9 +673,11 @@ export default function GlobalAssessmentDetailPage() {
                                 : "-"}
                             </TableCell>
                             <TableCell>
-                              {submission.responses.length} / {assessment.topics.flatMap(
-                                t => t.questions
-                              ).length}
+                              {submission.responses.length} /{" "}
+                              {
+                                assessment.topics.flatMap((t) => t.questions)
+                                  .length
+                              }
                             </TableCell>
                             <TableCell className="text-right">
                               <Button
@@ -706,4 +746,4 @@ export default function GlobalAssessmentDetailPage() {
       </Tabs>
     </div>
   );
-} 
+}

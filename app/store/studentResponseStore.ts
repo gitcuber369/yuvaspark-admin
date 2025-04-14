@@ -6,7 +6,6 @@ interface StudentResponse {
   questionId: string;
   response: string;
   isCorrect: boolean;
-  evaluationId: string;
   createdAt: string;
   student: {
     id: string;
@@ -15,10 +14,6 @@ interface StudentResponse {
   question: {
     id: string;
     text: string;
-  };
-  evaluation?: {
-    id: string;
-    title: string;
   };
   StudentResponseScore?: {
     id: string;
@@ -31,7 +26,6 @@ interface StudentResponse {
 
 interface StudentResponseFilters {
   studentId?: string;
-  evaluationId?: string;
   questionId?: string;
   startDate?: string;
   endDate?: string;
@@ -43,7 +37,6 @@ interface StudentResponseStore {
   error: string | null;
   fetchResponses: (filters?: StudentResponseFilters) => Promise<void>;
   fetchByStudent: (studentId: string) => Promise<void>;
-  fetchByEvaluation: (evaluationId: string) => Promise<void>;
   fetchScoredResponses: (filters?: StudentResponseFilters) => Promise<void>;
   fetchResponseById: (id: string) => Promise<StudentResponse>;
   deleteResponse: (id: string) => Promise<void>;
@@ -64,8 +57,6 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
       // If filters are provided, use the appropriate endpoint
       if (filters.studentId) {
         url = `http://localhost:3000/api/student-responses/student/${filters.studentId}`;
-      } else if (filters.evaluationId) {
-        url = `http://localhost:3000/api/student-responses/evaluation/${filters.evaluationId}`;
       }
       
       // Add date filters as query parameters if they exist
@@ -114,35 +105,12 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
     }
   },
   
-  fetchByEvaluation: async (evaluationId: string) => {
-    set({ loading: true, error: null });
-    try {
-      const url = `http://localhost:3000/api/student-responses/evaluation/${evaluationId}`;
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch student responses');
-      }
-      
-      const data = await response.json();
-      set({ responses: data });
-    } catch (error: any) {
-      console.error('Error fetching student responses:', error);
-      set({ error: error.message || 'An unknown error occurred' });
-    } finally {
-      set({ loading: false });
-    }
-  },
-  
   fetchScoredResponses: async (filters = {}) => {
     set({ loading: true, error: null });
     try {
       const queryParams = new URLSearchParams();
       
       // Apply filters if provided
-      if (filters.evaluationId) {
-        queryParams.append('evaluationId', filters.evaluationId);
-      }
       if (filters.startDate) {
         queryParams.append('startDate', filters.startDate);
       }
@@ -222,7 +190,6 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
       // Note: Assuming an export endpoint exists, otherwise we need to implement client-side export
       const queryParams = new URLSearchParams();
       if (filters.studentId) queryParams.append('studentId', filters.studentId);
-      if (filters.evaluationId) queryParams.append('evaluationId', filters.evaluationId);
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       

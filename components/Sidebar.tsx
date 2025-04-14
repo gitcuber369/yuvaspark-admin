@@ -48,7 +48,6 @@ const adminNav = [
   { title: "Cohorts", icon: Cohorts, url: "/admin/cohorts" },
   { title: "Topics", icon: PanelTopInactive, url: "/admin/topic" },
   { title: "Questions", icon: MessagesSquare, url: "/admin/questions" },
-  { title: "Evaluation", icon: ClipboardCheck, url: "/admin/evaluations" },
   {
     title: "Global Assessments",
     icon: ClipboardList,

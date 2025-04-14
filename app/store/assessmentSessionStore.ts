@@ -52,7 +52,6 @@ export const useAssessmentSessionStore = create<AssessmentSessionStore>((set, ge
       const queryParams = new URLSearchParams();
       if (filters.studentId) queryParams.append('studentId', filters.studentId);
       if (filters.teacherId) queryParams.append('teacherId', filters.teacherId);
-      if (filters.evaluationId) queryParams.append('evaluationId', filters.evaluationId);
       if (filters.status) queryParams.append('status', filters.status);
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
@@ -100,7 +99,6 @@ export const useAssessmentSessionStore = create<AssessmentSessionStore>((set, ge
       const queryParams = new URLSearchParams();
       if (filters.studentId) queryParams.append('studentId', filters.studentId);
       if (filters.teacherId) queryParams.append('teacherId', filters.teacherId);
-      if (filters.evaluationId) queryParams.append('evaluationId', filters.evaluationId);
       if (filters.status) queryParams.append('status', filters.status);
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);

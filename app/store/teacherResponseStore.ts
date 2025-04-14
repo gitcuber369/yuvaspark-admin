@@ -32,7 +32,6 @@ export interface StudentResponse {
 
 interface TeacherResponseFilters {
   studentId?: string;
-  evaluationId?: string;
   startDate?: string;
   endDate?: string;
 }
@@ -43,7 +42,6 @@ interface TeacherResponseStore {
   error: string | null;
   fetchTeacherResponses: (teacherId: string, filters?: TeacherResponseFilters) => Promise<void>;
   fetchByStudent: (teacherId: string, studentId: string) => Promise<void>;
-  fetchByEvaluation: (teacherId: string, evaluationId: string) => Promise<void>;
   exportResponses: (teacherId: string, filters?: TeacherResponseFilters) => Promise<string>;
 }
 
@@ -58,7 +56,6 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
       // Build query params
       const queryParams = new URLSearchParams();
       if (filters.studentId) queryParams.append('studentId', filters.studentId);
-      if (filters.evaluationId) queryParams.append('evaluationId', filters.evaluationId);
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       
@@ -97,32 +94,12 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
     }
   },
   
-  fetchByEvaluation: async (teacherId: string, evaluationId: string) => {
-    set({ loading: true, error: null });
-    try {
-      const url = `http://localhost:3000/api/teachers/${teacherId}/student-responses?evaluationId=${evaluationId}`;
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch evaluation responses');
-      }
-      
-      const data = await response.json();
-      set({ responses: data, loading: false });
-    } catch (error: any) {
-      console.error('Error fetching evaluation responses:', error);
-      set({ error: error.message || 'An unknown error occurred', loading: false });
-      toast.error('Failed to load evaluation responses');
-    }
-  },
-  
   exportResponses: async (teacherId: string, filters = {}) => {
     set({ loading: true, error: null });
     try {
       // Build query params for export
       const queryParams = new URLSearchParams();
       if (filters.studentId) queryParams.append('studentId', filters.studentId);
-      if (filters.evaluationId) queryParams.append('evaluationId', filters.evaluationId);
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       
