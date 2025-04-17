@@ -15,6 +15,8 @@ interface Question {
   imageUrl: string;
   audioUrl: string;
   topicId: string;
+  answerOptions?: string[];
+  correctAnswer?: number | null;
   topic?: {
     id: string;
     name: string;
@@ -131,15 +133,43 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
               <p className="text-lg">{question.text}</p>
             </div>
 
+            {/* Answer Options Section */}
+            {question.answerOptions && question.answerOptions.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">Answer Options</h3>
+                <div className="space-y-2 mt-2">
+                  {question.answerOptions.map((option, index) => (
+                    <div 
+                      key={index}
+                      className={`p-3 rounded-md ${
+                        question.correctAnswer === index 
+                          ? 'bg-green-100 border border-green-300' 
+                          : 'bg-gray-50 border border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {question.correctAnswer === index && (
+                          <Badge className="bg-green-500">Correct Answer</Badge>
+                        )}
+                        <p className={question.correctAnswer === index ? 'font-medium' : ''}>
+                          {option}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Image</h3>
                 {question.imageUrl ? (
-                  <div className="rounded-md overflow-hidden border h-[200px]">
+                  <div className="rounded-md overflow-hidden border">
                     <img
                       src={question.imageUrl}
                       alt="Question visual"
-                      className="w-full h-full object-cover"
+                      className="w-full h-auto object-contain max-h-[200px]"
                     />
                   </div>
                 ) : (

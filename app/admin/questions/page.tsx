@@ -47,6 +47,8 @@ interface Question {
   imageUrl: string;
   audioUrl: string;
   topicId: string;
+  answerOptions?: string[];
+  correctAnswer?: number | null;
   topic?: {
     id: string;
     name: string;
@@ -69,20 +71,29 @@ interface BatchQuestionInput {
   topicId: string;
   image: File | null;
   audio: File | null;
+  answerOptions: string[];
+  correctAnswer: number | null;
 }
 
 export default function QuestionAdminPage() {
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [selectedTopicId, setSelectedTopicId] = useState<string>("");
+  const [selectedTopicId, setSelectedTopicId] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
 
   // For single question creation
   const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [audio, setAudio] = useState<File | null>(null);
+  const [answerOptions, setAnswerOptions] = useState<string[]>([
+    "",
+    "",
+    "",
+    "",
+  ]); // 4 empty options
+  const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
 
   // For question details
@@ -94,7 +105,14 @@ export default function QuestionAdminPage() {
   // For batch creation
   const [batchOpen, setBatchOpen] = useState(false);
   const [batchQuestions, setBatchQuestions] = useState<BatchQuestionInput[]>([
-    { text: "", topicId: "", image: null, audio: null },
+    {
+      text: "",
+      topicId: "",
+      image: null,
+      audio: null,
+      answerOptions: ["", "", "", ""],
+      correctAnswer: null,
+    },
   ]);
 
   const router = useRouter();
@@ -157,12 +175,33 @@ export default function QuestionAdminPage() {
     formData.append("image", image);
     formData.append("audio", audio);
 
+    // Filter out empty answer options and add to formData
+    const filteredOptions = answerOptions.filter(
+      (option) => option.trim() !== ""
+    );
+
+    // Add each answer option as a separate form field
+    filteredOptions.forEach((option, index) => {
+      formData.append(`answerOptions[${index}]`, option);
+    });
+
+    // Add correctAnswer if selected and valid
+    if (
+      correctAnswer !== null &&
+      correctAnswer >= 0 &&
+      correctAnswer < filteredOptions.length
+    ) {
+      formData.append("correctAnswer", correctAnswer.toString());
+    }
+
     try {
       await createQuestion(formData);
       toast.success("Question created successfully!");
       setText("");
       setImage(null);
       setAudio(null);
+      setAnswerOptions(["", "", "", ""]);
+      setCorrectAnswer(null);
       setOpen(false);
 
       // Refresh questions
@@ -213,11 +252,39 @@ export default function QuestionAdminPage() {
           formData.append("audio", question.audio);
         }
 
+        // Filter out empty answer options
+        const filteredOptions = question.answerOptions.filter(
+          (option) => option.trim() !== ""
+        );
+
+        // Add each answer option as a separate form field
+        filteredOptions.forEach((option, index) => {
+          formData.append(`answerOptions[${index}]`, option);
+        });
+
+        // Add correctAnswer if selected and valid
+        if (
+          question.correctAnswer !== null &&
+          question.correctAnswer >= 0 &&
+          question.correctAnswer < filteredOptions.length
+        ) {
+          formData.append("correctAnswer", question.correctAnswer.toString());
+        }
+
         await createQuestion(formData);
       }
 
       toast.success("Questions created successfully!");
-      setBatchQuestions([{ text: "", topicId: "", image: null, audio: null }]);
+      setBatchQuestions([
+        {
+          text: "",
+          topicId: "",
+          image: null,
+          audio: null,
+          answerOptions: ["", "", "", ""],
+          correctAnswer: null,
+        },
+      ]);
       setBatchOpen(false);
 
       // Refresh questions
@@ -251,7 +318,14 @@ export default function QuestionAdminPage() {
   const addBatchQuestion = () => {
     setBatchQuestions([
       ...batchQuestions,
-      { text: "", topicId: "", image: null, audio: null },
+      {
+        text: "",
+        topicId: "",
+        image: null,
+        audio: null,
+        answerOptions: ["", "", "", ""],
+        correctAnswer: null,
+      },
     ]);
   };
 
@@ -315,6 +389,38 @@ export default function QuestionAdminPage() {
                     onChange={(e) => setText(e.target.value)}
                     placeholder="What's the question?"
                   />
+                </div>
+
+                <div className="space-y-4">
+                  <Label>Answer Options (up to 4)</Label>
+                  {answerOptions.map((option, index) => (
+                    <div key={index} className="flex gap-2 items-center">
+                      <Input
+                        value={option}
+                        onChange={(e) => {
+                          const newOptions = [...answerOptions];
+                          newOptions[index] = e.target.value;
+                          setAnswerOptions(newOptions);
+                        }}
+                        placeholder={`Answer option ${index + 1}`}
+                      />
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          id={`correctAnswer-${index}`}
+                          name="correctAnswer"
+                          checked={correctAnswer === index}
+                          onChange={() => setCorrectAnswer(index)}
+                        />
+                        <Label
+                          htmlFor={`correctAnswer-${index}`}
+                          className="text-sm cursor-pointer"
+                        >
+                          Correct
+                        </Label>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="space-y-2">
@@ -403,6 +509,51 @@ export default function QuestionAdminPage() {
                         }
                         placeholder="What's the question?"
                       />
+                    </div>
+
+                    <div className="space-y-4">
+                      <Label>Answer Options (up to 4)</Label>
+                      {question.answerOptions.map((option, optionIndex) => (
+                        <div
+                          key={optionIndex}
+                          className="flex gap-2 items-center"
+                        >
+                          <Input
+                            value={option}
+                            onChange={(e) => {
+                              const newOptions = [...question.answerOptions];
+                              newOptions[optionIndex] = e.target.value;
+                              updateBatchQuestion(
+                                index,
+                                "answerOptions",
+                                newOptions
+                              );
+                            }}
+                            placeholder={`Answer option ${optionIndex + 1}`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              id={`question-${index}-correctAnswer-${optionIndex}`}
+                              name={`question-${index}-correctAnswer`}
+                              checked={question.correctAnswer === optionIndex}
+                              onChange={() =>
+                                updateBatchQuestion(
+                                  index,
+                                  "correctAnswer",
+                                  optionIndex
+                                )
+                              }
+                            />
+                            <Label
+                              htmlFor={`question-${index}-correctAnswer-${optionIndex}`}
+                              className="text-sm cursor-pointer"
+                            >
+                              Correct
+                            </Label>
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
                     <div className="space-y-2">
@@ -631,6 +782,48 @@ export default function QuestionAdminPage() {
                 </h3>
                 <p className="text-lg">{selectedQuestion.text}</p>
               </div>
+
+              {/* Answer Options Section */}
+              {selectedQuestion.answerOptions &&
+                selectedQuestion.answerOptions.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                      Answer Options
+                    </h3>
+                    <div className="space-y-2 mt-2">
+                      {selectedQuestion.answerOptions.map((option, index) => (
+                        <div
+                          key={index}
+                          className={`p-2 rounded-md ${
+                            selectedQuestion.correctAnswer === index
+                              ? "bg-green-100 border border-green-300"
+                              : "bg-gray-50 border border-gray-200"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {selectedQuestion.correctAnswer === index && (
+                              <Badge
+                                variant="outline"
+                                className="bg-green-500 text-white"
+                              >
+                                Correct Answer
+                              </Badge>
+                            )}
+                            <p
+                              className={
+                                selectedQuestion.correctAnswer === index
+                                  ? "font-medium"
+                                  : ""
+                              }
+                            >
+                              {option}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
