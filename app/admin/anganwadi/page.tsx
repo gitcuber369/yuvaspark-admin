@@ -14,6 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AnganwadiForm } from "@/components/AnganwadiForm";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface Anganwadi {
   id: string;
@@ -51,15 +58,19 @@ export default function AnganwadiPage() {
       <Card className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl">Anganwadi Centers</CardTitle>
-          <Button onClick={() => setShowForm(!showForm)}>
-            {showForm ? "Close Form" : "Add New"}
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>{showForm ? "Close Form" : "Add New"}</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Add New Anganwadi</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to add a new Anganwadi center.
+              </DialogDescription>
+              <AnganwadiForm onSuccess={fetchAnganwadis} />
+            </DialogContent>
+          </Dialog>
         </CardHeader>
-        {showForm && (
-          <CardContent>
-            <AnganwadiForm onSuccess={fetchAnganwadis} />
-          </CardContent>
-        )}
       </Card>
 
       <Card>
