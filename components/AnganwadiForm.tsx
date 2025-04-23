@@ -165,8 +165,8 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
   };
 
   return (
-    <Card className="max-w-lg mx-auto mt-8 border rounded-lg shadow-sm">
-      <CardHeader className="border-b px-6 py-4">
+    <Card className="w-full mx-auto max-h-[100vh] border rounded-lg shadow-sm">
+      <CardHeader className="border-b px-4">
         <div className="flex justify-between items-center">
           <CardTitle className="text-xl font-semibold text-gray-800">
             {step === 1
@@ -183,9 +183,9 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
             : "Add existing or new students."}
         </p>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="">
         {step === 1 && (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {/* Anganwadi Details */}
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1.5">
@@ -266,12 +266,16 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
               <Input
                 placeholder="Phone Number"
                 value={form.teacher.phone}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    teacher: { ...form.teacher, phone: e.target.value },
-                  })
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setForm({
+                      ...form,
+                      teacher: { ...form.teacher, phone: value },
+                    });
+                  }
+                }}
+                inputMode="numeric"
                 className="w-full"
                 aria-invalid={!!errors.teacherPhone}
               />
@@ -296,7 +300,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
         )}
 
         {step === 2 && (
-          <div className="space-y-6">
+          <div className="">
             {/* Connect Existing Students */}
             <div>
               <h3 className="text-lg font-medium mb-3">
@@ -309,7 +313,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
             </div>
 
             {/* Create New Students */}
-            <div className="pt-5 border-t">
+            <div className="pt-2 border-t">
               <h3 className="text-lg font-medium mb-4">Create New Students</h3>
               <ScrollArea className="h-72 w-full rounded-md border p-4 mb-4">
                 <div className="space-y-4">
