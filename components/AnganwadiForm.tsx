@@ -110,7 +110,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
     const res = await fetch(
       `http://localhost:3000/api/anganwadis/${anganwadiId}`,
       {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           studentIds,
