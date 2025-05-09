@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   LogOut,
   Settings,
@@ -71,6 +71,48 @@ export function AdminSidebar({
   const router = useRouter();
   const pathname = usePathname();
   const { userName, logout } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Don't render user-specific content until client-side
+  const renderProfile = () => {
+    if (!mounted) {
+      return (
+        <div className="px-3 py-2 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+            <Avatar>
+              <AvatarFallback>...</AvatarFallback>
+            </Avatar>
+          </div>
+          <div>
+            <p className="text-sm font-medium truncate">Loading...</p>
+            <p className="text-xs text-gray-500">Loading...</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="px-3 py-2 flex items-center gap-3">
+        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+          <Avatar>
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        </div>
+        <div>
+          <p className="text-sm font-medium truncate">{userName || "Guest"}</p>
+          <p className="text-xs text-gray-500">
+            {localStorage.getItem("userRole") || "Role"}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -78,17 +120,14 @@ export function AdminSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/admin/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+                <div className="flex items-center justify-center rounded-lg text-sidebar-primary-foreground w-full">
                   <Image
-                    src="/logo-yuvaspark.png"
+                    src="/logo.png"
                     alt="Yuva Spark Logo"
-                    width={30}
-                    height={30}
-                    className="object-contain"
+                    width={200}
+                    height={200}
+                    objectFit="cover"
                   />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Yuvspark-Kanasu-Admin</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -118,29 +157,7 @@ export function AdminSidebar({
 
       <div className="mt-auto p-4 border-t">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <div className="px-3 py-2 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                <Avatar>
-                  <AvatarImage
-                    src="https://github.com/shadcn.png"
-                    alt="@shadcn"
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </div>
-              {typeof window !== "undefined" && (
-                <div>
-                  <p className="text-sm font-medium truncate">
-                    {userName || "Guest"}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {localStorage.getItem("userRole") || "Role"}
-                  </p>
-                </div>
-              )}
-            </div>
-          </SidebarMenuItem>
+          <SidebarMenuItem>{renderProfile()}</SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <button
