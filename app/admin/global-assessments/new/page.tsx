@@ -27,6 +27,7 @@ import {
   createGlobalAssessment,
   getAllTopics,
   getAllAnganwadis,
+  getAllCohorts,
 } from "@/app/api/api";
 import { toast } from "sonner";
 import { Save, Loader2, ArrowLeft, ChevronRight } from "lucide-react";
@@ -51,12 +52,24 @@ interface Anganwadi {
   }>;
 }
 
+interface Cohort {
+  id: string;
+  name: string;
+  region?: string;
+  teachers: Array<{
+    id: string;
+    name: string;
+    anganwadiId?: string;
+  }>;
+}
+
 export default function NewGlobalAssessmentPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
   const [loading, setLoading] = useState(false);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [anganwadis, setAnganwadis] = useState<Anganwadi[]>([]);
+  const [cohorts, setCohorts] = useState<Cohort[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -67,6 +80,7 @@ export default function NewGlobalAssessmentPage() {
     isActive: true,
     topicIds: [] as string[],
     anganwadiIds: [] as string[],
+    cohortIds: [] as string[],
   });
 
   // Topic selection state
@@ -79,8 +93,14 @@ export default function NewGlobalAssessmentPage() {
     Record<string, boolean>
   >({});
 
+  // Cohort selection state
+  const [selectedCohorts, setSelectedCohorts] = useState<
+    Record<string, boolean>
+  >({});
+
   // For search/filter
   const [topicSearch, setTopicSearch] = useState("");
+  const [cohortSearch, setCohortSearch] = useState("");
   const [anganwadiSearch, setAnganwadiSearch] = useState("");
 
   // Form validation
@@ -90,13 +110,15 @@ export default function NewGlobalAssessmentPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [topicsData, anganwadisData] = await Promise.all([
+        const [topicsData, anganwadisData, cohortsData] = await Promise.all([
           getAllTopics(),
           getAllAnganwadis(),
+          getAllCohorts(),
         ]);
 
         setTopics(topicsData);
         setAnganwadis(anganwadisData);
+        setCohorts(cohortsData);
 
         // Initialize selection states
         const topicSelections: Record<string, boolean> = {};
@@ -110,6 +132,12 @@ export default function NewGlobalAssessmentPage() {
           anganwadiSelections[anganwadi.id] = false;
         });
         setSelectedAnganwadis(anganwadiSelections);
+
+        const cohortSelections: Record<string, boolean> = {};
+        cohortsData.forEach((cohort: Cohort) => {
+          cohortSelections[cohort.id] = false;
+        });
+        setSelectedCohorts(cohortSelections);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to load required data");
@@ -124,6 +152,14 @@ export default function NewGlobalAssessmentPage() {
     setSelectedTopics((prev) => ({
       ...prev,
       [topicId]: !prev[topicId],
+    }));
+  };
+
+  // Handle cohort selection
+  const handleCohortToggle = (cohortId: string) => {
+    setSelectedCohorts((prev) => ({
+      ...prev,
+      [cohortId]: !prev[cohortId],
     }));
   };
 
@@ -142,6 +178,15 @@ export default function NewGlobalAssessmentPage() {
       newSelection[id] = select;
     });
     setSelectedTopics(newSelection);
+  };
+
+  // Select/deselect all cohorts
+  const handleSelectAllCohorts = (select: boolean) => {
+    const newSelection = { ...selectedCohorts };
+    Object.keys(newSelection).forEach((id) => {
+      newSelection[id] = select;
+    });
+    setSelectedCohorts(newSelection);
   };
 
   // Select/deselect all anganwadis
@@ -175,8 +220,13 @@ export default function NewGlobalAssessmentPage() {
     const selectedAnganwadiIds = Object.keys(selectedAnganwadis).filter(
       (id) => selectedAnganwadis[id]
     );
-    if (selectedAnganwadiIds.length === 0) {
-      newErrors.anganwadis = "At least one anganwadi must be selected";
+
+    const selectedCohortIds = Object.keys(selectedCohorts).filter(
+      (id) => selectedCohorts[id]
+    );
+
+    if (selectedAnganwadiIds.length === 0 && selectedCohortIds.length === 0) {
+      newErrors.selection = "You must select at least one anganwadi or cohort";
     }
 
     setErrors(newErrors);
@@ -205,11 +255,17 @@ export default function NewGlobalAssessmentPage() {
         (id) => selectedAnganwadis[id]
       );
 
+      // Get selected cohort IDs
+      const cohortIds = Object.keys(selectedCohorts).filter(
+        (id) => selectedCohorts[id]
+      );
+
       // Prepare form data
       const assessmentData = {
         ...formData,
         topicIds,
         anganwadiIds,
+        cohortIds,
       };
 
       // Submit to API
@@ -230,6 +286,11 @@ export default function NewGlobalAssessmentPage() {
     topic.name.toLowerCase().includes(topicSearch.toLowerCase())
   );
 
+  // Helper to filter cohorts by search term
+  const filteredCohorts = cohorts.filter((cohort) =>
+    cohort.name.toLowerCase().includes(cohortSearch.toLowerCase())
+  );
+
   // Helper to filter anganwadis by search term
   const filteredAnganwadis = anganwadis.filter((anganwadi) =>
     anganwadi.name.toLowerCase().includes(anganwadiSearch.toLowerCase())
@@ -238,6 +299,8 @@ export default function NewGlobalAssessmentPage() {
   // Count selected items
   const selectedTopicCount =
     Object.values(selectedTopics).filter(Boolean).length;
+  const selectedCohortCount =
+    Object.values(selectedCohorts).filter(Boolean).length;
   const selectedAnganwadiCount =
     Object.values(selectedAnganwadis).filter(Boolean).length;
 
@@ -261,6 +324,8 @@ export default function NewGlobalAssessmentPage() {
         setErrors({ ...errors, topics: "At least one topic must be selected" });
         return;
       }
+      setActiveTab("cohorts");
+    } else if (activeTab === "cohorts") {
       setActiveTab("anganwadis");
     }
   };
@@ -268,8 +333,10 @@ export default function NewGlobalAssessmentPage() {
   const goToPreviousTab = () => {
     if (activeTab === "topics") {
       setActiveTab("basic");
-    } else if (activeTab === "anganwadis") {
+    } else if (activeTab === "cohorts") {
       setActiveTab("topics");
+    } else if (activeTab === "anganwadis") {
+      setActiveTab("cohorts");
     }
   };
 
@@ -290,9 +357,10 @@ export default function NewGlobalAssessmentPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="basic">Basic Information</TabsTrigger>
           <TabsTrigger value="topics">Select Topics</TabsTrigger>
+          <TabsTrigger value="cohorts">Select Cohorts</TabsTrigger>
           <TabsTrigger value="anganwadis">Select Anganwadis</TabsTrigger>
         </TabsList>
 
@@ -343,7 +411,7 @@ export default function NewGlobalAssessmentPage() {
                   </Label>
                   <DatePicker
                     date={formData.startDate}
-                    onSelect={(date) =>
+                    setDate={(date) =>
                       date && setFormData({ ...formData, startDate: date })
                     }
                   />
@@ -355,7 +423,7 @@ export default function NewGlobalAssessmentPage() {
                   </Label>
                   <DatePicker
                     date={formData.endDate}
-                    onSelect={(date) =>
+                    setDate={(date) =>
                       date && setFormData({ ...formData, endDate: date })
                     }
                   />
@@ -471,7 +539,93 @@ export default function NewGlobalAssessmentPage() {
                 Back
               </Button>
               <Button onClick={goToNextTab}>
-                Next: Select Anganwadis
+                Next: Select Cohorts
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="cohorts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Select Cohorts</CardTitle>
+              <CardDescription>
+                Choose cohorts to include all their anganwadis in this
+                assessment
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Search cohorts..."
+                    value={cohortSearch}
+                    onChange={(e) => setCohortSearch(e.target.value)}
+                    className="mb-2"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSelectAllCohorts(true)}
+                  >
+                    Select All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSelectAllCohorts(false)}
+                  >
+                    Deselect All
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border rounded-md h-[300px] overflow-y-auto p-2">
+                {filteredCohorts.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4">
+                    No cohorts found matching your search
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {filteredCohorts.map((cohort) => (
+                      <div
+                        key={cohort.id}
+                        className="flex items-center space-x-2 p-2 hover:bg-muted/50 rounded"
+                      >
+                        <Checkbox
+                          id={`cohort-${cohort.id}`}
+                          checked={selectedCohorts[cohort.id] || false}
+                          onCheckedChange={() => handleCohortToggle(cohort.id)}
+                        />
+                        <Label
+                          htmlFor={`cohort-${cohort.id}`}
+                          className="flex-1 cursor-pointer"
+                        >
+                          {cohort.name}
+                        </Label>
+                        <span className="text-sm text-muted-foreground">
+                          {cohort.region || ""} - {cohort.teachers.length}{" "}
+                          teachers
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="text-sm text-muted-foreground">
+                Selected {selectedCohortCount} of {cohorts.length} cohorts
+              </div>
+            </CardContent>
+            <CardFooter className="justify-between">
+              <Button variant="outline" onClick={goToPreviousTab}>
+                Back
+              </Button>
+              <Button onClick={goToNextTab}>
+                Next: Select Individual Anganwadis
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
@@ -481,9 +635,11 @@ export default function NewGlobalAssessmentPage() {
         <TabsContent value="anganwadis">
           <Card>
             <CardHeader>
-              <CardTitle>Select Anganwadis</CardTitle>
+              <CardTitle>Select Individual Anganwadis</CardTitle>
               <CardDescription>
-                Choose which anganwadis will participate in this assessment
+                Choose specific anganwadis to include in this assessment
+                {selectedCohortCount > 0 &&
+                  " (in addition to anganwadis from selected cohorts)"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -553,8 +709,21 @@ export default function NewGlobalAssessmentPage() {
                 anganwadis
               </div>
 
-              {errors.anganwadis && (
-                <p className="text-sm text-red-500">{errors.anganwadis}</p>
+              {errors.selection && (
+                <p className="text-sm text-red-500">{errors.selection}</p>
+              )}
+
+              {selectedCohortCount > 0 && (
+                <div className="p-4 bg-blue-50 rounded-md text-blue-700 mt-4">
+                  <p className="font-medium">
+                    Note: You selected {selectedCohortCount} cohort(s)
+                  </p>
+                  <p className="text-sm">
+                    All anganwadis associated with teachers in those cohorts
+                    will be included automatically, in addition to any
+                    individual anganwadis you select here.
+                  </p>
+                </div>
               )}
             </CardContent>
             <CardFooter className="justify-between">

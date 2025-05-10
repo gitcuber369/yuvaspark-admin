@@ -414,6 +414,7 @@ export const createGlobalAssessment = async (data: {
   isActive: boolean;
   topicIds: string[];
   anganwadiIds: string[];
+  cohortIds?: string[];
 }) => {
   try {
     const res = await API.post("global-assessments", data);
@@ -544,6 +545,17 @@ export const getStudentResponses = async (assessmentId: string) => {
     return res.data;
   } catch (error) {
     console.error("Error fetching student responses:", error);
+    throw error;
+  }
+};
+
+// ✅ Get All Cohorts
+export const getAllCohorts = async () => {
+  try {
+    const res = await API.get("/cohorts");
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching cohorts:", error);
     throw error;
   }
 };
