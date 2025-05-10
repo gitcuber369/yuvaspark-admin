@@ -1,367 +1,234 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
+  TableHead,
   TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-
-interface Cohort {
-  id: string;
-  name: string;
-  region: string;
-  teachers: {
-    id: string;
-    name: string | null;
-  }[];
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Teacher {
   id: string;
   name: string;
 }
-export default function CohortAdminPage() {
+
+interface Cohort {
+  id: string;
+  name: string;
+  region: string;
+  teachers: Teacher[];
+}
+
+export default function CohortsPage() {
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [name, setName] = useState("");
   const [region, setRegion] = useState("");
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
-  const [teacherSearch, setTeacherSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
-  const fetchData = async () => {
-    setIsLoading(true);
+  const fetchCohorts = async () => {
     try {
-      const [cohortRes, teacherRes] = await Promise.all([
-        fetch("http://localhost:3000/api/cohort").then((res) => res.json()),
-        fetch("http://localhost:3000/api/teachers").then((res) => res.json()),
-      ]);
-      setCohorts(cohortRes);
-      setTeachers(teacherRes);
+      const res = await fetch("http://localhost:3000/api/cohorts");
+      if (!res.ok) throw new Error("Failed to fetch cohorts");
+      const data = await res.json();
+      setCohorts(data);
     } catch (error) {
-      toast.error("Failed to load data");
-    } finally {
-      setIsLoading(false);
+      toast.error("Failed to load cohorts");
+      console.error(error);
+    }
+  };
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/teachers");
+      if (!res.ok) throw new Error("Failed to fetch teachers");
+      const data = await res.json();
+      setTeachers(data);
+    } catch (error) {
+      toast.error("Failed to load teachers");
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchCohorts();
+    fetchTeachers();
   }, []);
 
-  const filteredTeachers = teachers.filter((teacher) =>
-    teacher.name.toLowerCase().includes(teacherSearch.toLowerCase())
-  );
-
-  const handleCheckboxChange = (teacherId: string) => {
-    setSelectedTeachers((prev) => {
-      if (prev.includes(teacherId)) {
-        return prev.filter((id) => id !== teacherId);
-      } else {
-        // Check if adding another teacher would exceed the limit
-        if (prev.length >= 25) {
-          toast.warning("Maximum of 25 teachers allowed per cohort");
-          return prev;
-        }
-        return [...prev, teacherId];
-      }
-    });
-  };
-
-  const handleCreateCohort = async () => {
-    if (!name || !region) {
-      toast.error("Name and Region are required.");
-      return;
-    }
-
-    if (selectedTeachers.length > 25) {
-      toast.error("Maximum of 25 teachers allowed per cohort.");
-      return;
-    }
-
-    setIsLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3000/api/cohort", {
+      const body = {
+        name,
+        region,
+        teacherIds: selectedTeachers,
+      };
+
+      const res = await fetch("http://localhost:3000/api/cohorts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          region,
-          teacherIds: selectedTeachers,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
 
-      const data = await res.json();
-
+      const result = await res.json();
       if (res.ok) {
-        toast.success("Cohort created successfully!");
-        setName("");
-        setRegion("");
-        setSelectedTeachers([]);
-        setIsDialogOpen(false);
-        fetchData();
+        toast.success("Cohort created successfully");
+        fetchCohorts();
+        resetForm();
+        setIsOpen(false);
       } else {
-        toast.error(data?.error || "Failed to create cohort");
+        toast.error(result.error || "Failed to create cohort");
       }
     } catch (error) {
-      toast.error("An error occurred while creating the cohort");
-    } finally {
-      setIsLoading(false);
+      toast.error("An error occurred");
+      console.error(error);
     }
   };
 
   const handleDelete = async (id: string) => {
-    setDeleteLoading(id);
     try {
-      const res = await fetch(`http://localhost:3000/api/cohort/${id}`, {
+      const res = await fetch(`http://localhost:3000/api/cohorts/${id}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+
       if (res.ok) {
-        toast.success("Cohort deleted successfully!");
-        fetchData();
+        toast.success("Cohort deleted successfully");
+        fetchCohorts();
       } else {
-        toast.error(data?.error || "Failed to delete cohort");
+        const result = await res.json();
+        toast.error(result.error || "Failed to delete cohort");
       }
     } catch (error) {
-      toast.error("An error occurred while deleting the cohort");
-    } finally {
-      setDeleteLoading(null);
+      toast.error("An error occurred");
+      console.error(error);
     }
   };
 
+  const resetForm = () => {
+    setName("");
+    setRegion("");
+    setSelectedTeachers([]);
+  };
+
+  const toggleTeacherSelection = (teacherId: string) => {
+    setSelectedTeachers(prev => 
+      prev.includes(teacherId)
+        ? prev.filter(id => id !== teacherId)
+        : [...prev, teacherId]
+    );
+  };
+
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Cohort Management
-        </h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="default" className="gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-plus"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Create Cohort
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <div className="space-y-4 py-2">
-              <h3 className="text-lg font-medium">Create New Cohort</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Fill in the details below to create a new cohort.
-              </p>
-
-              <div className="space-y-2">
-                <Label htmlFor="cohort-name">Cohort Name</Label>
-                <Input
-                  id="cohort-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter cohort name"
-                  className="focus-visible:ring-1"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="region">Region</Label>
-                <Input
-                  id="region"
-                  value={region}
-                  onChange={(e) => setRegion(e.target.value)}
-                  placeholder="Enter region"
-                  className="focus-visible:ring-1"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Assign Teachers (Max 25)</Label>
-                <div className="flex justify-between items-center mb-2">
+    <div className="max-w-4xl mx-auto py-10">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Cohorts</CardTitle>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button variant="default">Add Cohort</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogTitle>Create New Cohort</DialogTitle>
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium">Name</label>
                   <Input
-                    placeholder="Search teachers..."
-                    value={teacherSearch}
-                    onChange={(e) => setTeacherSearch(e.target.value)}
-                    className="focus-visible:ring-1"
+                    id="name"
+                    placeholder="Cohort name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
                   />
-                  <span className="text-xs text-gray-500 ml-2">
-                    {selectedTeachers.length}/25
-                  </span>
                 </div>
-                <div className="border rounded-md p-3 max-h-48 overflow-auto grid grid-cols-2 gap-3">
-                  {teachers.length === 0 ? (
-                    <p className="text-sm text-gray-500 col-span-2">
-                      No teachers available
-                    </p>
-                  ) : filteredTeachers.length === 0 ? (
-                    <p className="text-sm text-gray-500 col-span-2">
-                      No teachers match your search
-                    </p>
-                  ) : (
-                    filteredTeachers.map((t) => (
-                      <div
-                        key={t.id}
-                        className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
-                      >
-                        <Checkbox
-                          id={`teacher-${t.id}`}
-                          checked={selectedTeachers.includes(t.id)}
-                          onCheckedChange={() => handleCheckboxChange(t.id)}
-                          disabled={
-                            !selectedTeachers.includes(t.id) &&
-                            selectedTeachers.length >= 25
-                          }
-                        />
-                        <Label
-                          htmlFor={`teacher-${t.id}`}
-                          className={`cursor-pointer ${
-                            !selectedTeachers.includes(t.id) &&
-                            selectedTeachers.length >= 25
-                              ? "text-gray-400"
-                              : ""
-                          }`}
-                        >
-                          {t.name}
-                        </Label>
-                      </div>
-                    ))
-                  )}
+                <div className="space-y-2">
+                  <label htmlFor="region" className="text-sm font-medium">Region</label>
+                  <Input
+                    id="region"
+                    placeholder="Region"
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
+                    required
+                  />
                 </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateCohort} disabled={isLoading}>
-                  {isLoading ? "Creating..." : "Create Cohort"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <Card className="shadow-md">
-        <CardHeader className="bg-gray-50 dark:bg-gray-800 rounded-t-lg">
-          <CardTitle className="text-xl">All Cohorts</CardTitle>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Teachers (Optional)</label>
+                  <div className="border rounded-md p-3 max-h-40 overflow-y-auto">
+                    {teachers.length > 0 ? (
+                      teachers.map((teacher) => (
+                        <div key={teacher.id} className="flex items-center space-x-2 py-1">
+                          <input
+                            type="checkbox"
+                            id={`teacher-${teacher.id}`}
+                            checked={selectedTeachers.includes(teacher.id)}
+                            onChange={() => toggleTeacherSelection(teacher.id)}
+                            className="rounded"
+                          />
+                          <label htmlFor={`teacher-${teacher.id}`}>{teacher.name}</label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No teachers available</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex justify-end pt-4">
+                  <Button type="submit">Create Cohort</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
-        <CardContent className="p-0">
-          {isLoading && !cohorts.length ? (
-            <div className="flex items-center justify-center h-48">
-              <p className="text-gray-500">Loading cohorts...</p>
-            </div>
-          ) : cohorts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 text-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-gray-400 mb-2"
-              >
-                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2z"></path>
-                <path d="M9 7h6"></path>
-                <path d="M9 11h6"></path>
-                <path d="M9 15h4"></path>
-              </svg>
-              <p className="text-gray-500 dark:text-gray-400">
-                No cohorts found
-              </p>
-              <Button
-                variant="link"
-                onClick={() => setIsDialogOpen(true)}
-                className="mt-2"
-              >
-                Create your first cohort
-              </Button>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[200px]">Name</TableHead>
-                  <TableHead className="w-[200px]">Region</TableHead>
-                  <TableHead>Teachers</TableHead>
-                  <TableHead className="text-right w-[100px]">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {cohorts.map((cohort) => (
-                  <TableRow
-                    key={cohort.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                  >
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Region</TableHead>
+                <TableHead>Teachers</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {cohorts.length > 0 ? (
+                cohorts.map((cohort) => (
+                  <TableRow key={cohort.id}>
                     <TableCell className="font-medium">{cohort.name}</TableCell>
                     <TableCell>{cohort.region}</TableCell>
                     <TableCell>
-                      {cohort.teachers.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {cohort.teachers.map((t) => (
-                            <span
-                              key={t.id}
-                              className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                            >
-                              {t.name}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">
-                          No teachers assigned
-                        </span>
-                      )}
+                      {cohort.teachers.length > 0 
+                        ? cohort.teachers.map(t => t.name).join(", ")
+                        : "No teachers assigned"}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDelete(cohort.id)}
-                        disabled={deleteLoading === cohort.id}
                       >
-                        {deleteLoading === cohort.id ? "Deleting..." : "Delete"}
+                        Delete
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                    No cohorts found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

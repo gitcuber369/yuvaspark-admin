@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 interface Topic {
@@ -97,6 +97,7 @@ export default function TopicsPage() {
               <Button variant="default">Add Topic</Button>
             </DialogTrigger>
             <DialogContent>
+              <DialogTitle>{editingTopic ? "Edit Topic" : "Add New Topic"}</DialogTitle>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                   placeholder="Topic name"

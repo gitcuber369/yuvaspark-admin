@@ -124,8 +124,8 @@ export function AdminSidebar({
                   <Image
                     src="/logo.png"
                     alt="Yuva Spark Logo"
-                    width={200}
-                    height={200}
+                    width={180}
+                    height={180}
                     objectFit="cover"
                   />
                 </div>
