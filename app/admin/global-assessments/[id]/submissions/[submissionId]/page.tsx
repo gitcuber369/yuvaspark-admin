@@ -15,6 +15,7 @@ import {
   getSubmissionById,
   getStudentResponses,
   scoreStudentResponse,
+  getAnganwadiById
 } from "@/app/api/api";
 import { toast } from "sonner";
 import {
@@ -98,6 +99,8 @@ interface StudentSubmission {
   student: {
     id: string;
     name: string;
+    anganwadiId?: string;
+    anganwadiName?: string;
   };
   teacher: {
     id: string;
@@ -131,6 +134,18 @@ export default function SubmissionDetailsPage() {
           params.id as string,
           params.submissionId as string
         );
+        
+        // If student data doesn't include anganwadi name but has anganwadiId, fetch the anganwadi details
+        if (data.student && !data.student.anganwadiName && data.anganwadiId) {
+          try {
+            const anganwadiData = await getAnganwadiById(data.anganwadiId);
+            data.student.anganwadiName = anganwadiData.name;
+            data.student.anganwadiId = data.anganwadiId;
+          } catch (error) {
+            console.error("Failed to fetch anganwadi details:", error);
+          }
+        }
+        
         setSubmission(data);
 
         // Initialize metadata loading state for each response
@@ -411,6 +426,11 @@ export default function SubmissionDetailsPage() {
                   <p className="text-base font-semibold text-slate-800 truncate">
                     {submission.student.name}
                   </p>
+                  {submission.student.anganwadiName && (
+                    <p className="text-sm text-slate-600 truncate">
+                      <span className="font-medium">Anganwadi:</span> {submission.student.anganwadiName}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">
