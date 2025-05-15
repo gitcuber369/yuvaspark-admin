@@ -12,9 +12,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Teacher {
   id: string;
@@ -121,9 +132,9 @@ export default function CohortsPage() {
   };
 
   const toggleTeacherSelection = (teacherId: string) => {
-    setSelectedTeachers(prev => 
+    setSelectedTeachers((prev) =>
       prev.includes(teacherId)
-        ? prev.filter(id => id !== teacherId)
+        ? prev.filter((id) => id !== teacherId)
         : [...prev, teacherId]
     );
   };
@@ -133,60 +144,81 @@ export default function CohortsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Cohorts</CardTitle>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button variant="default">Add Cohort</Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogTitle>Create New Cohort</DialogTitle>
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium">Name</label>
-                  <Input
-                    id="name"
-                    placeholder="Cohort name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="region" className="text-sm font-medium">Region</label>
-                  <Input
-                    id="region"
-                    placeholder="Region"
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Teachers (Optional)</label>
-                  <div className="border rounded-md p-3 max-h-40 overflow-y-auto">
-                    {teachers.length > 0 ? (
-                      teachers.map((teacher) => (
-                        <div key={teacher.id} className="flex items-center space-x-2 py-1">
-                          <input
-                            type="checkbox"
-                            id={`teacher-${teacher.id}`}
-                            checked={selectedTeachers.includes(teacher.id)}
-                            onChange={() => toggleTeacherSelection(teacher.id)}
-                            className="rounded"
-                          />
-                          <label htmlFor={`teacher-${teacher.id}`}>{teacher.name}</label>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm text-gray-500">No teachers available</p>
-                    )}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => window.location.href = "/admin/cohorts/rankings"}
+            >
+              View Teacher Rankings
+            </Button>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button variant="default">Add Cohort</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogTitle>Create New Cohort</DialogTitle>
+                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="text-sm font-medium">
+                      Name
+                    </label>
+                    <Input
+                      id="name"
+                      placeholder="Cohort name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
                   </div>
-                </div>
-                <div className="flex justify-end pt-4">
-                  <Button type="submit">Create Cohort</Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <div className="space-y-2">
+                    <label htmlFor="region" className="text-sm font-medium">
+                      Region
+                    </label>
+                    <Input
+                      id="region"
+                      placeholder="Region"
+                      value={region}
+                      onChange={(e) => setRegion(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Teachers (Optional)
+                    </label>
+                    <div className="border rounded-md p-3 max-h-40 overflow-y-auto">
+                      {teachers.length > 0 ? (
+                        teachers.map((teacher) => (
+                          <div
+                            key={teacher.id}
+                            className="flex items-center space-x-2 py-1"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`teacher-${teacher.id}`}
+                              checked={selectedTeachers.includes(teacher.id)}
+                              onChange={() => toggleTeacherSelection(teacher.id)}
+                              className="rounded"
+                            />
+                            <label htmlFor={`teacher-${teacher.id}`}>
+                              {teacher.name}
+                            </label>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500">
+                          No teachers available
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-4">
+                    <Button type="submit">Create Cohort</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -205,8 +237,8 @@ export default function CohortsPage() {
                     <TableCell className="font-medium">{cohort.name}</TableCell>
                     <TableCell>{cohort.region}</TableCell>
                     <TableCell>
-                      {cohort.teachers.length > 0 
-                        ? cohort.teachers.map(t => t.name).join(", ")
+                      {cohort.teachers.length > 0
+                        ? cohort.teachers.map((t) => t.name).join(", ")
                         : "No teachers assigned"}
                     </TableCell>
                     <TableCell className="text-right">
@@ -222,7 +254,10 @@ export default function CohortsPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                  <TableCell
+                    colSpan={4}
+                    className="text-center py-6 text-gray-500"
+                  >
                     No cohorts found
                   </TableCell>
                 </TableRow>
