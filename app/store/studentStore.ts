@@ -5,6 +5,7 @@ import {
   deleteStudent,
   assignStudentToAnganwadi,
   getStudentsByAnganwadi,
+  updateStudent,
 } from "@/app/api/api";
 
 interface Student {
@@ -29,6 +30,7 @@ interface StudentStore {
   removeStudent: (id: string) => Promise<void>;
   assignToAnganwadi: (studentId: string, anganwadiId: string) => Promise<void>;
   fetchByAnganwadi: (anganwadiId: string) => Promise<void>;
+  updateStudent: (id: string, data: Partial<Omit<Student, "id">>) => Promise<void>;
 }
 
 export const useStudentStore = create<StudentStore>((set) => ({
@@ -95,6 +97,21 @@ export const useStudentStore = create<StudentStore>((set) => ({
     try {
       const students = await getStudentsByAnganwadi(anganwadiId);
       set({ students, loading: false });
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
+    }
+  },
+
+  updateStudent: async (id, data) => {
+    set({ loading: true, error: null });
+    try {
+      const updatedStudent = await updateStudent(id, data);
+      set((state) => ({
+        students: state.students.map((s) =>
+          s.id === id ? updatedStudent : s
+        ),
+        loading: false,
+      }));
     } catch (err: any) {
       set({ error: err.message, loading: false });
     }

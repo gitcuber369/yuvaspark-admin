@@ -559,3 +559,17 @@ export const getAllCohorts = async () => {
     throw error;
   }
 };
+
+// Update a Student
+export const updateStudent = async (
+  id: string,
+  data: {
+    name?: string;
+    gender?: string;
+    status?: string;
+    anganwadiId?: string;
+  }
+) => {
+  const res = await API.patch(`/students/${id}`, data);
+  return res.data;
+};

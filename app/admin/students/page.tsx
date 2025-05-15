@@ -27,6 +27,8 @@ import {
   Search,
   ChevronRight,
   FileUp,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -55,7 +57,7 @@ interface Student {
 }
 
 export default function StudentDashboard() {
-  const { students, loading, error, fetchStudents, addStudent, removeStudent } =
+  const { students, loading, error, fetchStudents, addStudent, removeStudent, updateStudent } =
     useStudentStore();
 
   const [newStudent, setNewStudent] = useState({
@@ -212,7 +214,7 @@ export default function StudentDashboard() {
             <TabsTrigger value="students">Students Directory</TabsTrigger>
             <TabsTrigger value="import">CSV Import</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="students">
             {/* Student Directory */}
             <Card className="border shadow-sm">
@@ -255,7 +257,9 @@ export default function StudentDashboard() {
                 {loading ? (
                   <div className="flex justify-center items-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-black" />
-                    <span className="ml-2 text-gray-600">Loading students...</span>
+                    <span className="ml-2 text-gray-600">
+                      Loading students...
+                    </span>
                   </div>
                 ) : error ? (
                   <div className="text-red-500 bg-red-50 border border-red-100 p-4 rounded-md">
@@ -293,7 +297,9 @@ export default function StudentDashboard() {
                         className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <h3 className="text-lg font-medium">{student.name}</h3>
+                          <h3 className="text-lg font-medium">
+                            {student.name}
+                          </h3>
                           <Button
                             size="icon"
                             variant="ghost"
@@ -305,15 +311,44 @@ export default function StudentDashboard() {
                         <p className="text-sm text-gray-600">
                           Gender: {student.gender}
                         </p>
-                        {student.status && (
-                          <p className="text-sm text-gray-500">
-                            Status: {student.status}
-                          </p>
-                        )}
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-sm text-gray-500">Status:</span>
+                          <Select
+                            value={(student.status || "").toUpperCase()}
+                            onValueChange={(value) => {
+                              updateStudent(student.id, { status: value });
+                            }}
+                          >
+                            <SelectTrigger className="w-28 h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="ACTIVE" className="text-green-600">
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4" />
+                                  <span>Active</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="INACTIVE" className="text-red-600">
+                                <div className="flex items-center gap-2">
+                                  <XCircle className="w-4 h-4" />
+                                  <span>Inactive</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         {student.anganwadiId && (
                           <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
                             <ChevronRight className="w-4 h-4" />
-                            <span>Anganwadi ID: {student.anganwadiId}</span>
+                            {student.anganwadi?.name ? (
+                              <span>
+                                Anganwadi: {student.anganwadi.name} (
+                                {student.anganwadiId})
+                              </span>
+                            ) : (
+                              <span>Anganwadi ID: {student.anganwadiId}</span>
+                            )}
                           </div>
                         )}
                       </li>
