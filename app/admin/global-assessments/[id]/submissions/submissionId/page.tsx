@@ -20,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getAnganwadiById } from "@/app/api/api";
 
 interface Response {
   id: string;
@@ -38,6 +39,7 @@ interface Submission {
     id: string;
     name: string;
     anganwadiId: string;
+    anganwadiName: string;
   };
   teacher: {
     id: string;
@@ -72,6 +74,23 @@ export default function SubmissionDetails({
           throw new Error("Failed to fetch submission");
         }
         const data = await response.json();
+
+        // If anganwadiName is not provided by the API, we need to add it
+        if (
+          data.student &&
+          data.student.anganwadiId &&
+          !data.student.anganwadiName
+        ) {
+          // We'll use the API function to fetch the anganwadi name
+          try {
+            const anganwadiData = await getAnganwadiById(data.student.anganwadiId);
+            data.student.anganwadiName = anganwadiData.name;
+          } catch (anganwadiErr) {
+            console.error("Failed to fetch anganwadi details:", anganwadiErr);
+            data.student.anganwadiName = "Not available";
+          }
+        }
+
         setSubmission(data);
       } catch (err) {
         setError("Failed to fetch submission details");
@@ -144,7 +163,10 @@ export default function SubmissionDetails({
         {/* Student Info */}
         <Card>
           <CardHeader>
-            <CardTitle>Student Information</CardTitle>
+            <CardTitle>
+              {submission.student.name} -{" "}
+              {submission.student.anganwadiName || "Unknown Anganwadi"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -155,6 +177,10 @@ export default function SubmissionDetails({
               <p>
                 <span className="font-medium">Anganwadi ID:</span>{" "}
                 {submission.student.anganwadiId}
+              </p>
+              <p>
+                <span className="font-medium">Anganwadi Name:</span>{" "}
+                {submission.student.anganwadiName || "Not available"}
               </p>
             </div>
           </CardContent>

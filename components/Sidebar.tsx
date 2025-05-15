@@ -41,7 +41,7 @@ import Image from "next/image";
 
 const adminNav = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/admin/dashboard" },
-  { title: "Users", icon: ShieldCheck, url: "/admin/users" },
+
   { title: "Teachers", icon: School, url: "/admin/teachers" },
   { title: "Students", icon: GraduationCap, url: "/admin/students" },
   { title: "Anganwadi", icon: HomeIcon, url: "/admin/anganwadi" },
@@ -53,11 +53,7 @@ const adminNav = [
     icon: ClipboardList,
     url: "/admin/global-assessments",
   },
-  {
-    title: "Assessment Sessions",
-    icon: FileBarChart2,
-    url: "/admin/assessment-sessions",
-  },
+
   {
     title: "Student Responses",
     icon: MessageSquareText,
@@ -124,8 +120,8 @@ export function AdminSidebar({
                   <Image
                     src="/logo.png"
                     alt="Yuva Spark Logo"
-                    width={200}
-                    height={200}
+                    width={180}
+                    height={180}
                     objectFit="cover"
                   />
                 </div>
