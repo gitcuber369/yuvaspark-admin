@@ -204,7 +204,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1.5">
-                Location
+                Taluk
               </label>
               <Input
                 placeholder="Village/Area"

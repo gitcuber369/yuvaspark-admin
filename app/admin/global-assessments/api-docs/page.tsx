@@ -23,7 +23,15 @@ export default function ApiDocsPage() {
     setTimeout(() => setCopiedEndpoint(null), 2000);
   };
 
-  const CodeBlock = ({ code, language = "json", endpoint }: { code: string; language?: string; endpoint: string }) => (
+  const CodeBlock = ({
+    code,
+    language = "json",
+    endpoint,
+  }: {
+    code: string;
+    language?: string;
+    endpoint: string;
+  }) => (
     <div className="relative">
       <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto">
         <code className={`language-${language}`}>{code}</code>
@@ -54,7 +62,9 @@ export default function ApiDocsPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold">API Documentation for Mobile Integration</h1>
+        <h1 className="text-2xl font-bold">
+          API Documentation for Mobile Integration
+        </h1>
       </div>
 
       <div className="grid gap-6">
@@ -62,13 +72,15 @@ export default function ApiDocsPage() {
           <CardHeader>
             <CardTitle>Overview</CardTitle>
             <CardDescription>
-              Documentation for integrating mobile apps with the Global Assessment API
+              Documentation for integrating mobile apps with the Global
+              Assessment API
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p>
-              This documentation provides details on how to integrate mobile apps with the Global Assessment API.
-              Teachers can submit student responses to global assessments through these endpoints.
+              This documentation provides details on how to integrate mobile
+              apps with the Global Assessment API. Teachers can submit student
+              responses to global assessments through these endpoints.
             </p>
           </CardContent>
         </Card>
@@ -91,16 +103,16 @@ export default function ApiDocsPage() {
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="text-lg font-medium mb-2">Endpoint</h3>
-                  <CodeBlock 
+                  <CodeBlock
                     endpoint="submission-endpoint"
-                    code="POST /api/global-assessments/:assessmentId/student/:studentId" 
-                    language="bash" 
+                    code="POST /api/global-assessments/:assessmentId/student/:studentId"
+                    language="bash"
                   />
                 </div>
 
                 <div>
                   <h3 className="text-lg font-medium mb-2">Request Body</h3>
-                  <CodeBlock 
+                  <CodeBlock
                     endpoint="submission-body"
                     code={`{
   "teacherId": "teacher-uuid", 
@@ -114,13 +126,13 @@ export default function ApiDocsPage() {
     },
     // ... more responses
   ]
-}`} 
+}`}
                   />
                 </div>
 
                 <div>
                   <h3 className="text-lg font-medium mb-2">Response</h3>
-                  <CodeBlock 
+                  <CodeBlock
                     endpoint="submission-response"
                     code={`{
   "message": "Student submission recorded successfully",
@@ -136,15 +148,17 @@ export default function ApiDocsPage() {
       // Array of created responses
     ]
   }
-}`} 
+}`}
                   />
                 </div>
 
                 <div className="bg-amber-50 p-4 rounded-md border border-amber-200">
                   <h3 className="text-amber-800 font-medium">Important Note</h3>
                   <p className="text-amber-700 text-sm mt-1">
-                    Student submissions are only created when teachers submit responses through the mobile app. 
-                    There are no pre-created placeholders, so you must provide all required data in your request.
+                    Student submissions are only created when teachers submit
+                    responses through the mobile app. There are no pre-created
+                    placeholders, so you must provide all required data in your
+                    request.
                   </p>
                 </div>
               </CardContent>
@@ -162,16 +176,16 @@ export default function ApiDocsPage() {
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="text-lg font-medium mb-2">Endpoint</h3>
-                  <CodeBlock 
+                  <CodeBlock
                     endpoint="assessments-endpoint"
-                    code="GET /api/global-assessments/active?anganwadiId=:anganwadiId" 
-                    language="bash" 
+                    code="GET /api/global-assessments/active?anganwadiId=:anganwadiId"
+                    language="bash"
                   />
                 </div>
 
                 <div>
                   <h3 className="text-lg font-medium mb-2">Response</h3>
-                  <CodeBlock 
+                  <CodeBlock
                     endpoint="assessments-response"
                     code={`[
   {
@@ -198,7 +212,7 @@ export default function ApiDocsPage() {
     ]
   },
   // ... more assessments
-]`} 
+]`}
                   />
                 </div>
               </CardContent>
@@ -216,16 +230,16 @@ export default function ApiDocsPage() {
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="text-lg font-medium mb-2">Endpoint</h3>
-                  <CodeBlock 
+                  <CodeBlock
                     endpoint="anganwadi-endpoint"
-                    code="GET /api/anganwadis/:anganwadiId" 
-                    language="bash" 
+                    code="GET /api/anganwadis/:anganwadiId"
+                    language="bash"
                   />
                 </div>
 
                 <div>
                   <h3 className="text-lg font-medium mb-2">Response</h3>
-                  <CodeBlock 
+                  <CodeBlock
                     endpoint="anganwadi-response"
                     code={`{
   "id": "anganwadi-uuid",
@@ -244,7 +258,7 @@ export default function ApiDocsPage() {
     },
     // ... more students
   ]
-}`} 
+}`}
                   />
                 </div>
               </CardContent>
@@ -254,7 +268,9 @@ export default function ApiDocsPage() {
 
         <Card className="bg-blue-50 border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-800">Implementation Guide</CardTitle>
+            <CardTitle className="text-blue-800">
+              Implementation Guide
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4 text-blue-700">
@@ -264,14 +280,18 @@ export default function ApiDocsPage() {
               <ol className="list-decimal pl-5 space-y-2">
                 <li>Fetch active assessments for the teacher's anganwadi</li>
                 <li>Display assessment details and questions to the teacher</li>
-                <li>Allow the teacher to select a student and record audio responses</li>
+                <li>
+                  Allow the teacher to select a student and record audio
+                  responses
+                </li>
                 <li>Submit the student's responses to the API</li>
                 <li>Track completion status for each assessment</li>
               </ol>
               <p className="mt-4">
-                <strong>Important:</strong> Student submissions will only be tracked after the teacher submits
-                them through your mobile app. This is a change from the previous workflow where student placeholders
-                were created in advance.
+                <strong>Important:</strong> Student submissions will only be
+                tracked after the teacher submits them through your mobile app.
+                This is a change from the previous workflow where student
+                placeholders were created in advance.
               </p>
             </div>
           </CardContent>
@@ -279,4 +299,4 @@ export default function ApiDocsPage() {
       </div>
     </div>
   );
-} 
+}

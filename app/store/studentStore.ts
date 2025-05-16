@@ -29,6 +29,7 @@ interface StudentStore {
   addStudent: (data: Omit<Student, "id">) => Promise<void>;
   removeStudent: (id: string) => Promise<void>;
   assignToAnganwadi: (studentId: string, anganwadiId: string) => Promise<void>;
+  batchAssignToAnganwadi: (studentIds: string[], anganwadiId: string) => Promise<void>;
   fetchByAnganwadi: (anganwadiId: string) => Promise<void>;
   updateStudent: (id: string, data: Partial<Omit<Student, "id">>) => Promise<void>;
 }
@@ -84,6 +85,29 @@ export const useStudentStore = create<StudentStore>((set) => ({
       set((state) => ({
         students: state.students.map((s) =>
           s.id === studentId ? { ...s, anganwadiId: updated.anganwadiId } : s
+        ),
+        loading: false,
+      }));
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
+    }
+  },
+
+  batchAssignToAnganwadi: async (studentIds, anganwadiId) => {
+    set({ loading: true, error: null });
+    try {
+      // Process students one by one
+      for (const studentId of studentIds) {
+        await assignStudentToAnganwadi({
+          studentId,
+          anganwadiId,
+        });
+      }
+      
+      // Update all students in state
+      set((state) => ({
+        students: state.students.map((s) =>
+          studentIds.includes(s.id) ? { ...s, anganwadiId } : s
         ),
         loading: false,
       }));

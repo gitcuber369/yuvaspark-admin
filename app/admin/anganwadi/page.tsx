@@ -82,7 +82,7 @@ export default function AnganwadiPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead>Taluk</TableHead>
                 <TableHead>District</TableHead>
                 <TableHead>Teacher</TableHead>
                 <TableHead>Students</TableHead>
