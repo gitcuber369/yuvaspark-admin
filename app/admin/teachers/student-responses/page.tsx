@@ -50,7 +50,6 @@ export default function TeacherStudentResponsesPage() {
     loading,
     fetchTeacherResponses,
     fetchByStudent,
-    fetchByEvaluation,
     exportResponses,
   } = useTeacherResponseStore();
   
@@ -145,10 +144,21 @@ export default function TeacherStudentResponsesPage() {
 
   const handleEvaluationFilterChange = async (selectedEvaluationId: string) => {
     setEvaluationFilter(selectedEvaluationId === "all-evaluations" ? "" : selectedEvaluationId);
-    if (selectedEvaluationId && selectedEvaluationId !== "all-evaluations" && teacherFilter) {
-      await fetchByEvaluation(teacherFilter, selectedEvaluationId);
-    } else if (teacherFilter) {
-      await fetchTeacherResponses(teacherFilter);
+    
+    if (teacherFilter) {
+      // Use the main fetchTeacherResponses with filters instead of the missing method
+      const filters: any = {};
+      
+      if (selectedEvaluationId && selectedEvaluationId !== "all-evaluations") {
+        filters.evaluationId = selectedEvaluationId;
+      }
+      
+      // Keep student filter if it exists
+      if (studentFilter) {
+        filters.studentId = studentFilter;
+      }
+      
+      await fetchTeacherResponses(teacherFilter, filters);
     }
   };
 

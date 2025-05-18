@@ -88,6 +88,7 @@ const quickActions = [
   },
   {
     title: "View Reports",
+    // @ts-ignore
     link: "/admin/reports",
     icon: <FileBarChart2 className="w-5 h-5" />,
     color: "bg-red-100 text-red-600",
@@ -108,7 +109,9 @@ export default function DashboardPage() {
           <BarChart3 className="mr-3 h-8 w-8 text-indigo-600" />
           Admin Dashboard
         </h1>
-        <p className="text-gray-600 ml-11">Welcome back! Here's what's happening today.</p>
+        <p className="text-gray-600 ml-11">
+          Welcome back! Here's what's happening today.
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -156,7 +159,9 @@ export default function DashboardPage() {
                   >
                     {action.icon}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{action.title}</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {action.title}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -179,8 +184,8 @@ export default function DashboardPage() {
             ) : error ? (
               <div className="text-center py-10">
                 <p className="text-red-500 mb-2">Failed to load anganwadis</p>
-                <button 
-                  onClick={() => fetchAnganwadis()} 
+                <button
+                  onClick={() => fetchAnganwadis()}
                   className="px-4 py-2 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors"
                 >
                   Try Again
@@ -190,7 +195,7 @@ export default function DashboardPage() {
               <div className="text-center py-10">
                 <p className="text-gray-500 mb-4">No anganwadis found.</p>
                 <Link
-                  href="/admin/anganwadi" 
+                  href="/admin/anganwadi"
                   className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
                 >
                   Add Anganwadi
@@ -200,14 +205,22 @@ export default function DashboardPage() {
               <div className="overflow-hidden overflow-y-auto max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <ul className="divide-y">
                   {anganwadis.map((a) => (
-                    <li key={a._id} className="py-4 first:pt-0 last:pb-0 hover:bg-gray-50 transition-colors rounded-md px-2">
+                    <li
+                      key={a._id}
+                      className="py-4 first:pt-0 last:pb-0 hover:bg-gray-50 transition-colors rounded-md px-2"
+                    >
                       <div className="flex items-center">
                         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium shadow">
                           {a.name?.charAt(0) || "A"}
                         </div>
                         <div className="ml-4 flex-grow">
-                          <p className="text-sm font-medium text-gray-900">{a.name}</p>
-                          <p className="text-xs text-gray-500">{a.location || "No location"}, {a.district || "No district"}</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {a.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {a.location || "No location"},{" "}
+                            {a.district || "No district"}
+                          </p>
                         </div>
                         <Link
                           href={`/admin/anganwadi/${a._id}`}

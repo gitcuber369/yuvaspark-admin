@@ -292,7 +292,10 @@ export default function StudentDashboard() {
                       <SelectContent className="max-h-60">
                         <SelectItem value="">None</SelectItem>
                         {anganwadis.map((anganwadi) => (
-                          <SelectItem key={anganwadi._id} value={anganwadi._id}>
+                          <SelectItem 
+                            key={anganwadi._id?.toString() || anganwadi.id} 
+                            value={anganwadi._id?.toString() || anganwadi.id}
+                          >
                             {anganwadi.name}
                           </SelectItem>
                         ))}
@@ -333,7 +336,10 @@ export default function StudentDashboard() {
                       </SelectTrigger>
                       <SelectContent className="max-h-60">
                         {anganwadis.map((anganwadi) => (
-                          <SelectItem key={anganwadi._id} value={anganwadi._id}>
+                          <SelectItem 
+                            key={anganwadi._id?.toString() || anganwadi.id} 
+                            value={anganwadi._id?.toString() || anganwadi.id}
+                          >
                             {anganwadi.name}
                           </SelectItem>
                         ))}
@@ -415,7 +421,10 @@ export default function StudentDashboard() {
                       <SelectContent>
                         <SelectItem value="all">All Anganwadis</SelectItem>
                         {uniqueAnganwadis.map((anganwadi) => (
-                          <SelectItem key={anganwadi.id} value={anganwadi.id}>
+                          <SelectItem 
+                            key={anganwadi.id} 
+                            value={anganwadi.id}
+                          >
                             {anganwadi.name}
                           </SelectItem>
                         ))}
@@ -600,9 +609,9 @@ export default function StudentDashboard() {
                                 </SelectItem>
                               )}
                               {anganwadis.map((anganwadi) => (
-                                <SelectItem
-                                  key={anganwadi._id}
-                                  value={anganwadi._id}
+                                <SelectItem 
+                                  key={anganwadi._id?.toString() || anganwadi.id} 
+                                  value={anganwadi._id?.toString() || anganwadi.id}
                                 >
                                   {anganwadi.name}
                                 </SelectItem>

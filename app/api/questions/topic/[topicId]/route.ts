@@ -3,10 +3,10 @@ import axios from "axios";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { topicId: string } }
+  context: { params: Promise<{ topicId: string }> }
 ) {
   try {
-    const topicId = params.topicId;
+    const { topicId } = await context.params;
     
     // Make a request to the backend API
     const response = await axios.get(

@@ -41,12 +41,20 @@ API.interceptors.response.use((response) => {
     console.error("Error status:", error.response.status);
     console.error("Error data:", error.response.data);
     
-    // Add more detailed logging for 404 errors
+    // Add more detailed logging for specific error types
     if (error.response.status === 404) {
       console.error(`Resource not found: ${error.config.url}`);
       console.error("Request method:", error.config.method);
       console.error("Request data:", error.config.data);
       console.error("Full config:", error.config);
+    } 
+    // Handle specific database constraint errors
+    else if (error.response.status === 500 && 
+             typeof error.response.data === 'string' && 
+             error.response.data.includes('Foreign key constraint violated')) {
+      console.error("Database constraint error:", error.response.data);
+      console.error("Request:", error.config.method, error.config.url);
+      console.error("Request data:", error.config.data);
     }
   } else if (error.request) {
     // The request was made but no response was received

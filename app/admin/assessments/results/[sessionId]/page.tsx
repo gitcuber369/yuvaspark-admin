@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -19,17 +19,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  School,
-  Search,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, School, Search, Loader2 } from "lucide-react";
 import axios from "axios";
-
+import React from "react";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/";
 
 // API functions
@@ -51,27 +45,41 @@ interface Anganwadi {
   state?: string;
 }
 
-export default function AssessmentResultsPage() {
-  const params = useParams();
+// Type definition for params
+interface PageParams {
+  sessionId: string;
+}
+
+// Fixed type definition for Next.js 15.4 Pages
+// @ts-ignore - Next.js type mismatch with searchParams
+interface PageProps {
+  params: Promise<PageParams>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+// @ts-ignore - Suppressing type error between Next.js PageProps types
+export default function AssessmentResultsPage({ params }: PageProps) {
   const router = useRouter();
-  const sessionId = params.sessionId as string;
-  
+
+  // Use React.use() to unwrap the params
+  const { sessionId } = React.use(params);
+
   const [loading, setLoading] = useState(true);
   const [assessmentSession, setAssessmentSession] = useState<any>(null);
   const [anganwadis, setAnganwadis] = useState<Anganwadi[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Get session details and anganwadis
         const [sessionData, anganwadisData] = await Promise.all([
           getAssessmentSessionById(sessionId),
-          getAnganwadis()
+          getAnganwadis(),
         ]);
-        
+
         setAssessmentSession(sessionData);
         setAnganwadis(anganwadisData);
       } catch (error) {
@@ -81,17 +89,19 @@ export default function AssessmentResultsPage() {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [sessionId]);
-  
+
   const filteredAnganwadis = anganwadis.filter(
-    anganwadi => 
+    (anganwadi) =>
       anganwadi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (anganwadi.location && anganwadi.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (anganwadi.district && anganwadi.district.toLowerCase().includes(searchQuery.toLowerCase()))
+      (anganwadi.location &&
+        anganwadi.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (anganwadi.district &&
+        anganwadi.district.toLowerCase().includes(searchQuery.toLowerCase()))
   );
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -100,12 +110,15 @@ export default function AssessmentResultsPage() {
       </div>
     );
   }
-  
+
   if (!assessmentSession) {
     return (
       <div className="container mx-auto py-8 text-center">
         <h1 className="text-2xl font-bold mb-4">Assessment Not Found</h1>
-        <p className="text-gray-500 mb-4">The assessment session you're looking for doesn't exist or has been removed.</p>
+        <p className="text-gray-500 mb-4">
+          The assessment session you're looking for doesn't exist or has been
+          removed.
+        </p>
         <Button onClick={() => router.push("/admin/assessments")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Assessments
@@ -113,27 +126,29 @@ export default function AssessmentResultsPage() {
       </div>
     );
   }
-  
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center mb-6">
-        <Button 
-          variant="outline" 
-          className="mr-4" 
+        <Button
+          variant="outline"
+          className="mr-4"
           onClick={() => router.push("/admin/assessments")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        
+
         <div>
-          <h1 className="text-3xl font-bold">{assessmentSession.name} Results</h1>
+          <h1 className="text-3xl font-bold">
+            {assessmentSession.name} Results
+          </h1>
           <p className="text-muted-foreground">
             View assessment results from anganwadis
           </p>
         </div>
       </div>
-      
+
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div className="relative w-full max-w-md">
@@ -147,7 +162,7 @@ export default function AssessmentResultsPage() {
             />
           </div>
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Anganwadi Results</CardTitle>
@@ -158,7 +173,9 @@ export default function AssessmentResultsPage() {
           <CardContent>
             {filteredAnganwadis.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500">No anganwadis found with the current filters</p>
+                <p className="text-gray-500">
+                  No anganwadis found with the current filters
+                </p>
               </div>
             ) : (
               <Table>
@@ -201,4 +218,4 @@ export default function AssessmentResultsPage() {
       </div>
     </div>
   );
-} 
+}

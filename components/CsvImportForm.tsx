@@ -140,7 +140,10 @@ export default function CsvImportForm() {
               <SelectContent className="max-h-60">
                 <SelectItem value="none">None</SelectItem>
                 {anganwadis.map((anganwadi) => (
-                  <SelectItem key={anganwadi._id} value={anganwadi._id}>
+                  <SelectItem 
+                    key={anganwadi._id?.toString() || anganwadi.id} 
+                    value={anganwadi._id?.toString() || anganwadi.id}
+                  >
                     {anganwadi.name}
                   </SelectItem>
                 ))}

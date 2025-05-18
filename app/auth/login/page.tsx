@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loginUser } from "@/app/api/api";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
 import Link from "next/link";
 import React from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -136,12 +136,24 @@ export default function LoginPage() {
           </Link>
           <p className="text-sm text-gray-600 mt-2">
             Don't have an account?{" "}
-            <Link href="/auth/register" className="text-black hover:underline font-medium">
+            <Link
+              href="/auth/register"
+              className="text-black hover:underline font-medium"
+            >
               Create Account
             </Link>
           </p>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+// Wrap the component that uses useSearchParams in a Suspense boundary
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white p-4">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { getQuestionDetails } from "@/app/api/api";
+import React from "react";
 
 interface Question {
   id: string;
@@ -41,35 +42,49 @@ interface Question {
   }>;
 }
 
-export default function QuestionDetailPage({ params }: { params: { id: string } }) {
+// Fixed type definition for Next.js Pages
+// @ts-ignore - Next.js type mismatch with params
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+// @ts-ignore - Suppressing type error between Next.js PageProps types
+export default function QuestionDetailPage({ params }: PageProps) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
+  // Unwrap the params Promise
+  const { id } = React.use(params);
 
   useEffect(() => {
     const fetchQuestionDetails = async () => {
       setIsLoading(true);
       try {
-        console.log("Component: Fetching question with ID:", params.id);
-        
+        console.log("Component: Fetching question with ID:", id);
+
         // Fetch the question details
-        const data = await getQuestionDetails(params.id);
+        const data = await getQuestionDetails(id);
         console.log("Component: Question data received:", data);
-        
+
         if (!data) {
           console.error("Component: No data returned from API");
           toast.error("No question data found");
           setQuestion(null);
           return;
         }
-        
+
         setQuestion(data);
       } catch (error: any) {
         console.error("Component: Failed to fetch question details:", error);
         console.error("Component: Error message:", error.message);
         console.error("Component: Error response:", error.response?.data);
-        
-        toast.error(error.response?.data?.message || "Failed to load question details");
+
+        toast.error(
+          error.response?.data?.message || "Failed to load question details"
+        );
         setQuestion(null);
       } finally {
         setIsLoading(false);
@@ -77,7 +92,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
     };
 
     fetchQuestionDetails();
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -117,7 +132,9 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Topic</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                Topic
+              </h3>
               <div className="flex items-center">
                 <Badge variant="outline" className="mr-2">
                   {question.topic?.name || "Unknown Topic"}
@@ -129,29 +146,39 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Question Text</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                Question Text
+              </h3>
               <p className="text-lg">{question.text}</p>
             </div>
 
             {/* Answer Options Section */}
             {question.answerOptions && question.answerOptions.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Answer Options</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                  Answer Options
+                </h3>
                 <div className="space-y-2 mt-2">
                   {question.answerOptions.map((option, index) => (
-                    <div 
+                    <div
                       key={index}
                       className={`p-3 rounded-md ${
-                        question.correctAnswer === index 
-                          ? 'bg-green-100 border border-green-300' 
-                          : 'bg-gray-50 border border-gray-200'
+                        question.correctAnswer === index
+                          ? "bg-green-100 border border-green-300"
+                          : "bg-gray-50 border border-gray-200"
                       }`}
                     >
                       <div className="flex items-center gap-2">
                         {question.correctAnswer === index && (
                           <Badge className="bg-green-500">Correct Answer</Badge>
                         )}
-                        <p className={question.correctAnswer === index ? 'font-medium' : ''}>
+                        <p
+                          className={
+                            question.correctAnswer === index
+                              ? "font-medium"
+                              : ""
+                          }
+                        >
                           {option}
                         </p>
                       </div>
@@ -163,7 +190,9 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Image</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                  Image
+                </h3>
                 {question.imageUrl ? (
                   <div className="rounded-md overflow-hidden border">
                     <img
@@ -178,10 +207,16 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Audio</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                  Audio
+                </h3>
                 {question.audioUrl ? (
                   <div className="p-4 border rounded-md">
-                    <audio controls src={question.audioUrl} className="w-full" />
+                    <audio
+                      controls
+                      src={question.audioUrl}
+                      className="w-full"
+                    />
                   </div>
                 ) : (
                   <p className="text-muted-foreground">No audio available</p>
@@ -198,23 +233,37 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 bg-muted rounded-md">
-                <h4 className="text-sm font-medium text-muted-foreground">Total Responses</h4>
-                <p className="text-2xl font-semibold">{question.stats?.totalResponses || 0}</p>
+                <h4 className="text-sm font-medium text-muted-foreground">
+                  Total Responses
+                </h4>
+                <p className="text-2xl font-semibold">
+                  {question.stats?.totalResponses || 0}
+                </p>
               </div>
               <div className="p-3 bg-muted rounded-md">
-                <h4 className="text-sm font-medium text-muted-foreground">Graded</h4>
-                <p className="text-2xl font-semibold">{question.stats?.gradedResponses || 0}</p>
+                <h4 className="text-sm font-medium text-muted-foreground">
+                  Graded
+                </h4>
+                <p className="text-2xl font-semibold">
+                  {question.stats?.gradedResponses || 0}
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 bg-muted rounded-md">
-                <h4 className="text-sm font-medium text-muted-foreground">Average Score</h4>
+                <h4 className="text-sm font-medium text-muted-foreground">
+                  Average Score
+                </h4>
                 <p className="text-2xl font-semibold">
-                  {question.stats?.averageScore ? question.stats.averageScore.toFixed(1) : "N/A"}
+                  {question.stats?.averageScore
+                    ? question.stats.averageScore.toFixed(1)
+                    : "N/A"}
                 </p>
               </div>
               <div className="p-3 bg-muted rounded-md">
-                <h4 className="text-sm font-medium text-muted-foreground">Grading %</h4>
+                <h4 className="text-sm font-medium text-muted-foreground">
+                  Grading %
+                </h4>
                 <p className="text-2xl font-semibold">
                   {question.stats?.gradingPercentage
                     ? `${question.stats.gradingPercentage.toFixed(0)}%`
@@ -265,18 +314,14 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
                   {response.StudentResponseScore &&
                     response.StudentResponseScore.length > 0 && (
                       <div className="bg-muted p-3 rounded-md">
-                        <h5 className="text-sm font-medium mb-2">
-                          Evaluation
-                        </h5>
+                        <h5 className="text-sm font-medium mb-2">Evaluation</h5>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <p className="text-sm text-muted-foreground">
                               Score
                             </p>
                             <p className="text-xl font-semibold">
-                              {
-                                response.StudentResponseScore[0].score
-                              }
+                              {response.StudentResponseScore[0].score}
                             </p>
                           </div>
                           <div>
@@ -299,4 +344,4 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
       )}
     </div>
   );
-} 
+}

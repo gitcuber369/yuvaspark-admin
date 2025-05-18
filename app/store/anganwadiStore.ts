@@ -6,7 +6,9 @@ import {
   updateAnganwadi,
   deleteAnganwadi,
   assignToAnganwadi,
+  checkAnganwadiDependencies,
 } from "@/app/api/api"; // update path as needed
+import { Key } from "react";
 
 interface Teacher {
   name: string;
@@ -14,7 +16,8 @@ interface Teacher {
 }
 
 export interface Anganwadi {
-  _id: string;
+  _id: Key | null | undefined;
+  id: string;
   name: string;
   location: string;
   district: string;
@@ -38,11 +41,12 @@ interface AnganwadiStore {
   ) => Promise<void>;
   updateAnganwadi: (
     id: string,
-    data: Partial<Omit<Anganwadi, "_id" | "teacher">> & {
+    data: Partial<Omit<Anganwadi, "id" | "teacher">> & {
       studentIds?: string[];
     }
   ) => Promise<void>;
   removeAnganwadi: (id: string) => Promise<void>;
+  checkDependencies: (id: string) => Promise<{hasDependencies: boolean; details?: string}>;
   assignStudent: (studentId: string, anganwadiId: string) => Promise<void>;
 }
 
@@ -96,7 +100,7 @@ export const useAnganwadiStore = create<AnganwadiStore>((set, get) => ({
       const updated = await updateAnganwadi(id, data);
       set((state) => ({
         anganwadis: state.anganwadis.map((a) =>
-          a._id === id ? { ...a, ...updated } : a
+          a.id === id ? { ...a, ...updated } : a
         ),
         loading: false,
       }));
@@ -110,11 +114,22 @@ export const useAnganwadiStore = create<AnganwadiStore>((set, get) => ({
     try {
       await deleteAnganwadi(id);
       set((state) => ({
-        anganwadis: state.anganwadis.filter((a) => a._id !== id),
+        anganwadis: state.anganwadis.filter((a) => a.id !== id),
         loading: false,
       }));
     } catch (err: any) {
       set({ error: err.message, loading: false });
+      throw err; // Re-throw the error to be handled by the component
+    }
+  },
+
+  checkDependencies: async (id) => {
+    try {
+      const result = await checkAnganwadiDependencies(id);
+      return result;
+    } catch (err: any) {
+      set({ error: err.message });
+      return { hasDependencies: true, details: err.message };
     }
   },
 
@@ -124,7 +139,7 @@ export const useAnganwadiStore = create<AnganwadiStore>((set, get) => ({
       const updated = await assignToAnganwadi({ studentId, anganwadiId });
       set((state) => ({
         anganwadis: state.anganwadis.map((a) =>
-          a._id === anganwadiId
+          a.id === anganwadiId
             ? { ...a, studentIds: [...(a.studentIds || []), studentId] }
             : a
         ),

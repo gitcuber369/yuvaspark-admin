@@ -130,6 +130,39 @@ export const deleteAnganwadi = async (id: string) => {
   return res.data;
 };
 
+// Check if anganwadi can be safely deleted (has no dependencies)
+export const checkAnganwadiDependencies = async (id: string) => {
+  try {
+    const res = await API.get(`/anganwadis/${id}/dependencies`);
+    return res.data;
+  } catch (error) {
+    console.error("Error checking anganwadi dependencies:", error);
+    throw error;
+  }
+};
+
+// Remove all students from an Anganwadi
+export const removeAllStudentsFromAnganwadi = async (id: string) => {
+  try {
+    const res = await API.delete(`/anganwadis/${id}/students`);
+    return res.data;
+  } catch (error) {
+    console.error("Error removing students from anganwadi:", error);
+    throw error;
+  }
+};
+
+// Remove all dependencies (students, assessments, submissions) from an Anganwadi
+export const removeAnganwadiDependencies = async (id: string) => {
+  try {
+    const res = await API.delete(`/anganwadis/${id}/dependencies`);
+    return res.data;
+  } catch (error) {
+    console.error("Error removing anganwadi dependencies:", error);
+    throw error;
+  }
+};
+
 // ✅ Assign Student to Anganwadi
 export const assignToAnganwadi = async ({
   anganwadiId,
@@ -572,4 +605,19 @@ export const updateStudent = async (
 ) => {
   const res = await API.patch(`/students/${id}`, data);
   return res.data;
+};
+
+// Add createEvaluation function - handles creating a new evaluation with audio file
+export const createEvaluation = async (formData: FormData) => {
+  try {
+    const res = await API.post("/evaluations", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error creating evaluation:", error);
+    throw error;
+  }
 };
