@@ -56,7 +56,7 @@ export const useAssessmentSessionStore = create<AssessmentSessionStore>((set, ge
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
 
-      const url = `http://192.168.1.3:3000/api/assessment-sessions?${queryParams.toString()}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/assessment-sessions?${queryParams.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -76,7 +76,7 @@ export const useAssessmentSessionStore = create<AssessmentSessionStore>((set, ge
   getSessionDetails: async (sessionId: string) => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch(`http://192.168.1.3:3000/api/assessment-sessions/${sessionId}`);
+      const response = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/assessment-sessions/${sessionId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch session details');
@@ -103,7 +103,7 @@ export const useAssessmentSessionStore = create<AssessmentSessionStore>((set, ge
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       
-      const url = `http://192.168.1.3:3000/api/assessment-sessions/export?${queryParams.toString()}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/assessment-sessions/export?${queryParams.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {

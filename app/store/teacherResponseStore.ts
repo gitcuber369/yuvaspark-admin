@@ -59,7 +59,7 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       
-      const url = `http://192.168.1.3:3000/api/teachers/${teacherId}/student-responses?${queryParams.toString()}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/teachers/${teacherId}/student-responses?${queryParams.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -78,7 +78,7 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
   fetchByStudent: async (teacherId: string, studentId: string) => {
     set({ loading: true, error: null });
     try {
-      const url = `http://192.168.1.3:3000/api/teachers/${teacherId}/student-responses?studentId=${studentId}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/teachers/${teacherId}/student-responses?studentId=${studentId}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -104,7 +104,7 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       
       // Use the general export endpoint but with teacher-specific filters
-      const url = `http://192.168.1.3:3000/api/student-responses/export?teacherId=${teacherId}&${queryParams.toString()}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/export?teacherId=${teacherId}&${queryParams.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {

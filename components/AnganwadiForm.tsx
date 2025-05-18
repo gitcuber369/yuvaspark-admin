@@ -52,7 +52,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
     if (!Object.values(step1Errors).every((error) => error === "")) return;
 
     setLoading(true);
-    const res = await fetch("http://192.168.1.3:3000/api/anganwadis", {
+    const res = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -108,7 +108,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
 
     setLoading(true);
     const res = await fetch(
-      `http://192.168.1.3:3000/api/anganwadis/${anganwadiId}`,
+      `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis/${anganwadiId}`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

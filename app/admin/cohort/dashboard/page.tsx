@@ -52,7 +52,7 @@ export default function CohortDashboardPage() {
     const fetchCohorts = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch("http://192.168.1.3:3000/api/cohorts");
+        const res = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts");
         if (!res.ok) throw new Error("Failed to fetch cohorts");
         const data = await res.json();
         setCohorts(data);
@@ -78,7 +78,7 @@ export default function CohortDashboardPage() {
       if (cohortId === "all") {
         // Get top teachers from all cohorts
         const allTeachersPromises = cohorts.map(cohort => 
-          fetch(`http://192.168.1.3:3000/api/cohorts/${cohort.id}/rankings`)
+          fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohort.id}/rankings`)
             .then(res => res.ok ? res.json() : [])
         );
         
@@ -86,7 +86,7 @@ export default function CohortDashboardPage() {
         teachers = allTeachersResults.flat();
       } else {
         // Get teachers from specific cohort
-        const res = await fetch(`http://192.168.1.3:3000/api/cohorts/${cohortId}/rankings`);
+        const res = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohortId}/rankings`);
         if (res.ok) {
           teachers = await res.json();
         }

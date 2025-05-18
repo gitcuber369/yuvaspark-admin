@@ -78,8 +78,8 @@ export default function CohortPage() {
       setIsLoading(true);
       try {
         const [cohortsRes, teachersRes] = await Promise.all([
-          fetch("http://192.168.1.3:3000/api/cohorts"),
-          fetch("http://192.168.1.3:3000/api/teachers")
+          fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts"),
+          fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/teachers")
         ]);
 
         if (!cohortsRes.ok || !teachersRes.ok) {
@@ -118,7 +118,7 @@ export default function CohortPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://192.168.1.3:3000/api/cohorts", {
+      const response = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -133,7 +133,7 @@ export default function CohortPage() {
       toast.success("Cohort created successfully");
       
       // Refresh cohorts data
-      const cohortsRes = await fetch("http://192.168.1.3:3000/api/cohorts");
+      const cohortsRes = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts");
       const cohortsData = await cohortsRes.json();
       setCohorts(cohortsData);
       
@@ -154,7 +154,7 @@ export default function CohortPage() {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.3:3000/api/cohorts/${id}`, {
+      const response = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${id}`, {
         method: "DELETE"
       });
 

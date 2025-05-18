@@ -55,7 +55,7 @@ export default function AnganwadiPage() {
   const router = useRouter();
 
   const fetchAnganwadis = async () => {
-    const res = await fetch("http://192.168.1.3:3000/api/anganwadis");
+    const res = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis");
     const data = await res.json();
     setAnganwadis(data);
   };
@@ -172,7 +172,7 @@ export default function AnganwadiPage() {
 
     setLoading(true);
     const res = await fetch(
-      `http://192.168.1.3:3000/api/anganwadis/${selectedAnganwadi.id}`,
+      `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis/${selectedAnganwadi.id}`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

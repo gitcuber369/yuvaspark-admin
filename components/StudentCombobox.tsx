@@ -31,7 +31,7 @@ export default function StudentCombobox({ selected, setSelected }: Props) {
 
       try {
         // Fetch all selected students in one request
-        const res = await fetch(`http://192.168.1.3:3000/api/students?ids=${selected.join(',')}`);
+        const res = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/students?ids=${selected.join(',')}`);
         if (res.ok) {
           const data = await res.json();
           setSelectedStudents(data);
@@ -52,7 +52,7 @@ export default function StudentCombobox({ selected, setSelected }: Props) {
     }
 
     try {
-      const res = await fetch(`http://192.168.1.3:3000/api/students?search=${q}`);
+      const res = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/students?search=${q}`);
       if (res.ok) {
         const data = await res.json();
         // Filter out already selected students

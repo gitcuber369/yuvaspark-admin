@@ -67,13 +67,13 @@ export default function TeacherRankingsPage({ params }: PageProps) {
     setIsLoading(true);
     try {
       // Fetch cohort details
-      const cohortRes = await fetch(`http://192.168.1.3:3000/api/cohorts/${cohortId}`);
+      const cohortRes = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohortId}`);
       if (!cohortRes.ok) throw new Error("Failed to fetch cohort");
       const cohortData = await cohortRes.json();
       setCohort(cohortData);
 
       // Fetch teacher rankings
-      const rankingsRes = await fetch(`http://192.168.1.3:3000/api/cohorts/${cohortId}/rankings`);
+      const rankingsRes = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohortId}/rankings`);
       if (!rankingsRes.ok) throw new Error("Failed to fetch rankings");
       const rankingsData = await rankingsRes.json();
       setRankings(rankingsData);
@@ -92,7 +92,7 @@ export default function TeacherRankingsPage({ params }: PageProps) {
   const updateRankings = async () => {
     setIsUpdating(true);
     try {
-      const response = await fetch(`http://192.168.1.3:3000/api/cohorts/${cohortId}/update-rankings`, {
+      const response = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohortId}/update-rankings`, {
         method: "POST"
       });
 
