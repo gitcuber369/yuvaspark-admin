@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Determine the base URL based on environment
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/";
+const baseURL = "https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/";
 
 console.log("API base URL:", baseURL);
 
