@@ -75,7 +75,7 @@ export default function SubmissionDetailPage({ params }: PageProps) {
     const fetchSubmission = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/global-assessments/${id}/submissions/${submissionId}`
+          `http://192.168.1.3:3000/api/global-assessments/${id}/submissions/${submissionId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch submission");

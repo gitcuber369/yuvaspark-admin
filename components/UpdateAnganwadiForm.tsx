@@ -37,7 +37,7 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     const fetchAnganwadi = async () => {
       setIsFetching(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/anganwadis/${anganwadiId}`);
+        const res = await fetch(`http://192.168.1.3:3000/api/anganwadis/${anganwadiId}`);
         if (res.ok) {
           const data = await res.json();
           setForm({
@@ -91,7 +91,7 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:3000/api/anganwadis/${anganwadiId}`,
+        `http://192.168.1.3:3000/api/anganwadis/${anganwadiId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

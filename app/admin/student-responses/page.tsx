@@ -115,7 +115,7 @@ export default function StudentResponsesPage() {
   const fetchStudents = async () => {
     setLoadingStudents(true);
     try {
-      const response = await fetch("http://localhost:3000/api/students");
+      const response = await fetch("http://192.168.1.3:3000/api/students");
       if (!response.ok) {
         throw new Error("Failed to fetch students");
       }

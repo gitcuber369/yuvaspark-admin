@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { ArrowLeft, School, Search, Loader2 } from "lucide-react";
 import axios from "axios";
 import React from "react";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.3:3000/api/";
 
 // API functions
 const getAssessmentSessionById = async (id: string) => {

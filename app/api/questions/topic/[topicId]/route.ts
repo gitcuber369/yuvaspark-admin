@@ -10,7 +10,7 @@ export async function GET(
     
     // Make a request to the backend API
     const response = await axios.get(
-      `${process.env.BACKEND_API_URL || 'http://localhost:3000'}/questions/topic/${topicId}`,
+      `${process.env.BACKEND_API_URL || 'http://192.168.1.3:3000'}/questions/topic/${topicId}`,
       {
         headers: {
           // Forward authorization if present

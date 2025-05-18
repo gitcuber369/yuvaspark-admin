@@ -101,7 +101,7 @@ export default function TeacherStudentResponsesPage() {
   const fetchStudentsForTeacher = async (teacherId: string) => {
     setLoadingStudents(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/teachers/${teacherId}/students`);
+      const response = await fetch(`http://192.168.1.3:3000/api/teachers/${teacherId}/students`);
       if (!response.ok) {
         throw new Error("Failed to fetch students");
       }
@@ -119,7 +119,7 @@ export default function TeacherStudentResponsesPage() {
   const fetchEvaluationsForTeacher = async (teacherId: string) => {
     setLoadingEvaluations(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/teachers/${teacherId}/evaluations`);
+      const response = await fetch(`http://192.168.1.3:3000/api/teachers/${teacherId}/evaluations`);
       if (!response.ok) {
         throw new Error("Failed to fetch evaluations");
       }

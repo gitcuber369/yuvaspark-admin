@@ -10,7 +10,7 @@ export async function GET(
     console.log(`API route handler: Fetching question details for id: ${id}`);
     
     // Make a request to the backend API
-    const backendUrl = `${process.env.BACKEND_API_URL || 'http://localhost:3000'}/questions/${id}`;
+    const backendUrl = `${process.env.BACKEND_API_URL || 'http://192.168.1.3:3000'}/questions/${id}`;
     console.log(`Making request to backend URL: ${backendUrl}`);
     
     const response = await axios.get(

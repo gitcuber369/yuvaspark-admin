@@ -49,7 +49,7 @@ export default function CohortsPage() {
 
   const fetchCohorts = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/cohorts");
+      const res = await fetch("http://192.168.1.3:3000/api/cohorts");
       if (!res.ok) throw new Error("Failed to fetch cohorts");
       const data = await res.json();
       setCohorts(data);
@@ -61,7 +61,7 @@ export default function CohortsPage() {
 
   const fetchTeachers = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/teachers");
+      const res = await fetch("http://192.168.1.3:3000/api/teachers");
       if (!res.ok) throw new Error("Failed to fetch teachers");
       const data = await res.json();
       setTeachers(data);
@@ -85,7 +85,7 @@ export default function CohortsPage() {
         teacherIds: selectedTeachers,
       };
 
-      const res = await fetch("http://localhost:3000/api/cohorts", {
+      const res = await fetch("http://192.168.1.3:3000/api/cohorts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -108,7 +108,7 @@ export default function CohortsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/cohorts/${id}`, {
+      const res = await fetch(`http://192.168.1.3:3000/api/cohorts/${id}`, {
         method: "DELETE",
       });
 

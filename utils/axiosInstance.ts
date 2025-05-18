@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Determine the base URL based on environment
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/";
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.3:3000/api/";
 
 console.log("API base URL:", baseURL);
 

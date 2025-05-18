@@ -49,7 +49,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.3:3000/api/";
 
 // Type definitions
 interface Topic {

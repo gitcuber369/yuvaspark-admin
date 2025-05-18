@@ -593,6 +593,54 @@ export const getAllCohorts = async () => {
   }
 };
 
+// ✅ Get Teacher Rankings for a Cohort
+export const getTeacherRankings = async (cohortId: string) => {
+  try {
+    // Check if cohortId is valid
+    if (!cohortId || cohortId === "undefined") {
+      console.error("Invalid cohort ID provided:", cohortId);
+      throw new Error("Invalid cohort ID");
+    }
+    
+    const res = await API.get(`/cohorts/${cohortId}/rankings`);
+    
+    // Validate that the response contains an array of teachers
+    if (!Array.isArray(res.data)) {
+      console.error("Unexpected response format:", res.data);
+      throw new Error("Invalid response format");
+    }
+    
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching teacher rankings:", error);
+    // Return empty array instead of throwing to prevent UI from breaking
+    return [];
+  }
+};
+
+// ✅ Update Teacher Rankings for a Cohort
+export const updateTeacherRankings = async (cohortId: string) => {
+  try {
+    // Check if cohortId is valid
+    if (!cohortId || cohortId === "undefined") {
+      console.error("Invalid cohort ID provided:", cohortId);
+      throw new Error("Invalid cohort ID");
+    }
+    
+    const res = await API.post(`/cohorts/${cohortId}/rankings`);
+    
+    // Validate that the response contains the expected data
+    if (!res.data || !res.data.message) {
+      console.warn("Unexpected response format from ranking update:", res.data);
+    }
+    
+    return res.data;
+  } catch (error) {
+    console.error("Error updating teacher rankings:", error);
+    throw error;
+  }
+};
+
 // Update a Student
 export const updateStudent = async (
   id: string,

@@ -28,7 +28,7 @@ export default function TopicsPage() {
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
 
   const fetchTopics = async () => {
-    const res = await fetch("http://localhost:3000/api/topics");
+    const res = await fetch("http://192.168.1.3:3000/api/topics");
     const data = await res.json();
     setTopics(data);
   };
@@ -46,8 +46,8 @@ export default function TopicsPage() {
 
     const res = await fetch(
       editingTopic
-        ? `http://localhost:3000/api/topics/${editingTopic.id}`
-        : "http://localhost:3000/api/topics",
+        ? `http://192.168.1.3:3000/api/topics/${editingTopic.id}`
+        : "http://192.168.1.3:3000/api/topics",
       {
         method: editingTopic ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,7 +68,7 @@ export default function TopicsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
+    const res = await fetch(`http://192.168.1.3:3000/api/topics/${id}`, {
       method: "DELETE",
     });
 
