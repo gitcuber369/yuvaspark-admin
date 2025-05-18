@@ -3,10 +3,10 @@ import axios from "axios";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await context.params;
     console.log(`API route handler: Fetching question details for id: ${id}`);
     
     // Make a request to the backend API

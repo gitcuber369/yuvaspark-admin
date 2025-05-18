@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loginUser } from "@/app/api/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,24 +13,37 @@ import {
 } from "@/components/ui/card";
 import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
 import Link from "next/link";
+import React from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  // Check for registration success
+  useEffect(() => {
+    const registered = searchParams.get("registered");
+    if (registered === "true") {
+      setSuccess("Account created successfully! You can now log in.");
+    }
+  }, [searchParams]);
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    setSuccess("");
 
     try {
       await loginUser(email, password);
       router.push("/admin/dashboard");
-    } catch {
+    } catch (error) {
       setError("Invalid email or password. Please try again.");
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -47,9 +60,9 @@ export default function LoginPage() {
   };
 
   // Call the function when component mounts
-  useState(() => {
+  useEffect(() => {
     checkAuthStatus();
-  });
+  }, [router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
@@ -71,6 +84,11 @@ export default function LoginPage() {
           {error && (
             <div className="bg-gray-100 text-gray-800 border border-gray-300 p-3 rounded-md mb-4 text-sm flex items-center">
               <span className="mr-2">⚠️</span> {error}
+            </div>
+          )}
+          {success && (
+            <div className="bg-green-50 text-green-800 border border-green-200 p-3 rounded-md mb-4 text-sm flex items-center">
+              <span className="mr-2">✅</span> {success}
             </div>
           )}
           <form onSubmit={handleLogin} className="space-y-4">
@@ -116,8 +134,26 @@ export default function LoginPage() {
           >
             Forgot your password?
           </Link>
+          <p className="text-sm text-gray-600 mt-2">
+            Don't have an account?{" "}
+            <Link
+              href="/auth/register"
+              className="text-black hover:underline font-medium"
+            >
+              Create Account
+            </Link>
+          </p>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+// Wrap the component that uses useSearchParams in a Suspense boundary
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white p-4">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

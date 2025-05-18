@@ -35,31 +35,45 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+// Define interfaces for type safety
+interface Teacher {
+  id: string;
+  name: string;
+  phone: string;
+  cohort?: { id: string; name: string };
+  anganwadi?: { id: string; name: string };
+}
+
+interface Anganwadi {
+  id: string;
+  name: string;
+  location?: string;
+  code?: string;
+}
+
 export default function TeachersPage() {
   const {
     teachers,
-    assignToAnganwadi,
-    assignToCohort,
-    getByAnganwadi,
     loading,
     fetchTeachers,
     createTeacher,
     deleteTeacher,
+    getByAnganwadi,
   } = useTeacherStore();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [open, setOpen] = useState(false);
   const [assignAnganwadiOpen, setAssignAnganwadiOpen] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
   const [searchAnganwadi, setSearchAnganwadi] = useState("");
-  const [anganwadiResults, setAnganwadiResults] = useState([]);
+  const [anganwadiResults, setAnganwadiResults] = useState<Anganwadi[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [selectedAnganwadi, setSelectedAnganwadi] = useState(null);
+  const [selectedAnganwadi, setSelectedAnganwadi] = useState<Anganwadi | null>(null);
 
   const [creating, setCreating] = useState(false);
-  const [deletingTeacherId, setDeletingTeacherId] = useState(null);
-  const [assigningAnganwadiId, setAssigningAnganwadiId] = useState(null);
+  const [deletingTeacherId, setDeletingTeacherId] = useState<string | null>(null);
+  const [assigningAnganwadiId, setAssigningAnganwadiId] = useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -110,7 +124,7 @@ export default function TeachersPage() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     setDeletingTeacherId(id);
     try {
       await deleteTeacher(id);
@@ -122,21 +136,31 @@ export default function TeachersPage() {
     }
   };
 
-  const openAssignAnganwadi = (teacher) => {
+  const openAssignAnganwadi = (teacher: Teacher) => {
     setSelectedTeacher(teacher);
     setAssignAnganwadiOpen(true);
     setSearchAnganwadi("");
     setAnganwadiResults([]);
   };
 
-  const handleAssignAnganwadi = async (anganwadiId) => {
+  const handleAssignAnganwadi = async (anganwadiId: string) => {
     if (!selectedTeacher || !anganwadiId) return;
     setAssigningAnganwadiId(anganwadiId);
     try {
-      await assignToAnganwadi(selectedTeacher.id, anganwadiId);
+      await fetch(`http://localhost:3000/api/teachers/assign`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          teacherId: selectedTeacher.id,
+          anganwadiId
+        }),
+      });
       toast.success("Anganwadi assigned successfully!");
       setAssignAnganwadiOpen(false);
       setSelectedTeacher(null);
+      fetchTeachers();
     } catch (err) {
       toast.error("Failed to assign anganwadi");
     } finally {

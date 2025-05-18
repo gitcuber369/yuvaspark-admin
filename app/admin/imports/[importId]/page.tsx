@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import API from "@/utils/axiosInstance";
@@ -12,7 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, FileText, RefreshCw, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  ArrowLeft,
+  FileText,
+  RefreshCw,
+  AlertCircle,
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 
@@ -30,16 +37,26 @@ interface ImportStatus {
   errors?: string[];
 }
 
-export default function ImportStatusPage({ params }: { params: { importId: string } }) {
+// Fixed type definition for Next.js Pages
+// @ts-ignore - Next.js type mismatch with params
+interface PageProps {
+  params: Promise<{
+    importId: string;
+  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default function ImportStatusPage({ params }: PageProps) {
   const [importStatus, setImportStatus] = useState<ImportStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { importId } = React.use(params);
 
   const fetchImportStatus = async () => {
     setLoading(true);
     try {
-      const response = await API.get(`/csv-import/${params.importId}`);
+      const response = await API.get(`/csv-import/${importId}`);
       setImportStatus(response.data);
       setError(null);
     } catch (err: any) {
@@ -52,13 +69,16 @@ export default function ImportStatusPage({ params }: { params: { importId: strin
 
   useEffect(() => {
     fetchImportStatus();
-    
+
     // If import is still processing, set up polling
-    if (importStatus?.status === "PENDING" || importStatus?.status === "PROCESSING") {
+    if (
+      importStatus?.status === "PENDING" ||
+      importStatus?.status === "PROCESSING"
+    ) {
       const intervalId = setInterval(fetchImportStatus, 5000);
       return () => clearInterval(intervalId);
     }
-  }, [params.importId, importStatus?.status]);
+  }, [importId, importStatus?.status]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -76,7 +96,9 @@ export default function ImportStatusPage({ params }: { params: { importId: strin
 
   const getProgress = () => {
     if (!importStatus?.totalRows) return 0;
-    return Math.round((importStatus.processedRows || 0) / importStatus.totalRows * 100);
+    return Math.round(
+      ((importStatus.processedRows || 0) / importStatus.totalRows) * 100
+    );
   };
 
   return (
@@ -124,31 +146,40 @@ export default function ImportStatusPage({ params }: { params: { importId: strin
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Filename</h3>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Filename
+                  </h3>
                   <p className="flex items-center mt-1">
                     <FileText className="h-4 w-4 mr-1" />
                     {importStatus.filename}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Imported By</h3>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Imported By
+                  </h3>
                   <p className="mt-1">{importStatus.importedBy}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Created At</h3>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Created At
+                  </h3>
                   <p className="mt-1">
                     {new Date(importStatus.createdAt).toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Last Updated</h3>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Last Updated
+                  </h3>
                   <p className="mt-1">
                     {new Date(importStatus.updatedAt).toLocaleString()}
                   </p>
                 </div>
               </div>
 
-              {(importStatus.status === "PENDING" || importStatus.status === "PROCESSING") && (
+              {(importStatus.status === "PENDING" ||
+                importStatus.status === "PROCESSING") && (
                 <div className="mt-4">
                   <div className="flex justify-between mb-2">
                     <span className="text-sm">Processing...</span>
@@ -162,11 +193,15 @@ export default function ImportStatusPage({ params }: { params: { importId: strin
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
                   <div className="bg-gray-100 p-3 rounded">
                     <h3 className="text-xs text-gray-500">Total Rows</h3>
-                    <p className="text-xl font-semibold">{importStatus.totalRows}</p>
+                    <p className="text-xl font-semibold">
+                      {importStatus.totalRows}
+                    </p>
                   </div>
                   <div className="bg-gray-100 p-3 rounded">
                     <h3 className="text-xs text-gray-500">Processed</h3>
-                    <p className="text-xl font-semibold">{importStatus.processedRows || 0}</p>
+                    <p className="text-xl font-semibold">
+                      {importStatus.processedRows || 0}
+                    </p>
                   </div>
                   <div className="bg-green-50 p-3 rounded">
                     <h3 className="text-xs text-green-600">Successful</h3>
@@ -185,7 +220,9 @@ export default function ImportStatusPage({ params }: { params: { importId: strin
 
               {importStatus.errors && importStatus.errors.length > 0 && (
                 <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Errors</h3>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">
+                    Errors
+                  </h3>
                   <div className="bg-red-50 p-3 rounded border border-red-200 max-h-64 overflow-y-auto">
                     <ul className="list-disc pl-5 space-y-1">
                       {importStatus.errors.map((error, index) => (
@@ -214,4 +251,4 @@ export default function ImportStatusPage({ params }: { params: { importId: strin
       ) : null}
     </div>
   );
-} 
+}

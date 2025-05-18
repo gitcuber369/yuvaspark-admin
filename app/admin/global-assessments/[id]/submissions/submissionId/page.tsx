@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getAnganwadiById } from "@/app/api/api";
+import React from "react";
 
 interface Response {
   id: string;
@@ -54,12 +55,18 @@ interface Submission {
   status: string;
 }
 
-export default function SubmissionDetails({
-  params,
-}: {
-  params: { id: string; submissionId: string };
-}) {
+// @ts-ignore - Next.js type mismatch with params
+interface PageProps {
+  params: Promise<{ 
+    id: string; 
+    submissionId: string 
+  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default function SubmissionDetailPage({ params }: PageProps) {
   const router = useRouter();
+  const { id, submissionId } = React.use(params);
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +75,7 @@ export default function SubmissionDetails({
     const fetchSubmission = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/global-assessments/${params.id}/submissions/${params.submissionId}`
+          `http://localhost:3000/api/global-assessments/${id}/submissions/${submissionId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch submission");
@@ -101,7 +108,7 @@ export default function SubmissionDetails({
     };
 
     fetchSubmission();
-  }, [params.id, params.submissionId]);
+  }, [id, submissionId]);
 
   const handlePlayAudio = (audioUrl: string) => {
     // Implement audio playback logic
