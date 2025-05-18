@@ -17,7 +17,12 @@ import {
   Home,
   BookOpen,
   Award,
+  BookText,
+  MessageSquareText,
+  ClipboardList,
+  FileCheck2,
 } from "lucide-react";
+import { useAnganwadiStore } from "@/app/store/anganwadiStore";
 
 const statsData = [
   {
@@ -42,10 +47,10 @@ const statsData = [
     color: "bg-gradient-to-r from-purple-600 to-purple-400",
   },
   {
-    title: "Exams",
+    title: "Assessments",
     count: 6,
-    icon: <Award className="w-6 h-6 text-white" />,
-    link: "/admin/exams",
+    icon: <ClipboardList className="w-6 h-6 text-white" />,
+    link: "/admin/global-assessments",
     color: "bg-gradient-to-r from-amber-600 to-amber-400",
   },
 ];
@@ -53,33 +58,33 @@ const statsData = [
 const quickActions = [
   {
     title: "Add New Teacher",
-    link: "/admin/teachers/new",
+    link: "/admin/teachers",
     icon: <Users className="w-5 h-5" />,
     color: "bg-blue-100 text-blue-600",
   },
   {
     title: "Add New Student",
-    link: "/admin/students/new",
+    link: "/admin/students",
     icon: <GraduationCap className="w-5 h-5" />,
     color: "bg-green-100 text-green-600",
   },
   {
     title: "Anganwadi Settings",
-    link: "/admin/anganwadi/settings",
+    link: "/admin/anganwadi",
     icon: <Home className="w-5 h-5" />,
     color: "bg-purple-100 text-purple-600",
   },
   {
-    title: "Publish Exam",
-    link: "/admin/exams/publish",
-    icon: <Award className="w-5 h-5" />,
+    title: "Manage Assessments",
+    link: "/admin/global-assessments",
+    icon: <ClipboardList className="w-5 h-5" />,
     color: "bg-amber-100 text-amber-600",
   },
   {
-    title: "System Settings",
-    link: "/admin/settings",
-    icon: <Settings className="w-5 h-5" />,
-    color: "bg-gray-100 text-gray-600",
+    title: "Manage Topics",
+    link: "/admin/topic",
+    icon: <BookText className="w-5 h-5" />,
+    color: "bg-indigo-100 text-indigo-600",
   },
   {
     title: "View Reports",
@@ -90,24 +95,11 @@ const quickActions = [
 ];
 
 export default function DashboardPage() {
-  const [anganwadis, setAnganwadis] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { anganwadis, loading, error, fetchAnganwadis } = useAnganwadiStore();
 
   useEffect(() => {
-    const fetchAnganwadis = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/api/anganwadis");
-        const data = await res.json();
-        setAnganwadis(data);
-      } catch (err) {
-        console.error("Failed to fetch anganwadis", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAnganwadis();
-  }, []);
+  }, [fetchAnganwadis]);
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -181,28 +173,53 @@ export default function DashboardPage() {
           </div>
           <div className="p-5">
             {loading ? (
-              <p className="text-gray-500">Loading anganwadis...</p>
+              <div className="flex justify-center items-center py-10">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-10">
+                <p className="text-red-500 mb-2">Failed to load anganwadis</p>
+                <button 
+                  onClick={() => fetchAnganwadis()} 
+                  className="px-4 py-2 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
             ) : anganwadis.length === 0 ? (
-              <p className="text-gray-500">No anganwadis found.</p>
+              <div className="text-center py-10">
+                <p className="text-gray-500 mb-4">No anganwadis found.</p>
+                <Link
+                  href="/admin/anganwadi" 
+                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                >
+                  Add Anganwadi
+                </Link>
+              </div>
             ) : (
-              <ul className="divide-y">
-                {anganwadis.map((a, index) => (
-                  <li key={a.id || index} className="py-4 first:pt-0 last:pb-0">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium shadow">
-                        {a.name?.charAt(0) || "A"}
+              <div className="overflow-hidden overflow-y-auto max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <ul className="divide-y">
+                  {anganwadis.map((a) => (
+                    <li key={a._id} className="py-4 first:pt-0 last:pb-0 hover:bg-gray-50 transition-colors rounded-md px-2">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium shadow">
+                          {a.name?.charAt(0) || "A"}
+                        </div>
+                        <div className="ml-4 flex-grow">
+                          <p className="text-sm font-medium text-gray-900">{a.name}</p>
+                          <p className="text-xs text-gray-500">{a.location || "No location"}, {a.district || "No district"}</p>
+                        </div>
+                        <Link
+                          href={`/admin/anganwadi/${a._id}`}
+                          className="text-xs font-medium px-3 py-1.5 bg-purple-100 rounded-full text-purple-600 hover:bg-purple-200 transition-colors"
+                        >
+                          View
+                        </Link>
                       </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-900">{a.name}</p>
-                        <p className="text-sm text-gray-500">{a.location || "No location"}</p>
-                      </div>
-                      <div className="ml-auto text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-600">
-                        ID: {a.id || index + 1}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
         </div>

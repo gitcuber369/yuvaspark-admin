@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AnganwadiForm } from "@/components/AnganwadiForm";
+import { UpdateAnganwadiForm } from "@/components/UpdateAnganwadiForm";
 import {
   Dialog,
   DialogTrigger,
@@ -34,6 +35,8 @@ interface Anganwadi {
 export default function AnganwadiPage() {
   const [anganwadis, setAnganwadis] = useState<Anganwadi[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [selectedAnganwadi, setSelectedAnganwadi] = useState<string | null>(null);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
   const router = useRouter();
 
   const fetchAnganwadis = async () => {
@@ -51,6 +54,16 @@ export default function AnganwadiPage() {
       method: "DELETE",
     });
     fetchAnganwadis();
+  };
+
+  const handleEdit = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation
+    setSelectedAnganwadi(id);
+    setShowUpdateForm(true);
+  };
+
+  const handleRowClick = (id: string) => {
+    router.push(`/admin/anganwadi/${id}`);
   };
 
   return (
@@ -73,6 +86,23 @@ export default function AnganwadiPage() {
         </CardHeader>
       </Card>
 
+      {/* Update Anganwadi Dialog */}
+      <Dialog open={showUpdateForm} onOpenChange={setShowUpdateForm}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogTitle>Update Anganwadi</DialogTitle>
+          <DialogDescription>
+            Update details or add students to this Anganwadi.
+          </DialogDescription>
+          {selectedAnganwadi && (
+            <UpdateAnganwadiForm
+              anganwadiId={selectedAnganwadi}
+              onSuccess={fetchAnganwadis}
+              onClose={() => setShowUpdateForm(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Card>
         <CardHeader>
           <CardTitle>All Centers</CardTitle>
@@ -94,33 +124,43 @@ export default function AnganwadiPage() {
                 anganwadis.map((a) => (
                   <TableRow
                     key={a.id}
-                    onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
                     className="cursor-pointer hover:bg-muted transition"
                   >
-                    <TableCell>{a.name}</TableCell>
-                    <TableCell>{a.location}</TableCell>
-                    <TableCell>{a.district}</TableCell>
-                    <TableCell>
+                    <TableCell onClick={() => handleRowClick(a.id)}>{a.name}</TableCell>
+                    <TableCell onClick={() => handleRowClick(a.id)}>{a.location}</TableCell>
+                    <TableCell onClick={() => handleRowClick(a.id)}>{a.district}</TableCell>
+                    <TableCell onClick={() => handleRowClick(a.id)}>
                       {a.teacher
                         ? `${a.teacher.name} (${a.teacher.phone})`
                         : "Not assigned"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={() => handleRowClick(a.id)}>
                       {a.students.length > 0
                         ? a.students.map((s) => s.name).join(", ")
                         : "No students"}
                     </TableCell>
                     <TableCell
                       className="text-right"
-                      onClick={(e) => e.stopPropagation()} // prevent navigation
                     >
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(a.id)}
-                      >
-                        Delete
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => handleEdit(a.id, e)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(a.id);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

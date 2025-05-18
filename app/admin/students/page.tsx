@@ -578,10 +578,13 @@ export default function StudentDashboard() {
                             Anganwadi:
                           </span>
                           <Select
-                            value={student.anganwadiId || ""}
+                            value={student.anganwadiId || "none"}
                             onValueChange={(value) => {
-                              if (value) {
+                              if (value && value !== "none") {
                                 assignToAnganwadi(student.id, value);
+                              } else if (value === "none" && student.anganwadiId) {
+                                // Unassign by setting anganwadiId to empty string
+                                updateStudent(student.id, { anganwadiId: "" });
                               }
                             }}
                           >
@@ -590,7 +593,7 @@ export default function StudentDashboard() {
                             </SelectTrigger>
                             <SelectContent className="max-h-60">
                               {student.anganwadiId && (
-                                <SelectItem value="">
+                                <SelectItem value="none">
                                   <span className="text-gray-500">
                                     Unassign
                                   </span>

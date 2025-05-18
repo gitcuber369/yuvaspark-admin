@@ -30,7 +30,7 @@ export default function CsvImportForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [importId, setImportId] = useState<string | null>(null);
-  const [selectedAnganwadiId, setSelectedAnganwadiId] = useState<string>("");
+  const [selectedAnganwadiId, setSelectedAnganwadiId] = useState<string>("none");
   const { anganwadis, fetchAnganwadis } = useAnganwadiStore();
   const router = useRouter();
 
@@ -70,8 +70,8 @@ export default function CsvImportForm() {
       const formData = new FormData();
       formData.append("file", file);
 
-      // Add anganwadi ID if one was selected
-      if (selectedAnganwadiId) {
+      // Add anganwadi ID if one was selected (not "none")
+      if (selectedAnganwadiId && selectedAnganwadiId !== "none") {
         formData.append("anganwadiId", selectedAnganwadiId);
       }
 
@@ -138,7 +138,7 @@ export default function CsvImportForm() {
                 <SelectValue placeholder="Select anganwadi (optional)" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {anganwadis.map((anganwadi) => (
                   <SelectItem key={anganwadi._id} value={anganwadi._id}>
                     {anganwadi.name}

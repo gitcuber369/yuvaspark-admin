@@ -59,6 +59,11 @@ const adminNav = [
     icon: MessageSquareText,
     url: "/admin/student-responses",
   },
+  {
+    title: "Reports",
+    icon: FileBarChart2,
+    url: "/admin/reports",
+  },
 ];
 
 export function AdminSidebar({
