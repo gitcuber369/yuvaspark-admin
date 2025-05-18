@@ -10,7 +10,7 @@ export async function GET(
     console.log(`API route handler: Fetching question details for id: ${id}`);
     
     // Make a request to the backend API
-    const backendUrl = `${process.env.BACKEND_API_URL || 'http://localhost:3000'}/questions/${id}`;
+    const backendUrl = `${process.env.BACKEND_API_URL || 'https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app'}/questions/${id}`;
     console.log(`Making request to backend URL: ${backendUrl}`);
     
     const response = await axios.get(

@@ -47,7 +47,7 @@ export default function AnganwadiResponsesPage() {
 
   const fetchAnganwadis = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/anganwadis");
+      const res = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis");
       if (!res.ok) throw new Error("Failed to fetch anganwadis");
       const data = await res.json();
       setAnganwadis(data);
@@ -71,7 +71,7 @@ export default function AnganwadiResponsesPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:3000/api/student-responses/anganwadi/${anganwadiId}/count`
+        `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/anganwadi/${anganwadiId}/count`
       );
       if (!res.ok) throw new Error("Failed to fetch response counts");
       const data = await res.json();
@@ -91,7 +91,7 @@ export default function AnganwadiResponsesPage() {
         anganwadiList.map(async (anganwadi) => {
           try {
             const res = await fetch(
-              `http://localhost:3000/api/student-responses/anganwadi/${anganwadi.id}/count`
+              `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/anganwadi/${anganwadi.id}/count`
             );
             if (!res.ok) {
               throw new Error(`Failed to fetch for ${anganwadi.name}`);

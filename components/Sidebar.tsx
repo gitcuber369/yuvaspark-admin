@@ -30,7 +30,6 @@ import {
   School,
   GraduationCap,
   ClipboardCheck,
-  Users as Cohorts,
   MessagesSquare,
   SettingsIcon,
   UserCircle,
@@ -45,7 +44,7 @@ const adminNav = [
   { title: "Teachers", icon: School, url: "/admin/teachers" },
   { title: "Students", icon: GraduationCap, url: "/admin/students" },
   { title: "Anganwadi", icon: HomeIcon, url: "/admin/anganwadi" },
-  { title: "Cohorts", icon: Cohorts, url: "/admin/cohorts" },
+  { title: "Cohorts", icon: Users, url: "/admin/cohorts" },
   { title: "Topics", icon: PanelTopInactive, url: "/admin/topic" },
   { title: "Questions", icon: MessagesSquare, url: "/admin/questions" },
   {
@@ -60,9 +59,19 @@ const adminNav = [
     url: "/admin/student-responses",
   },
   {
-    title: "Reports",
-    icon: FileBarChart2,
-    url: "/admin/reports",
+    title: "Cohort Management",
+    icon: Users,
+    url: "/admin/cohort",
+    submenu: [
+      {
+        title: "Cohorts",
+        url: "/admin/cohort"
+      },
+      {
+        title: "Rankings Dashboard",
+        url: "/admin/cohort/dashboard"
+      }
+    ]
   },
 ];
 

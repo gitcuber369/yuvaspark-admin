@@ -52,11 +52,11 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
     set({ loading: true, error: null });
     try {
       // Default to scored responses since there's no generic endpoint
-      let url = 'http://localhost:3000/api/student-responses/scored';
+      let url = 'https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/scored';
       
       // If filters are provided, use the appropriate endpoint
       if (filters.studentId) {
-        url = `http://localhost:3000/api/student-responses/student/${filters.studentId}`;
+        url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/student/${filters.studentId}`;
       }
       
       // Add date filters as query parameters if they exist
@@ -88,7 +88,7 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
   fetchByStudent: async (studentId: string) => {
     set({ loading: true, error: null });
     try {
-      const url = `http://localhost:3000/api/student-responses/student/${studentId}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/student/${studentId}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -118,7 +118,7 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
         queryParams.append('endDate', filters.endDate);
       }
       
-      let url = `http://localhost:3000/api/student-responses/scored`;
+      let url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/scored`;
       if (queryParams.toString()) {
         url += `?${queryParams.toString()}`;
       }
@@ -142,7 +142,7 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
   fetchResponseById: async (id: string) => {
     set({ loading: true, error: null });
     try {
-      const url = `http://localhost:3000/api/student-responses/${id}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/${id}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -163,7 +163,7 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
   deleteResponse: async (id: string) => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch(`http://localhost:3000/api/student-responses/${id}`, {
+      const response = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/${id}`, {
         method: 'DELETE',
       });
       
@@ -193,7 +193,7 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       
-      const url = `http://localhost:3000/api/student-responses/export?${queryParams.toString()}`;
+      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/export?${queryParams.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {

@@ -37,7 +37,7 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     const fetchAnganwadi = async () => {
       setIsFetching(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/anganwadis/${anganwadiId}`);
+        const res = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis/${anganwadiId}`);
         if (res.ok) {
           const data = await res.json();
           setForm({
@@ -91,7 +91,7 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:3000/api/anganwadis/${anganwadiId}`,
+        `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis/${anganwadiId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

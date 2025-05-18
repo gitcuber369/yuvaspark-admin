@@ -75,7 +75,7 @@ export default function SubmissionDetailPage({ params }: PageProps) {
     const fetchSubmission = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/global-assessments/${id}/submissions/${submissionId}`
+          `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/global-assessments/${id}/submissions/${submissionId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch submission");
