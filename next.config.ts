@@ -5,12 +5,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'http://54.144.64.93:3000/api/:path*', // Proxy to backend
-      },  
+        source: "/api/:path*",
+        destination: "http://54.144.64.93:3000/api/:path*", // Proxy to backend
+      },
     ];
   },
-  
 };
 
 export default nextConfig;
