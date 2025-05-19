@@ -481,9 +481,14 @@ export const getGlobalAssessmentById = async (id: string) => {
 };
 
 // Get submissions for a specific anganwadi in a global assessment
-export const getAnganwadiSubmissions = async (assessmentId: string, anganwadiId: string) => {
+export const getAnganwadiSubmissions = async (
+  assessmentId: string,
+  anganwadiId: string
+) => {
   try {
-    const res = await API.get(`global-assessments/${assessmentId}/anganwadi/${anganwadiId}`);
+    const res = await API.get(
+      `global-assessments/${assessmentId}/anganwadi/${anganwadiId}`
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching anganwadi submissions:", error);
@@ -493,8 +498,8 @@ export const getAnganwadiSubmissions = async (assessmentId: string, anganwadiId:
 
 // Record a student submission for a global assessment
 export const recordStudentSubmission = async (
-  assessmentId: string, 
-  studentId: string, 
+  assessmentId: string,
+  studentId: string,
   data: {
     teacherId: string;
     anganwadiId: string;
@@ -508,7 +513,10 @@ export const recordStudentSubmission = async (
   }
 ) => {
   try {
-    const res = await API.post(`global-assessments/${assessmentId}/student/${studentId}`, data);
+    const res = await API.post(
+      `global-assessments/${assessmentId}/student/${studentId}`,
+      data
+    );
     return res.data;
   } catch (error) {
     console.error("Error recording student submission:", error);
@@ -539,9 +547,14 @@ export const completeGlobalAssessment = async (id: string) => {
 };
 
 // Get details of a specific submission
-export const getSubmissionById = async (assessmentId: string, submissionId: string) => {
+export const getSubmissionById = async (
+  assessmentId: string,
+  submissionId: string
+) => {
   try {
-    const res = await API.get(`global-assessments/${assessmentId}/submissions/${submissionId}`);
+    const res = await API.get(
+      `global-assessments/${assessmentId}/submissions/${submissionId}`
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching submission details:", error);
@@ -550,9 +563,14 @@ export const getSubmissionById = async (assessmentId: string, submissionId: stri
 };
 
 // Score a single student response
-export const scoreStudentResponse = async (responseId: string, score: number) => {
+export const scoreStudentResponse = async (
+  responseId: string,
+  score: number
+) => {
   try {
-    const res = await API.post(`/student-responses/${responseId}/score`, { score });
+    const res = await API.post(`/student-responses/${responseId}/score`, {
+      score,
+    });
     return res.data;
   } catch (error) {
     console.error("Error scoring response:", error);
@@ -561,7 +579,9 @@ export const scoreStudentResponse = async (responseId: string, score: number) =>
 };
 
 // Batch score multiple responses
-export const batchScoreResponses = async (scores: { responseId: string; score: number }[]) => {
+export const batchScoreResponses = async (
+  scores: { responseId: string; score: number }[]
+) => {
   try {
     const res = await API.post("/student-responses/batch-score", { scores });
     return res.data;
@@ -589,6 +609,54 @@ export const getAllCohorts = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching cohorts:", error);
+    throw error;
+  }
+};
+
+// ✅ Get Teacher Rankings for a Cohort
+export const getTeacherRankings = async (cohortId: string) => {
+  try {
+    // Check if cohortId is valid
+    if (!cohortId || cohortId === "undefined") {
+      console.error("Invalid cohort ID provided:", cohortId);
+      throw new Error("Invalid cohort ID");
+    }
+
+    const res = await API.get(`/cohorts/${cohortId}/rankings`);
+
+    // Validate that the response contains an array of teachers
+    if (!Array.isArray(res.data)) {
+      console.error("Unexpected response format:", res.data);
+      throw new Error("Invalid response format");
+    }
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching teacher rankings:", error);
+    // Return empty array instead of throwing to prevent UI from breaking
+    return [];
+  }
+};
+
+// ✅ Update Teacher Rankings for a Cohort
+export const updateTeacherRankings = async (cohortId: string) => {
+  try {
+    // Check if cohortId is valid
+    if (!cohortId || cohortId === "undefined") {
+      console.error("Invalid cohort ID provided:", cohortId);
+      throw new Error("Invalid cohort ID");
+    }
+
+    const res = await API.post(`/cohorts/${cohortId}/rankings`);
+
+    // Validate that the response contains the expected data
+    if (!res.data || !res.data.message) {
+      console.warn("Unexpected response format from ranking update:", res.data);
+    }
+
+    return res.data;
+  } catch (error) {
+    console.error("Error updating teacher rankings:", error);
     throw error;
   }
 };

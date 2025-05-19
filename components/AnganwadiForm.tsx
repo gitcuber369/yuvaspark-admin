@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { ScrollArea } from "./ui/scroll-area";
+import { API_URL } from "@/lib/config";
 
 interface Props {
   onSuccess: () => void;
@@ -52,7 +53,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
     if (!Object.values(step1Errors).every((error) => error === "")) return;
 
     setLoading(true);
-    const res = await fetch("http://localhost:3000/api/anganwadis", {
+    const res = await fetch(`${API_URL}anganwadis`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -108,7 +109,7 @@ export const AnganwadiForm = ({ onSuccess }: Props) => {
 
     setLoading(true);
     const res = await fetch(
-      `http://localhost:3000/api/anganwadis/${anganwadiId}`,
+      `${API_URL}anganwadis/${anganwadiId}`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

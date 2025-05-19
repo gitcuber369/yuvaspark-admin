@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { API_URL } from "@/lib/config";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,8 +14,10 @@ export async function GET(request: NextRequest) {
     if (topic) queryParams.append("topic", topic);
     if (search) queryParams.append("search", search);
     
-    // Make request to the backend
-    const backendUrl = `${process.env.BACKEND_API_URL || 'http://localhost:3000'}/questions`;
+    // Make a request to the backend API
+    const backendUrl = `${API_URL}questions`;
+    console.log(`Making request to backend URL: ${backendUrl}`);
+    
     const finalUrl = queryParams.toString() 
       ? `${backendUrl}?${queryParams.toString()}` 
       : backendUrl;

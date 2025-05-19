@@ -12,8 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { API_URL } from "@/lib/config";
 
 interface Topic {
   id: string;
@@ -28,7 +34,7 @@ export default function TopicsPage() {
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
 
   const fetchTopics = async () => {
-    const res = await fetch("http://localhost:3000/api/topics");
+    const res = await fetch(`${API_URL}topics`);
     const data = await res.json();
     setTopics(data);
   };
@@ -45,9 +51,7 @@ export default function TopicsPage() {
     };
 
     const res = await fetch(
-      editingTopic
-        ? `http://localhost:3000/api/topics/${editingTopic.id}`
-        : "http://localhost:3000/api/topics",
+      editingTopic ? `${API_URL}topics/${editingTopic.id}` : `${API_URL}topics`,
       {
         method: editingTopic ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,7 +72,7 @@ export default function TopicsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
+    const res = await fetch(`${API_URL}topics/${id}`, {
       method: "DELETE",
     });
 
@@ -97,7 +101,9 @@ export default function TopicsPage() {
               <Button variant="default">Add Topic</Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogTitle>{editingTopic ? "Edit Topic" : "Add New Topic"}</DialogTitle>
+              <DialogTitle>
+                {editingTopic ? "Edit Topic" : "Add New Topic"}
+              </DialogTitle>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                   placeholder="Topic name"

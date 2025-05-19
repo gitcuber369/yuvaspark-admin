@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import API_URL from "@/utils/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -31,7 +31,12 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { checkAnganwadiDependencies, deleteAnganwadi, removeAnganwadiDependencies, removeAllStudentsFromAnganwadi } from "@/app/api/api";
+import {
+  checkAnganwadiDependencies,
+  deleteAnganwadi,
+  removeAnganwadiDependencies,
+  removeAllStudentsFromAnganwadi,
+} from "@/app/api/api";
 
 interface Anganwadi {
   id: string;
@@ -55,7 +60,7 @@ export default function AnganwadiPage() {
   const router = useRouter();
 
   const fetchAnganwadis = async () => {
-    const res = await fetch("http://localhost:3000/api/anganwadis");
+    const res = await fetch(`http://54.144.64.93:3000/api/anganwadis`);
     const data = await res.json();
     setAnganwadis(data);
   };
@@ -85,25 +90,28 @@ export default function AnganwadiPage() {
         const confirmRemoveDependencies = window.confirm(
           `Cannot delete this Anganwadi:\n${dependencies.details}\n\nWould you like to remove all dependencies and then delete this Anganwadi?`
         );
-        
+
         if (confirmRemoveDependencies) {
           try {
             // Remove all dependencies
             const result = await removeAnganwadiDependencies(id);
             alert(`Dependencies removed: ${JSON.stringify(result.removed)}`);
-            
+
             // Now try to delete again
             const confirmDeleteAfterCleanup = window.confirm(
               "Dependencies have been removed. Proceed with deleting the Anganwadi?"
             );
-            
+
             if (confirmDeleteAfterCleanup) {
               await deleteAnganwadi(id);
               fetchAnganwadis();
             }
           } catch (error: any) {
             console.error("Error removing dependencies:", error);
-            alert("Failed to remove dependencies: " + (error.response?.data?.error || error.message));
+            alert(
+              "Failed to remove dependencies: " +
+                (error.response?.data?.error || error.message)
+            );
           }
         }
         return;
@@ -172,7 +180,7 @@ export default function AnganwadiPage() {
 
     setLoading(true);
     const res = await fetch(
-      `http://localhost:3000/api/anganwadis/${selectedAnganwadi.id}`,
+      `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis/${selectedAnganwadi.id}`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -233,30 +241,45 @@ export default function AnganwadiPage() {
                     selected={studentIds}
                     setSelected={setStudentIds}
                   />
-                  {selectedAnganwadi && selectedAnganwadi.students && selectedAnganwadi.students.length > 0 && (
-                    <div className="mt-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700"
-                        onClick={async () => {
-                          if (window.confirm(`Are you sure you want to remove all ${selectedAnganwadi.students.length} students from this Anganwadi?`)) {
-                            try {
-                              await removeAllStudentsFromAnganwadi(selectedAnganwadi.id);
-                              setStudentIds([]);
-                              alert("All students have been removed");
-                              fetchAnganwadis();
-                            } catch (error: any) {
-                              console.error("Error removing students:", error);
-                              alert("Failed to remove students: " + (error.response?.data?.error || error.message));
+                  {selectedAnganwadi &&
+                    selectedAnganwadi.students &&
+                    selectedAnganwadi.students.length > 0 && (
+                      <div className="mt-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700"
+                          onClick={async () => {
+                            if (
+                              window.confirm(
+                                `Are you sure you want to remove all ${selectedAnganwadi.students.length} students from this Anganwadi?`
+                              )
+                            ) {
+                              try {
+                                await removeAllStudentsFromAnganwadi(
+                                  selectedAnganwadi.id
+                                );
+                                setStudentIds([]);
+                                alert("All students have been removed");
+                                fetchAnganwadis();
+                              } catch (error: any) {
+                                console.error(
+                                  "Error removing students:",
+                                  error
+                                );
+                                alert(
+                                  "Failed to remove students: " +
+                                    (error.response?.data?.error ||
+                                      error.message)
+                                );
+                              }
                             }
-                          }
-                        }}
-                      >
-                        Remove All Students
-                      </Button>
-                    </div>
-                  )}
+                          }}
+                        >
+                          Remove All Students
+                        </Button>
+                      </div>
+                    )}
                 </div>
 
                 {/* Create New Students */}

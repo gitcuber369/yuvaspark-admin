@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { ScrollArea } from "./ui/scroll-area";
+import { API_URL } from "@/lib/config";
 
 interface Props {
   anganwadiId: string;
@@ -37,7 +38,7 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     const fetchAnganwadi = async () => {
       setIsFetching(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/anganwadis/${anganwadiId}`);
+        const res = await fetch(`${API_URL}anganwadis/${anganwadiId}`);
         if (res.ok) {
           const data = await res.json();
           setForm({
@@ -91,7 +92,7 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:3000/api/anganwadis/${anganwadiId}`,
+        `${API_URL}anganwadis/${anganwadiId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

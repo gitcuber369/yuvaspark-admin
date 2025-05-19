@@ -48,8 +48,7 @@ import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
 import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/";
+import { API_URL } from "@/lib/config";
 
 // Type definitions
 interface Topic {

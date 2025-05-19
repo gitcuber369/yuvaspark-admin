@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { API_URL } from "@/lib/config";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
-    console.log(`API route handler: Fetching question details for id: ${id}`);
-    
-    // Make a request to the backend API
-    const backendUrl = `${process.env.BACKEND_API_URL || 'http://localhost:3000'}/questions/${id}`;
+    const backendUrl = `${API_URL}questions/${params.id}`;
     console.log(`Making request to backend URL: ${backendUrl}`);
     
     const response = await axios.get(

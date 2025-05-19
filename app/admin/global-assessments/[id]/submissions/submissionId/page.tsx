@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getAnganwadiById } from "@/app/api/api";
 import React from "react";
+import { API_URL } from "@/lib/config";
 
 interface Response {
   id: string;
@@ -75,7 +76,7 @@ export default function SubmissionDetailPage({ params }: PageProps) {
     const fetchSubmission = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/global-assessments/${id}/submissions/${submissionId}`
+          `${API_URL}global-assessments/${id}/submissions/${submissionId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch submission");
