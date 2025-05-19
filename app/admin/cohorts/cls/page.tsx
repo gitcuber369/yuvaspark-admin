@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { API_URL } from "@/lib/config";
 
 interface Teacher {
   id: string;
@@ -49,7 +50,7 @@ export default function CohortsPage() {
 
   const fetchCohorts = async () => {
     try {
-      const res = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts");
+      const res = await fetch(`${API_URL}cohorts`);
       if (!res.ok) throw new Error("Failed to fetch cohorts");
       const data = await res.json();
       setCohorts(data);
@@ -61,7 +62,7 @@ export default function CohortsPage() {
 
   const fetchTeachers = async () => {
     try {
-      const res = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/teachers");
+      const res = await fetch(`${API_URL}teachers`);
       if (!res.ok) throw new Error("Failed to fetch teachers");
       const data = await res.json();
       setTeachers(data);
@@ -85,7 +86,7 @@ export default function CohortsPage() {
         teacherIds: selectedTeachers,
       };
 
-      const res = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts", {
+      const res = await fetch(`${API_URL}cohorts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -108,7 +109,7 @@ export default function CohortsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${id}`, {
+      const res = await fetch(`${API_URL}cohorts/${id}`, {
         method: "DELETE",
       });
 
@@ -147,7 +148,7 @@ export default function CohortsPage() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => window.location.href = "/admin/cohorts/rankings"}
+              onClick={() => (window.location.href = "/admin/cohorts/rankings")}
             >
               View Teacher Rankings
             </Button>
@@ -197,7 +198,9 @@ export default function CohortsPage() {
                               type="checkbox"
                               id={`teacher-${teacher.id}`}
                               checked={selectedTeachers.includes(teacher.id)}
-                              onChange={() => toggleTeacherSelection(teacher.id)}
+                              onChange={() =>
+                                toggleTeacherSelection(teacher.id)
+                              }
                               className="rounded"
                             />
                             <label htmlFor={`teacher-${teacher.id}`}>

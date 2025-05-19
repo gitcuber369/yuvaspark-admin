@@ -13,21 +13,18 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { ArrowLeft, RefreshCw, Award } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { API_URL } from "@/lib/config";
 
-interface Anganwadi {
+interface Teacher {
   id: string;
   name: string;
+  anganwadiId: string;
+  anganwadiName: string;
 }
 
-interface AnganwadiResponse {
+interface TeacherResponse {
+  teacherId: string;
+  teacherName: string;
   anganwadiId: string;
   anganwadiName: string;
   totalStudents: number;
@@ -36,80 +33,53 @@ interface AnganwadiResponse {
   rank: number;
 }
 
-export default function AnganwadiResponsesPage() {
-  const [anganwadis, setAnganwadis] = useState<Anganwadi[]>([]);
-  const [selectedAnganwadiId, setSelectedAnganwadiId] = useState<string>("");
-  const [responseData, setResponseData] = useState<AnganwadiResponse | null>(
-    null
-  );
+export default function TeacherRankingsPage() {
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [responseData, setResponseData] = useState<TeacherResponse[]>([]);
   const [loading, setLoading] = useState(false);
-  const [allResponses, setAllResponses] = useState<AnganwadiResponse[]>([]);
-  const [loadingAll, setLoadingAll] = useState(false);
 
-  const fetchAnganwadis = async () => {
+  const fetchTeachers = async () => {
     try {
-      const res = await fetch(`${API_URL}anganwadis`);
-      if (!res.ok) throw new Error("Failed to fetch anganwadis");
+      const res = await fetch(`${API_URL}teachers`);
+      if (!res.ok) throw new Error("Failed to fetch teachers");
       const data = await res.json();
-      setAnganwadis(data);
-
-      // Select first anganwadi by default if available
-      if (data.length > 0 && !selectedAnganwadiId) {
-        setSelectedAnganwadiId(data[0].id);
-      }
-
-      // Fetch all anganwadi responses for ranking
-      fetchAllAnganwadiResponses(data);
+      setTeachers(data);
+      fetchTeacherResponses(data);
     } catch (error) {
-      toast.error("Failed to load anganwadis");
+      toast.error("Failed to load teachers");
       console.error(error);
     }
   };
 
-  const fetchResponseCounts = async (anganwadiId: string) => {
-    if (!anganwadiId) return;
-
+  const fetchTeacherResponses = async (teacherList: Teacher[]) => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${API_URL}student-responses/anganwadi/${anganwadiId}/count`
-      );
-      if (!res.ok) throw new Error("Failed to fetch response counts");
-      const data = await res.json();
-      setResponseData(data);
-    } catch (error) {
-      toast.error("Failed to load response counts");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAllAnganwadiResponses = async (anganwadiList: Anganwadi[]) => {
-    setLoadingAll(true);
-    try {
       const responses = await Promise.all(
-        anganwadiList.map(async (anganwadi) => {
+        teacherList.map(async (teacher) => {
           try {
             const res = await fetch(
-              `${API_URL}student-responses/anganwadi/${anganwadi.id}/count`
+              `${API_URL}student-responses/teacher/${teacher.id}/count`
             );
             if (!res.ok) {
-              throw new Error(`Failed to fetch for ${anganwadi.name}`);
+              throw new Error(`Failed to fetch for ${teacher.name}`);
             }
             const data = await res.json();
             return {
               ...data,
+              teacherName: teacher.name,
+              anganwadiName: teacher.anganwadiName,
               responsesPerStudent:
                 data.totalStudents > 0
                   ? data.totalResponses / data.totalStudents
                   : 0,
             };
           } catch (error) {
-            console.error(`Error fetching data for ${anganwadi.name}:`, error);
+            console.error(`Error fetching data for ${teacher.name}:`, error);
             return {
-              anganwadiId: anganwadi.id,
-              anganwadiName: anganwadi.name,
+              teacherId: teacher.id,
+              teacherName: teacher.name,
+              anganwadiId: teacher.anganwadiId,
+              anganwadiName: teacher.anganwadiName,
               totalStudents: 0,
               totalResponses: 0,
               responsesPerStudent: 0,
@@ -123,30 +93,24 @@ export default function AnganwadiResponsesPage() {
         (a, b) => b.totalResponses - a.totalResponses
       );
 
-      // Add rank to each anganwadi
+      // Add rank to each teacher
       const rankedResponses = sortedResponses.map((response, index) => ({
         ...response,
         rank: index + 1,
       }));
 
-      setAllResponses(rankedResponses);
+      setResponseData(rankedResponses);
     } catch (error) {
-      toast.error("Failed to load all anganwadi responses");
+      toast.error("Failed to load teacher responses");
       console.error(error);
     } finally {
-      setLoadingAll(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAnganwadis();
+    fetchTeachers();
   }, []);
-
-  useEffect(() => {
-    if (selectedAnganwadiId) {
-      fetchResponseCounts(selectedAnganwadiId);
-    }
-  }, [selectedAnganwadiId]);
 
   // Function to render top 3 ranks with visual indicator
   const renderRankBadge = (rank: number) => {
@@ -170,30 +134,28 @@ export default function AnganwadiResponsesPage() {
       </div>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Anganwadi Rankings</CardTitle>
+          <CardTitle>Teacher Rankings</CardTitle>
           <Button
             variant="outline"
-            onClick={fetchAnganwadis}
-            disabled={loadingAll}
+            onClick={fetchTeachers}
+            disabled={loading}
             className="flex items-center gap-1"
           >
-            <RefreshCw
-              className={`h-4 w-4 ${loadingAll ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh Rankings
           </Button>
         </CardHeader>
         <CardContent>
-          {loadingAll ? (
+          {loading ? (
             <div className="flex justify-center py-10">
-              <p>Loading anganwadi rankings...</p>
+              <p>Loading teacher rankings...</p>
             </div>
-          ) : allResponses.length > 0 ? (
+          ) : responseData.length > 0 ? (
             <div className="space-y-6">
               <div className="grid grid-cols-3 gap-4 mb-6">
-                {allResponses.slice(0, 3).map((response, index) => (
+                {responseData.slice(0, 3).map((response, index) => (
                   <Card
-                    key={response.anganwadiId}
+                    key={response.teacherId}
                     className={`overflow-hidden ${
                       index === 0
                         ? "border-yellow-500"
@@ -216,8 +178,11 @@ export default function AnganwadiResponsesPage() {
                     <CardContent className="pt-4">
                       <div className="text-center space-y-2">
                         <h3 className="text-lg font-semibold">
-                          {response.anganwadiName}
+                          {response.teacherName}
                         </h3>
+                        <p className="text-sm text-gray-500">
+                          {response.anganwadiName}
+                        </p>
                         <div className="grid grid-cols-2 gap-2 mt-2">
                           <div>
                             <p className="text-xl font-bold">
@@ -250,7 +215,8 @@ export default function AnganwadiResponsesPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-16">Rank</TableHead>
-                    <TableHead>Anganwadi Name</TableHead>
+                    <TableHead>Teacher Name</TableHead>
+                    <TableHead>Anganwadi</TableHead>
                     <TableHead className="text-right">Students</TableHead>
                     <TableHead className="text-right">Responses</TableHead>
                     <TableHead className="text-right">
@@ -259,9 +225,9 @@ export default function AnganwadiResponsesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {allResponses.map((response) => (
+                  {responseData.map((response) => (
                     <TableRow
-                      key={response.anganwadiId}
+                      key={response.teacherId}
                       className={response.rank <= 3 ? "bg-gray-50" : ""}
                     >
                       <TableCell className="font-medium text-center">
@@ -269,6 +235,7 @@ export default function AnganwadiResponsesPage() {
                           {renderRankBadge(response.rank)}
                         </div>
                       </TableCell>
+                      <TableCell>{response.teacherName}</TableCell>
                       <TableCell>{response.anganwadiName}</TableCell>
                       <TableCell className="text-right">
                         {response.totalStudents}
@@ -286,14 +253,15 @@ export default function AnganwadiResponsesPage() {
 
               <div className="text-xs text-gray-500 text-center mt-4">
                 <p>
-                  Anganwadis are ranked by total number of responses. Higher
-                  response counts indicate more active participation.
+                  Teachers are ranked by total number of student responses.
+                  Higher response counts indicate more active student
+                  participation and engagement.
                 </p>
               </div>
             </div>
           ) : (
             <div className="text-center py-10 text-gray-500">
-              <p>No anganwadi data found.</p>
+              <p>No teacher data found.</p>
             </div>
           )}
         </CardContent>

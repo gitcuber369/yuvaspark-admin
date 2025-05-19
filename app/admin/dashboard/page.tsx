@@ -106,11 +106,18 @@ export default function DashboardPage() {
     if (anganwadis) {
       // Check if we received HTML instead of JSON data (ngrok interstitial page)
       const anganwadiData = anganwadis as any;
-      if (typeof anganwadiData === 'string' && anganwadiData.includes('<!DOCTYPE html>')) {
-        console.error('Received HTML instead of JSON. This appears to be an ngrok interstitial page.');
-        console.error('Make sure your ngrok tunnel is properly set up and you have accepted the ngrok warning in browser');
+      if (
+        typeof anganwadiData === "string" &&
+        anganwadiData.includes("<!DOCTYPE html>")
+      ) {
+        console.error(
+          "Received HTML instead of JSON. This appears to be an ngrok interstitial page."
+        );
+        console.error(
+          "Make sure your ngrok tunnel is properly set up and you have accepted the ngrok warning in browser"
+        );
       } else {
-        console.log('Anganwadis data:', anganwadis);
+        console.log("Anganwadis data:", anganwadis);
       }
     }
   }, [anganwadis]);
@@ -121,7 +128,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (anganwadis) {
-      console.log('Anganwadis data:', anganwadis);
+      console.log("Anganwadis data:", anganwadis);
     }
   }, [anganwadis]);
 
@@ -214,7 +221,9 @@ export default function DashboardPage() {
                   Try Again
                 </button>
               </div>
-            ) : !anganwadis || !Array.isArray(anganwadis) || anganwadis.length === 0 ? (
+            ) : !anganwadis ||
+              !Array.isArray(anganwadis) ||
+              anganwadis.length === 0 ? (
               <div className="text-center py-10">
                 <p className="text-gray-500 mb-4">No anganwadis found.</p>
                 <Link

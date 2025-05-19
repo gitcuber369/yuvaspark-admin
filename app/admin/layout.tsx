@@ -30,29 +30,20 @@ export default function DashboardLayout({
   // Generate breadcrumb items from pathname
   const getBreadcrumbItems = () => {
     if (!pathname) return [];
-    
-    const segments = pathname.split('/').filter(Boolean);
+
+    const segments = pathname.split("/").filter(Boolean);
     // Remove 'admin' from segments since it's already in the main breadcrumb
-    if (segments[0] === 'admin') segments.shift();
-    
-    return segments.map(segment => {
+    if (segments[0] === "admin") segments.shift();
+
+    return segments.map((segment) => {
       // Capitalize and replace hyphens with spaces
-      return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+      return (
+        segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")
+      );
     });
   };
-  
+
   const breadcrumbItems = getBreadcrumbItems();
-
-  useEffect(() => {
-    // Check if running in browser environment
-    if (typeof window !== "undefined") {
-      const storedToken = localStorage.getItem("token");
-
-      if (!storedToken) {
-        router.push("/auth/login");
-      }
-    }
-  }, [router]);
 
   return (
     <SidebarProvider>
@@ -76,7 +67,11 @@ export default function DashboardLayout({
                       {index === breadcrumbItems.length - 1 ? (
                         <BreadcrumbPage>{item}</BreadcrumbPage>
                       ) : (
-                        <BreadcrumbLink href={`/admin/${breadcrumbItems.slice(0, index + 1).join('/')}`}>
+                        <BreadcrumbLink
+                          href={`/admin/${breadcrumbItems
+                            .slice(0, index + 1)
+                            .join("/")}`}
+                        >
                           {item}
                         </BreadcrumbLink>
                       )}
