@@ -48,8 +48,7 @@ import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
 import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/";
+import { API_URL } from "@/lib/config";
 
 // Type definitions
 interface Topic {

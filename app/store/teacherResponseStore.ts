@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
+import { API_URL } from "@/lib/config";
 
 export interface StudentResponse {
   id: string;
@@ -53,13 +54,12 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
   fetchTeacherResponses: async (teacherId: string, filters = {}) => {
     set({ loading: true, error: null });
     try {
-      // Build query params
       const queryParams = new URLSearchParams();
-      if (filters.studentId) queryParams.append('studentId', filters.studentId);
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
-      
-      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/teachers/${teacherId}/student-responses?${queryParams.toString()}`;
+      if (filters.studentId) queryParams.append('studentId', filters.studentId);
+
+      const url = `${API_URL}teachers/${teacherId}/student-responses?${queryParams.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -78,7 +78,7 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
   fetchByStudent: async (teacherId: string, studentId: string) => {
     set({ loading: true, error: null });
     try {
-      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/teachers/${teacherId}/student-responses?studentId=${studentId}`;
+      const url = `${API_URL}teachers/${teacherId}/student-responses?studentId=${studentId}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -97,11 +97,11 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
   exportResponses: async (teacherId: string, filters = {}) => {
     set({ loading: true, error: null });
     try {
-      // Build query params for export
       const queryParams = new URLSearchParams();
-      if (filters.studentId) queryParams.append('studentId', filters.studentId);
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
+      if (filters.studentId) queryParams.append('studentId', filters.studentId);
+
       
       // Use the general export endpoint but with teacher-specific filters
       const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/export?teacherId=${teacherId}&${queryParams.toString()}`;

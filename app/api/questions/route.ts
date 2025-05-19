@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { API_URL } from "@/lib/config";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     if (search) queryParams.append("search", search);
     
     // Make a request to the backend API
-    const backendUrl = `${process.env.BACKEND_API_URL || 'https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app'}/questions`;
+    const backendUrl = `${API_URL}questions`;
     console.log(`Making request to backend URL: ${backendUrl}`);
     
     const finalUrl = queryParams.toString() 

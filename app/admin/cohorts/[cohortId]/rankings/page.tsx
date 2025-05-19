@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -26,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import React from "react";
+import { API_URL } from "@/lib/config";
 
 interface TeacherRanking {
   id: string;
@@ -67,13 +74,13 @@ export default function TeacherRankingsPage({ params }: PageProps) {
     setIsLoading(true);
     try {
       // Fetch cohort details
-      const cohortRes = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohortId}`);
+      const cohortRes = await fetch(`${API_URL}cohorts/${cohortId}`);
       if (!cohortRes.ok) throw new Error("Failed to fetch cohort");
       const cohortData = await cohortRes.json();
       setCohort(cohortData);
 
       // Fetch teacher rankings
-      const rankingsRes = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohortId}/rankings`);
+      const rankingsRes = await fetch(`${API_URL}cohorts/${cohortId}/rankings`);
       if (!rankingsRes.ok) throw new Error("Failed to fetch rankings");
       const rankingsData = await rankingsRes.json();
       setRankings(rankingsData);
@@ -92,9 +99,12 @@ export default function TeacherRankingsPage({ params }: PageProps) {
   const updateRankings = async () => {
     setIsUpdating(true);
     try {
-      const response = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/cohorts/${cohortId}/update-rankings`, {
-        method: "POST"
-      });
+      const response = await fetch(
+        `${API_URL}cohorts/${cohortId}/update-rankings`,
+        {
+          method: "POST",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update rankings");
@@ -113,34 +123,45 @@ export default function TeacherRankingsPage({ params }: PageProps) {
 
   const getRankBadge = (rank: number) => {
     if (rank === 0) {
-      return <Badge variant="outline" className="bg-gray-100">Not Ranked</Badge>;
+      return (
+        <Badge variant="outline" className="bg-gray-100">
+          Not Ranked
+        </Badge>
+      );
     }
-    
+
     if (rank === 1) {
-      return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
-        <Medal className="h-3 w-3 mr-1 text-yellow-600" /> 1st
-      </Badge>;
+      return (
+        <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+          <Medal className="h-3 w-3 mr-1 text-yellow-600" /> 1st
+        </Badge>
+      );
     }
-    
+
     if (rank === 2) {
-      return <Badge className="bg-gray-200 text-gray-800 border-gray-300">
-        <Medal className="h-3 w-3 mr-1 text-gray-500" /> 2nd
-      </Badge>;
+      return (
+        <Badge className="bg-gray-200 text-gray-800 border-gray-300">
+          <Medal className="h-3 w-3 mr-1 text-gray-500" /> 2nd
+        </Badge>
+      );
     }
-    
+
     if (rank === 3) {
-      return <Badge className="bg-amber-100 text-amber-800 border-amber-300">
-        <Medal className="h-3 w-3 mr-1 text-amber-600" /> 3rd
-      </Badge>;
+      return (
+        <Badge className="bg-amber-100 text-amber-800 border-amber-300">
+          <Medal className="h-3 w-3 mr-1 text-amber-600" /> 3rd
+        </Badge>
+      );
     }
-    
+
     return <Badge variant="outline">{rank}th</Badge>;
   };
 
   // Calculate highest score for relative comparison
-  const highestAvgScore = rankings.length > 0 
-    ? Math.max(...rankings.map(t => t.stats.averageScore))
-    : 100;
+  const highestAvgScore =
+    rankings.length > 0
+      ? Math.max(...rankings.map((t) => t.stats.averageScore))
+      : 100;
 
   // Sort rankings by rank (unranked last)
   const sortedRankings = [...rankings].sort((a, b) => {
@@ -227,15 +248,15 @@ export default function TeacherRankingsPage({ params }: PageProps) {
                 <TableBody>
                   {sortedRankings.map((teacher) => (
                     <TableRow key={teacher.id}>
-                      <TableCell>
-                        {getRankBadge(teacher.rank)}
-                      </TableCell>
+                      <TableCell>{getRankBadge(teacher.rank)}</TableCell>
                       <TableCell>
                         <div className="flex items-center">
                           <User className="h-4 w-4 mr-2 text-gray-400" />
                           <div>
                             <div className="font-medium">{teacher.name}</div>
-                            <div className="text-sm text-muted-foreground">{teacher.phone}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {teacher.phone}
+                            </div>
                           </div>
                         </div>
                       </TableCell>
@@ -262,8 +283,11 @@ export default function TeacherRankingsPage({ params }: PageProps) {
                       </TableCell>
                       <TableCell>
                         <div className="w-40">
-                          <Progress 
-                            value={(teacher.stats.averageScore / highestAvgScore) * 100} 
+                          <Progress
+                            value={
+                              (teacher.stats.averageScore / highestAvgScore) *
+                              100
+                            }
                             className="h-2"
                           />
                         </div>
@@ -278,4 +302,4 @@ export default function TeacherRankingsPage({ params }: PageProps) {
       </Card>
     </div>
   );
-} 
+}

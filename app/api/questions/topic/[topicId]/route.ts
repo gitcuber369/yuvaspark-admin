@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { API_URL } from "@/lib/config";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ topicId: string }> }
+  { params }: { params: { topicId: string } }
 ) {
   try {
-    const { topicId } = await context.params;
+    const backendUrl = `${API_URL}questions/topic/${params.topicId}`;
     
     // Make a request to the backend API
     const response = await axios.get(
-      `${process.env.BACKEND_API_URL || 'https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app'}/questions/topic/${topicId}`,
+      backendUrl,
       {
         headers: {
           // Forward authorization if present

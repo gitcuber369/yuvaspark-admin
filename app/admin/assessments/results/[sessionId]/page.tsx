@@ -24,9 +24,7 @@ import { toast } from "sonner";
 import { ArrowLeft, School, Search, Loader2 } from "lucide-react";
 import axios from "axios";
 import React from "react";
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/";
+import { API_URL } from "@/lib/config";
 
 // API functions
 const getAssessmentSessionById = async (id: string) => {

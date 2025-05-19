@@ -1,25 +1,27 @@
-import axios from "axios";
+import axios, {
+  AxiosError,
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
+import { API_URL } from "@/lib/config";
 
-// Determine the base URL based on environment
-const baseURL = "https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/";
-
-console.log("API base URL:", baseURL);
+console.log("API base URL:", API_URL);
 
 const API = axios.create({
-  baseURL, // Base URL for the API
-  headers: { 
+  baseURL: API_URL, // Base URL for the API
+  headers: {
     "Content-Type": "application/json",
     // Add ngrok bypass headers
     "ngrok-skip-browser-warning": "true",
-    "Bypass-Tunnel-Reminder": "true" 
+    "Access-Control-Allow-Origin": "*",
   },
   timeout: 10000, // 10 second timeout
 });
 
 // Attach JWT token to requests
 API.interceptors.request.use(
-  (config) => {
-    let token;
+  (config: InternalAxiosRequestConfig) => {
+    let token: string | null = null;
 
     // Check if we're in a browser environment
     if (typeof window !== "undefined") {
@@ -27,7 +29,7 @@ API.interceptors.request.use(
     }
 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Set Authorization header
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     console.log(
@@ -37,7 +39,7 @@ API.interceptors.request.use(
     );
     return config;
   },
-  (error) => {
+  (error: AxiosError) => {
     console.error("API Request Error:", error);
     return Promise.reject(error);
   }
@@ -45,32 +47,43 @@ API.interceptors.request.use(
 
 // Add response interceptor for logging
 API.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     console.log(`API Response: ${response.status} from ${response.config.url}`);
     return response;
   },
-  (error) => {
+  (error: AxiosError) => {
     console.error("API Response Error:", error.message);
     if (error.response) {
       console.error("Error status:", error.response.status);
       console.error("Error data:", error.response.data);
 
-      // Add more detailed logging for specific error types
-      if (error.response.status === 404) {
-        console.error(`Resource not found: ${error.config.url}`);
-        console.error("Request method:", error.config.method);
-        console.error("Request data:", error.config.data);
-        console.error("Full config:", error.config);
-      }
-      // Handle specific database constraint errors
-      else if (
-        error.response.status === 500 &&
-        typeof error.response.data === "string" &&
-        error.response.data.includes("Foreign key constraint violated")
-      ) {
-        console.error("Database constraint error:", error.response.data);
-        console.error("Request:", error.config.method, error.config.url);
-        console.error("Request data:", error.config.data);
+      // Handle specific error types
+      switch (error.response.status) {
+        case 404:
+          console.error(`Resource not found: ${error.config?.url}`);
+          console.error("Request method:", error.config?.method);
+          console.error("Request data:", error.config?.data);
+          break;
+        case 401:
+          console.error("Authentication failed - please login again");
+          // Optionally redirect to login page or clear auth token
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("authToken");
+          }
+          break;
+        case 403:
+          console.error("Access forbidden - insufficient permissions");
+          break;
+        case 500:
+          if (
+            typeof error.response.data === "string" &&
+            error.response.data.includes("Foreign key constraint violated")
+          ) {
+            console.error("Database constraint error:", error.response.data);
+            console.error("Request:", error.config?.method, error.config?.url);
+            console.error("Request data:", error.config?.data);
+          }
+          break;
       }
     } else if (error.request) {
       // The request was made but no response was received

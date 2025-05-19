@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { X } from 'lucide-react'; 
+import { X } from 'lucide-react';
+import { API_URL } from "@/lib/config";
 
 interface Props {
   selected: string[];
@@ -30,36 +31,33 @@ export default function StudentCombobox({ selected, setSelected }: Props) {
       }
 
       try {
-        // Fetch all selected students in one request
-        const res = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/students?ids=${selected.join(',')}`);
+        const res = await fetch(`${API_URL}students?ids=${selected.join(',')}`);
         if (res.ok) {
           const data = await res.json();
           setSelectedStudents(data);
         }
       } catch (error) {
-        console.error('Error fetching selected students:', error);
+        console.error("Error fetching selected students:", error);
       }
     };
 
     fetchSelectedStudents();
   }, [selected]);
 
-  const handleSearch = async (q: string) => {
-    setQuery(q);
+  const searchStudents = async (q: string) => {
     if (q.length < 2) {
       setResults([]);
       return;
     }
 
     try {
-      const res = await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/students?search=${q}`);
+      const res = await fetch(`${API_URL}students?search=${q}`);
       if (res.ok) {
         const data = await res.json();
-        // Filter out already selected students
-        setResults(data.filter((student: Student) => !selected.includes(student.id)));
+        setResults(data);
       }
     } catch (error) {
-      console.error('Error searching students:', error);
+      console.error("Error searching students:", error);
     }
   };
 
@@ -80,7 +78,7 @@ export default function StudentCombobox({ selected, setSelected }: Props) {
       <Input
         placeholder="Search Students by Name..."
         value={query}
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={(e) => searchStudents(e.target.value)}
         className="mb-2"
       />
       
