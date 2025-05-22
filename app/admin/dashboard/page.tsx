@@ -117,18 +117,11 @@ export default function DashboardPage() {
           "Make sure your ngrok tunnel is properly set up and you have accepted the ngrok warning in browser"
         );
       } else {
-        console.log("Anganwadis data:", anganwadis);
+        console.log("Anganwadis data fetched successfully:", {
+          count: Array.isArray(anganwadis) ? anganwadis.length : 0,
+          data: anganwadis
+        });
       }
-    }
-  }, [anganwadis]);
-
-  useEffect(() => {
-    fetchAnganwadis();
-  }, [fetchAnganwadis]);
-
-  useEffect(() => {
-    if (anganwadis) {
-      console.log("Anganwadis data:", anganwadis);
     }
   }, [anganwadis]);
 
@@ -238,7 +231,7 @@ export default function DashboardPage() {
                 <ul className="divide-y">
                   {anganwadis.map((a) => (
                     <li
-                      key={a._id}
+                      key={a.id}
                       className="py-4 first:pt-0 last:pb-0 hover:bg-gray-50 transition-colors rounded-md px-2"
                     >
                       <div className="flex items-center">
@@ -255,7 +248,7 @@ export default function DashboardPage() {
                           </p>
                         </div>
                         <Link
-                          href={`/admin/anganwadi/${a._id}`}
+                          href={`/admin/anganwadi/${a.id}`}
                           className="text-xs font-medium px-3 py-1.5 bg-purple-100 rounded-full text-purple-600 hover:bg-purple-200 transition-colors"
                         >
                           View
