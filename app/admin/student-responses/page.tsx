@@ -115,7 +115,7 @@ export default function StudentResponsesPage() {
   const fetchStudents = async () => {
     setLoadingStudents(true);
     try {
-      const response = await fetch("https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/students");
+      const response = await fetch("https://api.dreamlaunch.studio/api/students");
       if (!response.ok) {
         throw new Error("Failed to fetch students");
       }
