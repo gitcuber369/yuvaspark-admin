@@ -104,7 +104,7 @@ export const useTeacherResponseStore = create<TeacherResponseStore>((set) => ({
 
       
       // Use the general export endpoint but with teacher-specific filters
-      const url = `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/student-responses/export?teacherId=${teacherId}&${queryParams.toString()}`;
+      const url = `https://api.dreamlaunch.studio/api/student-responses/export?teacherId=${teacherId}&${queryParams.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {
