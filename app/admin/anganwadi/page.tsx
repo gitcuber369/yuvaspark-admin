@@ -60,7 +60,7 @@ export default function AnganwadiPage() {
   const router = useRouter();
 
   const fetchAnganwadis = async () => {
-    const res = await fetch(`http://54.144.64.93:3000/api/anganwadis`);
+    const res = await fetch(`https://api.dreamlaunch.studio/api/anganwadis`);
     const data = await res.json();
     setAnganwadis(data);
   };
@@ -180,7 +180,7 @@ export default function AnganwadiPage() {
 
     setLoading(true);
     const res = await fetch(
-      `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis/${selectedAnganwadi.id}`,
+      `https://api.dreamlaunch.studio/api/anganwadis/${selectedAnganwadi.id}`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

@@ -90,7 +90,7 @@ export default function TeachersPage() {
       setSearchLoading(true);
       try {
         const response = await fetch(
-          `https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/anganwadis?search=${searchAnganwadi}`
+          `https://api.dreamlaunch.studio/api/anganwadis?search=${searchAnganwadi}`
         );
         const data = await response.json();
         setAnganwadiResults(data);
@@ -147,7 +147,7 @@ export default function TeachersPage() {
     if (!selectedTeacher || !anganwadiId) return;
     setAssigningAnganwadiId(anganwadiId);
     try {
-      await fetch(`https://0dd7-2401-4900-1cd7-672e-f883-6669-8e54-fbef.ngrok-free.app/api/teachers/assign`, {
+      await fetch(`https://api.dreamlaunch.studio/api/teachers/assign`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://54.144.64.93:3000/api/:path*", // Proxy to backend
+        destination: "https://api.dreamlaunch.studio/api/:path*", // Proxy to backend
       },
     ];
   },
