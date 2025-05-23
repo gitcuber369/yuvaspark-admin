@@ -1,5 +1,5 @@
 "use client";
-
+import { use } from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +23,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { use } from "react";
 
 interface Anganwadi {
   _id: string;
@@ -34,12 +33,13 @@ interface Anganwadi {
   students: { id: string; name: string; gender?: string }[];
 }
 
-export default function AnganwadiDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+function AnganwadiClient({ id }: { id: string }) {
   const router = useRouter();
   const [anganwadi, setAnganwadi] = useState<Anganwadi | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +49,7 @@ export default function AnganwadiDetailPage({
     try {
       setLoading(true);
       const res = await fetch(
-        `http://localhost:3000/api/anganwadis/${id}`,
+        `https://api.dreamlaunch.studio/api/anganwadis/${id}`,
         {
           cache: "no-store",
         }
@@ -283,4 +283,9 @@ export default function AnganwadiDetailPage({
       </Card>
     </div>
   );
+}
+
+export default function AnganwadiPage({ params }: PageProps) {
+  const resolvedParams = use(params);
+  return <AnganwadiClient id={resolvedParams.id} />;
 }

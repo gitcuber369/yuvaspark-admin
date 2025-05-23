@@ -86,13 +86,6 @@ const quickActions = [
     icon: <BookText className="w-5 h-5" />,
     color: "bg-indigo-100 text-indigo-600",
   },
-  {
-    title: "View Reports",
-    // @ts-ignore
-    link: "/admin/reports",
-    icon: <FileBarChart2 className="w-5 h-5" />,
-    color: "bg-red-100 text-red-600",
-  },
 ];
 
 export default function DashboardPage() {

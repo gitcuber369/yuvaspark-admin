@@ -1,14 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { useParams } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -18,27 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ArrowLeft,
-  Award,
-  RefreshCw,
-  School,
-  User,
-  FileText,
-  Loader2,
-  Medal,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import React from "react";
+import { ArrowLeft, RefreshCw, Trophy, Medal, Award } from "lucide-react";
 import { API_URL } from "@/lib/config";
 
 interface TeacherRanking {
   id: string;
   name: string;
   phone: string;
-  rank: number;
   anganwadi?: {
     id: string;
     name: string;
@@ -46,256 +29,306 @@ interface TeacherRanking {
   stats: {
     responseCount: number;
     averageScore: number;
+    totalStudents: number;
+    responsesPerStudent: number;
   };
 }
 
-interface Cohort {
-  id: string;
-  name: string;
-  region: string;
-}
-
-// @ts-ignore - Next.js type mismatch with params
-interface PageProps {
-  params: Promise<{ cohortId: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-export default function TeacherRankingsPage({ params }: PageProps) {
-  const router = useRouter();
-  const { cohortId } = React.use(params);
-
+export default function CohortTeacherRankingsPage() {
+  const params = useParams();
+  const cohortId = params.cohortId as string;
   const [rankings, setRankings] = useState<TeacherRanking[]>([]);
-  const [cohort, setCohort] = useState<Cohort | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [cohortName, setCohortName] = useState("");
+
+  const fetchCohortData = async () => {
+    try {
+      const response = await fetch(`${API_URL}cohorts/${cohortId}`);
+      if (!response.ok) throw new Error("Failed to fetch cohort data");
+      const data = await response.json();
+      setCohortName(data.name);
+    } catch (error) {
+      console.error("Error fetching cohort data:", error);
+      toast.error("Failed to load cohort information");
+    }
+  };
 
   const fetchRankings = async () => {
-    setIsLoading(true);
+    setLoading(true);
     try {
-      // Fetch cohort details
-      const cohortRes = await fetch(`${API_URL}cohorts/${cohortId}`);
-      if (!cohortRes.ok) throw new Error("Failed to fetch cohort");
-      const cohortData = await cohortRes.json();
-      setCohort(cohortData);
+      const response = await fetch(`${API_URL}cohorts/${cohortId}/rankings`);
+      if (!response.ok) throw new Error("Failed to fetch rankings");
+      const data = await response.json();
 
-      // Fetch teacher rankings
-      const rankingsRes = await fetch(`${API_URL}cohorts/${cohortId}/rankings`);
-      if (!rankingsRes.ok) throw new Error("Failed to fetch rankings");
-      const rankingsData = await rankingsRes.json();
-      setRankings(rankingsData);
+      // Get student responses for each teacher
+      const teachersWithResponses = await Promise.all(
+        data.map(async (teacher: any) => {
+          const responsesResponse = await fetch(
+            `${API_URL}teachers/${teacher.id}/student-responses`
+          );
+          if (!responsesResponse.ok)
+            throw new Error("Failed to fetch student responses");
+          const studentResponses = await responsesResponse.json();
+
+          return {
+            ...teacher,
+            stats: {
+              responseCount: studentResponses.length,
+              averageScore: teacher.stats.averageScore,
+              totalStudents: teacher.stats.totalStudents,
+              responsesPerStudent:
+                teacher.stats.totalStudents > 0
+                  ? studentResponses.length / teacher.stats.totalStudents
+                  : 0,
+            },
+          };
+        })
+      );
+
+      // Sort by response count and average score
+      const sortedData = teachersWithResponses.sort(
+        (a: TeacherRanking, b: TeacherRanking) => {
+          const scoreA =
+            a.stats.responseCount * 0.7 + a.stats.averageScore * 0.3;
+          const scoreB =
+            b.stats.responseCount * 0.7 + b.stats.averageScore * 0.3;
+          return scoreB - scoreA;
+        }
+      );
+
+      setRankings(sortedData);
     } catch (error) {
       console.error("Error fetching rankings:", error);
-      toast.error("Failed to load rankings");
+      toast.error("Failed to load teacher rankings");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    fetchCohortData();
     fetchRankings();
   }, [cohortId]);
 
-  const updateRankings = async () => {
-    setIsUpdating(true);
-    try {
-      const response = await fetch(
-        `${API_URL}cohorts/${cohortId}/update-rankings`,
-        {
-          method: "POST",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update rankings");
-      }
-
-      const data = await response.json();
-      setRankings(data.teachers);
-      toast.success("Rankings updated successfully");
-    } catch (error) {
-      console.error("Error updating rankings:", error);
-      toast.error("Failed to update rankings");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
   const getRankBadge = (rank: number) => {
-    if (rank === 0) {
-      return (
-        <Badge variant="outline" className="bg-gray-100">
-          Not Ranked
-        </Badge>
-      );
-    }
-
     if (rank === 1) {
       return (
-        <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
-          <Medal className="h-3 w-3 mr-1 text-yellow-600" /> 1st
-        </Badge>
+        <div className="flex items-center justify-center">
+          <Trophy className="h-5 w-5 text-yellow-500" />
+        </div>
       );
     }
-
     if (rank === 2) {
       return (
-        <Badge className="bg-gray-200 text-gray-800 border-gray-300">
-          <Medal className="h-3 w-3 mr-1 text-gray-500" /> 2nd
-        </Badge>
+        <div className="flex items-center justify-center">
+          <Medal className="h-5 w-5 text-gray-400" />
+        </div>
       );
     }
-
     if (rank === 3) {
       return (
-        <Badge className="bg-amber-100 text-amber-800 border-amber-300">
-          <Medal className="h-3 w-3 mr-1 text-amber-600" /> 3rd
-        </Badge>
+        <div className="flex items-center justify-center">
+          <Award className="h-5 w-5 text-amber-700" />
+        </div>
       );
     }
-
-    return <Badge variant="outline">{rank}th</Badge>;
+    return <div className="text-center">{rank}</div>;
   };
 
-  // Calculate highest score for relative comparison
-  const highestAvgScore =
+  // Calculate highest values for relative comparison
+  const highestResponseCount =
+    rankings.length > 0
+      ? Math.max(...rankings.map((t) => t.stats.responseCount))
+      : 100;
+  const highestAverageScore =
     rankings.length > 0
       ? Math.max(...rankings.map((t) => t.stats.averageScore))
       : 100;
 
-  // Sort rankings by rank (unranked last)
-  const sortedRankings = [...rankings].sort((a, b) => {
-    if (a.rank === 0) return 1;
-    if (b.rank === 0) return -1;
-    return a.rank - b.rank;
-  });
-
   return (
     <div className="container mx-auto py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div className="flex items-center">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
-            onClick={() => router.push("/admin/cohort")}
-            className="mr-4"
+            onClick={() => window.history.back()}
+            className="gap-2"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <div>
-            <h1 className="text-2xl font-bold flex items-center">
-              <Award className="mr-2 h-6 w-6" />
-              Teacher Rankings
-            </h1>
-            {cohort && (
-              <p className="text-muted-foreground">
-                {cohort.name} - {cohort.region}
-              </p>
-            )}
+            <h1 className="text-2xl font-bold">Teacher Rankings</h1>
+            <p className="text-sm text-gray-500">{cohortName}</p>
           </div>
         </div>
-        <Button
-          onClick={updateRankings}
-          disabled={isUpdating}
-          className="flex-shrink-0"
-        >
-          {isUpdating ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Updating Rankings...
-            </>
-          ) : (
-            <>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Update Rankings
-            </>
-          )}
+        <Button onClick={fetchRankings} disabled={loading} className="gap-2">
+          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          Refresh
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Teacher Performance Rankings</CardTitle>
-          <CardDescription>
-            Rankings are based on average scores and number of student responses
-          </CardDescription>
+          <CardTitle>Top Performing Teachers</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {loading ? (
             <div className="flex justify-center items-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin" />
+              <RefreshCw className="h-8 w-8 animate-spin" />
             </div>
           ) : rankings.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500">No teacher rankings available</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Teachers need to have evaluated responses to be ranked
-              </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="space-y-6">
+              {/* Top 3 Teachers Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {rankings.slice(0, 3).map((teacher, index) => (
+                  <Card key={teacher.id} className="relative overflow-hidden">
+                    <div
+                      className={`absolute top-0 left-0 w-full h-1 ${
+                        index === 0
+                          ? "bg-yellow-500"
+                          : index === 1
+                          ? "bg-gray-400"
+                          : "bg-amber-700"
+                      }`}
+                    />
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <div className="flex justify-center mb-2">
+                          {getRankBadge(index + 1)}
+                        </div>
+                        <h3 className="text-lg font-semibold">
+                          {teacher.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {teacher.anganwadi?.name || "No Anganwadi"}
+                        </p>
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <p className="text-2xl font-bold">
+                              {teacher.stats.responseCount}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Total Responses
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold">
+                              {teacher.stats.averageScore.toFixed(1)}%
+                            </p>
+                            <p className="text-sm text-gray-500">Avg. Score</p>
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-500">
+                            {teacher.stats.totalStudents} Students
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {teacher.stats.responsesPerStudent.toFixed(1)}{" "}
+                            responses/student
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Rankings Table */}
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Rank</TableHead>
+                    <TableHead className="w-16">Rank</TableHead>
                     <TableHead>Teacher</TableHead>
                     <TableHead>Anganwadi</TableHead>
-                    <TableHead>Response Count</TableHead>
-                    <TableHead>Average Score</TableHead>
-                    <TableHead>Performance</TableHead>
+                    <TableHead className="text-right">Students</TableHead>
+                    <TableHead className="text-right">
+                      Total Responses
+                    </TableHead>
+                    <TableHead className="text-right">
+                      Responses/Student
+                    </TableHead>
+                    <TableHead className="text-right">Avg. Score</TableHead>
+                    <TableHead className="text-right">Performance</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedRankings.map((teacher) => (
+                  {rankings.map((teacher, index) => (
                     <TableRow key={teacher.id}>
-                      <TableCell>{getRankBadge(teacher.rank)}</TableCell>
+                      <TableCell>{getRankBadge(index + 1)}</TableCell>
                       <TableCell>
-                        <div className="flex items-center">
-                          <User className="h-4 w-4 mr-2 text-gray-400" />
-                          <div>
-                            <div className="font-medium">{teacher.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {teacher.phone}
-                            </div>
-                          </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{teacher.name}</span>
+                          <span className="text-sm text-gray-500">
+                            {teacher.phone}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {teacher.anganwadi ? (
-                          <div className="flex items-center">
-                            <School className="h-4 w-4 mr-2 text-gray-400" />
-                            {teacher.anganwadi.name}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">Not assigned</span>
-                        )}
+                        {teacher.anganwadi?.name || "Not assigned"}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <FileText className="h-4 w-4 mr-2 text-gray-400" />
+                      <TableCell className="text-right">
+                        {teacher.stats.totalStudents}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="font-medium">
                           {teacher.stats.responseCount}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="font-medium">
+                      <TableCell className="text-right">
+                        <Badge variant="secondary">
+                          {teacher.stats.responsesPerStudent.toFixed(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Badge variant="secondary">
                           {teacher.stats.averageScore.toFixed(1)}%
-                        </div>
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="w-40">
-                          <Progress
-                            value={
-                              (teacher.stats.averageScore / highestAvgScore) *
-                              100
-                            }
-                            className="h-2"
-                          />
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">
+                              Responses
+                            </span>
+                            <Progress
+                              value={
+                                (teacher.stats.responseCount /
+                                  highestResponseCount) *
+                                100
+                              }
+                              className="h-2 flex-1"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Score</span>
+                            <Progress
+                              value={
+                                (teacher.stats.averageScore /
+                                  highestAverageScore) *
+                                100
+                              }
+                              className="h-2 flex-1"
+                            />
+                          </div>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+
+              <div className="text-xs text-gray-500 text-center mt-4">
+                <p>
+                  Teachers are ranked based on a combination of response count
+                  (70%) and average score (30%). Higher rankings indicate better
+                  overall performance and student engagement.
+                </p>
+              </div>
             </div>
           )}
         </CardContent>
