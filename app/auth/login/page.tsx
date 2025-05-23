@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loginUser } from "@/app/api/api";
+import { useAuthStore } from "@/app/store/authStore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,7 @@ import React from "react";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -39,7 +41,13 @@ function LoginForm() {
     setSuccess("");
 
     try {
-      await loginUser(email, password);
+      const response = await loginUser(email, password);
+      console.log("Login response:", response);
+      console.log("User name from response:", response.name);
+
+      login(response.token, response.name);
+      console.log("Login function called with token and name");
+
       router.push("/admin/dashboard");
     } catch (error) {
       setError("Invalid email or password. Please try again.");
@@ -152,7 +160,13 @@ function LoginForm() {
 // Wrap the component that uses useSearchParams in a Suspense boundary
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white p-4">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-white p-4">
+          Loading...
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

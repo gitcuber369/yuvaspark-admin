@@ -292,8 +292,8 @@ export default function StudentDashboard() {
                       <SelectContent className="max-h-60">
                         <SelectItem value="">None</SelectItem>
                         {anganwadis.map((anganwadi) => (
-                          <SelectItem 
-                            key={anganwadi._id?.toString() || anganwadi.id} 
+                          <SelectItem
+                            key={anganwadi._id?.toString() || anganwadi.id}
                             value={anganwadi._id?.toString() || anganwadi.id}
                           >
                             {anganwadi.name}
@@ -336,8 +336,8 @@ export default function StudentDashboard() {
                       </SelectTrigger>
                       <SelectContent className="max-h-60">
                         {anganwadis.map((anganwadi) => (
-                          <SelectItem 
-                            key={anganwadi._id?.toString() || anganwadi.id} 
+                          <SelectItem
+                            key={anganwadi._id?.toString() || anganwadi.id}
                             value={anganwadi._id?.toString() || anganwadi.id}
                           >
                             {anganwadi.name}
@@ -421,10 +421,7 @@ export default function StudentDashboard() {
                       <SelectContent>
                         <SelectItem value="all">All Anganwadis</SelectItem>
                         {uniqueAnganwadis.map((anganwadi) => (
-                          <SelectItem 
-                            key={anganwadi.id} 
-                            value={anganwadi.id}
-                          >
+                          <SelectItem key={anganwadi.id} value={anganwadi.id}>
                             {anganwadi.name}
                           </SelectItem>
                         ))}
@@ -515,127 +512,140 @@ export default function StudentDashboard() {
                     )}
                   </div>
                 ) : (
-                  <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {sortedStudents.map((student) => (
-                      <li
-                        key={student.id}
-                        className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-all"
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id={`student-${student.id}`}
-                              className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                              checked={selectedStudents.includes(student.id)}
-                              onChange={() =>
-                                toggleStudentSelection(student.id)
-                              }
-                            />
-                            <h3 className="text-lg font-medium">
-                              {student.name}
-                            </h3>
+                  <div className="max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {sortedStudents.map((student) => (
+                        <li
+                          key={student.id}
+                          className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-all"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                id={`student-${student.id}`}
+                                className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                                checked={selectedStudents.includes(student.id)}
+                                onChange={() =>
+                                  toggleStudentSelection(student.id)
+                                }
+                              />
+                              <h3 className="text-lg font-medium">
+                                {student.name}
+                              </h3>
+                            </div>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => removeStudent(student.id)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
+                            </Button>
                           </div>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => removeStudent(student.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
-                          </Button>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Gender: {student.gender}
-                        </p>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-sm text-gray-500">Status:</span>
-                          <Select
-                            value={(student.status || "").toUpperCase()}
-                            onValueChange={(value) => {
-                              updateStudent(student.id, { status: value });
-                            }}
-                          >
-                            <SelectTrigger className="w-28 h-8">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem
-                                value="ACTIVE"
-                                className="text-green-600"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <CheckCircle className="w-4 h-4" />
-                                  <span>Active</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem
-                                value="INACTIVE"
-                                className="text-red-600"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <XCircle className="w-4 h-4" />
-                                  <span>Inactive</span>
-                                </div>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        {/* Anganwadi Assignment Section */}
-                        <div className="flex items-center justify-between mt-3 border-t pt-2">
-                          <span className="text-sm text-gray-500">
-                            Anganwadi:
-                          </span>
-                          <Select
-                            value={student.anganwadiId || "none"}
-                            onValueChange={(value) => {
-                              if (value && value !== "none") {
-                                assignToAnganwadi(student.id, value);
-                              } else if (value === "none" && student.anganwadiId) {
-                                // Unassign by setting anganwadiId to empty string
-                                updateStudent(student.id, { anganwadiId: "" });
-                              }
-                            }}
-                          >
-                            <SelectTrigger className="w-40 h-8">
-                              <SelectValue placeholder="Assign Anganwadi" />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-60">
-                              {student.anganwadiId && (
-                                <SelectItem value="none">
-                                  <span className="text-gray-500">
-                                    Unassign
-                                  </span>
-                                </SelectItem>
-                              )}
-                              {anganwadis.map((anganwadi) => (
-                                <SelectItem 
-                                  key={anganwadi._id?.toString() || anganwadi.id} 
-                                  value={anganwadi._id?.toString() || anganwadi.id}
+                          <p className="text-sm text-gray-600">
+                            Gender: {student.gender}
+                          </p>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-sm text-gray-500">
+                              Status:
+                            </span>
+                            <Select
+                              value={(student.status || "").toUpperCase()}
+                              onValueChange={(value) => {
+                                updateStudent(student.id, { status: value });
+                              }}
+                            >
+                              <SelectTrigger className="w-28 h-8">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem
+                                  value="ACTIVE"
+                                  className="text-green-600"
                                 >
-                                  {anganwadi.name}
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span>Active</span>
+                                  </div>
                                 </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        {student.anganwadiId && (
-                          <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                            <ChevronRight className="w-4 h-4" />
-                            {student.anganwadi?.name ? (
-                              <span>
-                                Anganwadi: {student.anganwadi.name} (
-                                {student.anganwadiId})
-                              </span>
-                            ) : (
-                              <span>Anganwadi ID: {student.anganwadiId}</span>
-                            )}
+                                <SelectItem
+                                  value="INACTIVE"
+                                  className="text-red-600"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <XCircle className="w-4 h-4" />
+                                    <span>Inactive</span>
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+
+                          {/* Anganwadi Assignment Section */}
+                          <div className="flex items-center justify-between mt-3 border-t pt-2">
+                            <span className="text-sm text-gray-500">
+                              Anganwadi:
+                            </span>
+                            <Select
+                              value={student.anganwadiId || "none"}
+                              onValueChange={(value) => {
+                                if (value && value !== "none") {
+                                  assignToAnganwadi(student.id, value);
+                                } else if (
+                                  value === "none" &&
+                                  student.anganwadiId
+                                ) {
+                                  // Unassign by setting anganwadiId to empty string
+                                  updateStudent(student.id, {
+                                    anganwadiId: "",
+                                  });
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="w-40 h-8">
+                                <SelectValue placeholder="Assign Anganwadi" />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-60">
+                                {student.anganwadiId && (
+                                  <SelectItem value="none">
+                                    <span className="text-gray-500">
+                                      Unassign
+                                    </span>
+                                  </SelectItem>
+                                )}
+                                {anganwadis.map((anganwadi) => (
+                                  <SelectItem
+                                    key={
+                                      anganwadi._id?.toString() || anganwadi.id
+                                    }
+                                    value={
+                                      anganwadi._id?.toString() || anganwadi.id
+                                    }
+                                  >
+                                    {anganwadi.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {student.anganwadiId && (
+                            <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                              <ChevronRight className="w-4 h-4" />
+                              {student.anganwadi?.name ? (
+                                <span>
+                                  Anganwadi: {student.anganwadi.name} (
+                                  {student.anganwadiId})
+                                </span>
+                              ) : (
+                                <span>Anganwadi ID: {student.anganwadiId}</span>
+                              )}
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </CardContent>
             </Card>
