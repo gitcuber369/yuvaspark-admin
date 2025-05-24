@@ -58,21 +58,6 @@ const adminNav = [
     icon: MessageSquareText,
     url: "/admin/student-responses",
   },
-  {
-    title: "Cohort Management",
-    icon: Users,
-    url: "/admin/cohort",
-    submenu: [
-      {
-        title: "Cohorts",
-        url: "/admin/cohort"
-      },
-      {
-        title: "Rankings Dashboard",
-        url: "/admin/cohort/dashboard"
-      }
-    ]
-  },
 ];
 
 export function AdminSidebar({

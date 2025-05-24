@@ -119,14 +119,11 @@ export default function CohortPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(
-        `${API_URL}cohorts`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${API_URL}cohorts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const data = await response.json();
 
@@ -192,7 +189,7 @@ export default function CohortPage() {
   };
 
   const viewTeacherRankings = (cohortId: string) => {
-    router.push(`/admin/cohort/${cohortId}/rankings`);
+    router.push(`/admin/cohorts/${cohortId}/rankings`);
   };
 
   // Filter teachers that are not already assigned to a cohort

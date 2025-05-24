@@ -13,7 +13,7 @@ export const registerUser = async (
 
 export const loginUser = async (email: string, password: string) => {
   const res = await API.post("auth/login", { email, password });
-  useAuthStore.getState().login(res.data.token); // Update Zustand store
+  useAuthStore.getState().login(res.data.token, res.data.user); // Update Zustand store with token and user data
   return res.data;
 };
 
