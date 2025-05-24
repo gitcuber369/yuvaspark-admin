@@ -99,7 +99,6 @@ export function AdminSidebar({
           </Avatar>
         </div>
         <div>
-          <p className="text-sm font-medium truncate">{userName || "Guest"}</p>
           <p className="text-xs text-gray-500">
             {localStorage.getItem("userRole") || "Role"}
           </p>
