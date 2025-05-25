@@ -1,18 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTeacherStore } from "@/app/store/teacherStore";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -21,441 +11,450 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "sonner";
-import {
-  Loader2,
-  Plus,
-  Trash2,
-  UserRound,
-  Phone,
-  School,
-  Search,
-  FileText,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { Plus, RefreshCw, Phone, MapPin, Trash2, Search } from "lucide-react";
+import { API_URL } from "@/lib/config";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
-// Define interfaces for type safety
 interface Teacher {
   id: string;
   name: string;
   phone: string;
-  cohort?: { id: string; name: string };
-  anganwadi?: { id: string; name: string };
+  cohort?: {
+    id: string;
+    name: string;
+  };
+  anganwadi?: {
+    id: string;
+    name: string;
+  };
 }
 
 interface Anganwadi {
   id: string;
   name: string;
-  location?: string;
-  code?: string;
+}
+
+interface Cohort {
+  id: string;
+  name: string;
 }
 
 export default function TeachersPage() {
-  const {
-    teachers,
-    loading,
-    fetchTeachers,
-    createTeacher,
-    deleteTeacher,
-    getByAnganwadi,
-  } = useTeacherStore();
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [filteredTeachers, setFilteredTeachers] = useState<Teacher[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [anganwadis, setAnganwadis] = useState<Anganwadi[]>([]);
+  const [cohorts, setCohorts] = useState<Cohort[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newTeacher, setNewTeacher] = useState({
+    name: "",
+    phone: "",
+    anganwadiId: "",
+    cohortId: "",
+  });
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [open, setOpen] = useState(false);
-  const [assignAnganwadiOpen, setAssignAnganwadiOpen] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
-  const [searchAnganwadi, setSearchAnganwadi] = useState("");
-  const [anganwadiResults, setAnganwadiResults] = useState<Anganwadi[]>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [selectedAnganwadi, setSelectedAnganwadi] = useState<Anganwadi | null>(null);
+  // Fetch teachers
+  const fetchTeachers = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}teachers`);
+      if (!response.ok) throw new Error("Failed to fetch teachers");
+      const data = await response.json();
+      setTeachers(data);
+      setFilteredTeachers(data);
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
+      toast.error("Failed to load teachers");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const [creating, setCreating] = useState(false);
-  const [deletingTeacherId, setDeletingTeacherId] = useState<string | null>(null);
-  const [assigningAnganwadiId, setAssigningAnganwadiId] = useState<string | null>(null);
+  // Fetch anganwadis
+  const fetchAnganwadis = async () => {
+    try {
+      const response = await fetch(`${API_URL}anganwadis`);
+      if (!response.ok) throw new Error("Failed to fetch anganwadis");
+      const data = await response.json();
+      setAnganwadis(data);
+    } catch (error) {
+      console.error("Error fetching anganwadis:", error);
+      toast.error("Failed to load anganwadis");
+    }
+  };
 
-  const [searchTerm, setSearchTerm] = useState("");
+  // Fetch cohorts
+  const fetchCohorts = async () => {
+    try {
+      const response = await fetch(`${API_URL}cohorts`);
+      if (!response.ok) throw new Error("Failed to fetch cohorts");
+      const data = await response.json();
+      setCohorts(data);
+    } catch (error) {
+      console.error("Error fetching cohorts:", error);
+      toast.error("Failed to load cohorts");
+    }
+  };
 
   useEffect(() => {
     fetchTeachers();
-  }, [fetchTeachers]);
+    fetchAnganwadis();
+    fetchCohorts();
+  }, []);
 
-  useEffect(() => {
-    const searchAnganwadis = async () => {
-      if (searchAnganwadi.trim().length < 2) {
-        return;
-      }
-
-      setSearchLoading(true);
-      try {
-        const response = await fetch(
-          `https://api.dreamlaunch.studio/api/anganwadis?search=${searchAnganwadi}`
-        );
-        const data = await response.json();
-        setAnganwadiResults(data);
-      } catch (error) {
-        console.error("Failed to search anganwadis:", error);
-      } finally {
-        setSearchLoading(false);
-      }
-    };
-
-    const debounce = setTimeout(() => {
-      searchAnganwadis();
-    }, 300);
-
-    return () => clearTimeout(debounce);
-  }, [searchAnganwadi]);
-
-  const handleSubmit = async () => {
-    if (!name || !phone) return toast.error("Name and phone are required");
-    setCreating(true);
+  const handleDelete = async () => {
+    if (!teacherToDelete) return;
+    
+    setDeletingId(teacherToDelete.id);
     try {
-      await createTeacher(name, phone);
-      toast.success("Teacher added successfully!");
-      setName("");
-      setPhone("");
-      setOpen(false);
-    } catch (err) {
-      toast.error("Failed to create teacher");
-    } finally {
-      setCreating(false);
-    }
-  };
+      const response = await fetch(`${API_URL}teachers/${teacherToDelete.id}`, {
+        method: "DELETE",
+      });
 
-  const handleDelete = async (id: string) => {
-    setDeletingTeacherId(id);
-    try {
-      await deleteTeacher(id);
-      toast.success("Teacher deleted successfully!");
-    } catch (err) {
+      if (!response.ok) throw new Error("Failed to delete teacher");
+      
+      toast.success("Teacher deleted successfully");
+      fetchTeachers(); // Refresh the list
+      setIsDeleteDialogOpen(false);
+      setTeacherToDelete(null);
+    } catch (error) {
+      console.error("Error deleting teacher:", error);
       toast.error("Failed to delete teacher");
     } finally {
-      setDeletingTeacherId(null);
+      setDeletingId(null);
     }
   };
 
-  const openAssignAnganwadi = (teacher: Teacher) => {
-    setSelectedTeacher(teacher);
-    setAssignAnganwadiOpen(true);
-    setSearchAnganwadi("");
-    setAnganwadiResults([]);
-  };
+  const handleAddTeacher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTeacher.anganwadiId) {
+      toast.error("Please select an Anganwadi");
+      return;
+    }
 
-  const handleAssignAnganwadi = async (anganwadiId: string) => {
-    if (!selectedTeacher || !anganwadiId) return;
-    setAssigningAnganwadiId(anganwadiId);
+    setIsAdding(true);
     try {
-      await fetch(`https://api.dreamlaunch.studio/api/teachers/assign`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}teachers`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          teacherId: selectedTeacher.id,
-          anganwadiId
+          name: newTeacher.name,
+          phone: newTeacher.phone,
+          anganwadiId: newTeacher.anganwadiId,
+          cohortId: newTeacher.cohortId || undefined,
         }),
       });
-      toast.success("Anganwadi assigned successfully!");
-      setAssignAnganwadiOpen(false);
-      setSelectedTeacher(null);
-      fetchTeachers();
-    } catch (err) {
-      toast.error("Failed to assign anganwadi");
+
+      if (!response.ok) {
+        let errorMsg = "Failed to add teacher";
+        try {
+          const errorData = await response.json();
+          if (errorData && (errorData.error || errorData.message)) {
+            errorMsg = errorData.error || errorData.message;
+          }
+          console.error("API error response:", errorData);
+        } catch (jsonErr) {
+          const text = await response.text();
+          if (text) {
+            errorMsg = text;
+          }
+        }
+        throw new Error(errorMsg);
+      }
+
+      toast.success("Teacher added successfully");
+      fetchTeachers(); // Refresh the list
+      setIsAddDialogOpen(false);
+      setNewTeacher({ name: "", phone: "", anganwadiId: "", cohortId: "" }); // Reset form
+    } catch (error: any) {
+      console.error("Error adding teacher:", error);
+      toast.error(error.message || "Failed to add teacher");
     } finally {
-      setAssigningAnganwadiId(null);
+      setIsAdding(false);
     }
   };
 
-  // Handle search filtering with debounce
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  // Handle search
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredTeachers(teachers);
+      return;
+    }
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const filteredTeachers = teachers.filter((teacher) => {
-    const search = debouncedSearchTerm.toLowerCase();
-    return (
-      teacher.name.toLowerCase().includes(search) ||
-      teacher.phone.toLowerCase().includes(search)
+    const searchTerm = query.toLowerCase();
+    const filtered = teachers.filter(
+      (teacher) =>
+        teacher.name.toLowerCase().includes(searchTerm) ||
+        teacher.phone.includes(searchTerm)
     );
-  });
+    setFilteredTeachers(filtered);
+  };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card className="border border-gray-100 shadow-sm rounded-lg overflow-hidden">
-        <CardHeader className="border-b border-gray-100 pb-4 bg-white">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <CardTitle className="text-xl font-medium flex items-center gap-2 text-gray-800">
-              <School className="h-5 w-5 text-gray-600" /> Teachers Dashboard
-            </CardTitle>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1 h-9"
-                onClick={() => window.location.href = "/admin/teachers/student-responses"}
-              >
-                <FileText className="h-3.5 w-3.5" /> Student Responses
-              </Button>
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="flex items-center gap-1 h-9 bg-gray-800 hover:bg-gray-700 text-white"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Add Teacher
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[400px] rounded-lg bg-white">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg font-medium text-gray-800">
-                      New Teacher
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="name"
-                        className="text-sm font-medium text-gray-600"
-                      >
-                        Name
-                      </Label>
-                      <Input
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Full name"
-                        className="w-full border-gray-200 focus:border-gray-300"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="phone"
-                        className="text-sm font-medium text-gray-600"
-                      >
-                        Phone Number
-                      </Label>
-                      <Input
-                        id="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="Phone number"
-                        className="w-full border-gray-200 focus:border-gray-300"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      onClick={handleSubmit}
-                      size="sm"
-                      className="w-full bg-gray-800 hover:bg-gray-700 text-white"
-                      disabled={creating}
-                    >
-                      {creating ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : null}
-                      Add Teacher
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <div className="mt-4 relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <Input
-                placeholder="Search by name or phone number"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full border-gray-200 focus:border-gray-300"
-              />
-            </div>
+    <div className="container mx-auto py-8">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Teachers</h1>
+          <p className="text-sm text-gray-500">Manage and view all teachers</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Search by name or phone..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="w-64"
+            />
+            <Search className="h-4 w-4 text-gray-500" />
           </div>
+          <Button
+            onClick={fetchTeachers}
+            disabled={loading}
+            variant="outline"
+            size="icon"
+            title="Refresh list"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Teacher
+          </Button>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Teachers</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
-            <div className="flex justify-center items-center py-16">
-              <div className="text-center">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-500 mx-auto" />
-                <p className="mt-3 text-sm text-gray-500">
-                  Loading teachers...
-                </p>
-              </div>
+            <div className="flex justify-center items-center py-8">
+              <RefreshCw className="h-8 w-8 animate-spin" />
             </div>
           ) : filteredTeachers.length === 0 ? (
-            <div className="text-center py-16 px-4">
-              <UserRound className="h-12 w-12 mx-auto text-gray-300" />
-              <h3 className="mt-4 text-base font-medium text-gray-700">
-                No teachers found
-              </h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Try adjusting your search or add a new teacher
+            <div className="text-center py-8">
+              <p className="text-gray-500">
+                {searchQuery
+                  ? "No teachers found matching your search"
+                  : "No teachers found"}
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b border-gray-100 bg-gray-50">
-                    <TableHead className="text-xs font-medium text-gray-600 py-3">
-                      Name
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-600 py-3">
-                      Phone
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-600 py-3">
-                      Cohort
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-600 py-3">
-                      Anganwadi
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-600 py-3 text-right">
-                      Actions
-                    </TableHead>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Anganwadi</TableHead>
+                  <TableHead>Cohort</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTeachers.map((teacher) => (
+                  <TableRow key={teacher.id}>
+                    <TableCell>
+                      <div className="font-medium">{teacher.name}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-gray-500" />
+                        <span>{teacher.phone}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {teacher.anganwadi ? (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-gray-500" />
+                          <span>{teacher.anganwadi.name}</span>
+                        </div>
+                      ) : (
+                        <Badge variant="outline">Not Assigned</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {teacher.cohort ? (
+                        <Badge variant="secondary">{teacher.cohort.name}</Badge>
+                      ) : (
+                        <Badge variant="outline">No Cohort</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled={deletingId === teacher.id}
+                        onClick={() => {
+                          setTeacherToDelete(teacher);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {deletingId === teacher.id ? "Deleting..." : "Delete"}
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredTeachers.map((teacher) => (
-                    <TableRow
-                      key={teacher.id}
-                      className="border-b border-gray-100"
-                    >
-                      <TableCell className="text-sm font-medium text-gray-800 py-3">
-                        {teacher.name}
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-600 py-3">
-                        {teacher.phone}
-                      </TableCell>
-                      <TableCell className="py-3">
-                        {teacher.cohort?.name ? (
-                          <Badge
-                            variant="outline"
-                            className="text-xs bg-gray-100 text-gray-700 border-gray-200 font-normal"
-                          >
-                            {teacher.cohort.name}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-gray-400">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="py-3">
-                        {teacher.anganwadi?.name ? (
-                          <Badge
-                            variant="outline"
-                            className="text-xs bg-gray-100 text-gray-700 border-gray-200 font-normal"
-                          >
-                            {teacher.anganwadi.name}
-                          </Badge>
-                        ) : (
-                          <Button
-                            variant="link"
-                            className="text-xs p-0 h-auto text-gray-600 hover:text-gray-800"
-                            onClick={() => openAssignAnganwadi(teacher)}
-                          >
-                            Assign Anganwadi
-                          </Button>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right py-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(teacher.id)}
-                          className="h-8 w-8 p-0 rounded-full hover:bg-gray-100"
-                          disabled={deletingTeacherId === teacher.id}
-                        >
-                          {deletingTeacherId === teacher.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                          ) : (
-                            <Trash2 className="h-4 w-4 text-gray-500" />
-                          )}
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
 
-      <Dialog open={assignAnganwadiOpen} onOpenChange={setAssignAnganwadiOpen}>
-        <DialogContent className="sm:max-w-[400px] rounded-lg bg-white">
+      {/* Delete Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-lg font-medium text-gray-800">
-              Assign Anganwadi to {selectedTeacher?.name}
-            </DialogTitle>
+            <DialogTitle>Delete Teacher</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-3">
-            <div className="space-y-2">
-              <Label
-                htmlFor="search-anganwadi"
-                className="text-sm font-medium text-gray-600"
-              >
-                Search Anganwadi
-              </Label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-400" />
-                </div>
+          <div className="py-4">
+            <p className="text-sm text-gray-500">
+              Are you sure you want to delete {teacherToDelete?.name}? This
+              action cannot be undone.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setTeacherToDelete(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deletingId === teacherToDelete?.id}
+            >
+              {deletingId === teacherToDelete?.id ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Teacher Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Teacher</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddTeacher}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
                 <Input
-                  id="search-anganwadi"
-                  value={searchAnganwadi}
-                  onChange={(e) => setSearchAnganwadi(e.target.value)}
-                  placeholder="Search by name or code"
-                  className="pl-10 w-full border-gray-200 focus:border-gray-300"
+                  id="name"
+                  value={newTeacher.name}
+                  onChange={(e) =>
+                    setNewTeacher({ ...newTeacher, name: e.target.value })
+                  }
+                  placeholder="Enter teacher's name"
+                  required
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  value={newTeacher.phone}
+                  onChange={(e) =>
+                    setNewTeacher({ ...newTeacher, phone: e.target.value })
+                  }
+                  placeholder="Enter phone number"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="anganwadi">Anganwadi</Label>
+                <Select
+                  value={newTeacher.anganwadiId}
+                  onValueChange={(value) =>
+                    setNewTeacher({ ...newTeacher, anganwadiId: value })
+                  }
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an anganwadi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {anganwadis.map((anganwadi) => (
+                      <SelectItem key={anganwadi.id} value={anganwadi.id}>
+                        {anganwadi.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cohort">Cohort (Optional)</Label>
+                <Select
+                  value={newTeacher.cohortId}
+                  onValueChange={(value) =>
+                    setNewTeacher({ ...newTeacher, cohortId: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a cohort" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cohorts.map((cohort) => (
+                      <SelectItem key={cohort.id} value={cohort.id}>
+                        {cohort.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-
-            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
-              {searchLoading ? (
-                <div className="flex justify-center items-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
-                </div>
-              ) : anganwadiResults.length === 0 ? (
-                <div className="text-center py-8 text-sm text-gray-500">
-                  {searchAnganwadi.trim().length < 2
-                    ? "Type at least 2 characters to search"
-                    : "No anganwadis found"}
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100">
-                  {anganwadiResults.map((anganwadi) => (
-                    <button
-                      key={anganwadi.id}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex justify-between items-center"
-                      onClick={() => handleAssignAnganwadi(anganwadi.id)}
-                      disabled={assigningAnganwadiId === anganwadi.id}
-                    >
-                      <div>
-                        <div className="font-medium text-sm text-gray-800">
-                          {anganwadi.name}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-0.5">
-                          {anganwadi.code}
-                        </div>
-                      </div>
-                      {assigningAnganwadiId === anganwadi.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
-                      ) : null}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  setNewTeacher({
+                    name: "",
+                    phone: "",
+                    anganwadiId: "",
+                    cohortId: "",
+                  });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isAdding}>
+                {isAdding ? "Adding..." : "Add Teacher"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
