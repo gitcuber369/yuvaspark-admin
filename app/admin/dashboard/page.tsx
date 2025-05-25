@@ -112,7 +112,7 @@ export default function DashboardPage() {
       } else {
         console.log("Anganwadis data fetched successfully:", {
           count: Array.isArray(anganwadis) ? anganwadis.length : 0,
-          data: anganwadis
+          data: anganwadis,
         });
       }
     }
