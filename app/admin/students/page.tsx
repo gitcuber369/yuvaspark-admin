@@ -172,17 +172,17 @@ export default function StudentDashboard() {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="container mx-auto p-6 space-y-6">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b">
+      <div className="container mx-auto px-4 py-4 md:p-6 space-y-4 md:space-y-6">
+        <header className="flex flex-col gap-4 mb-6 pb-4 border-b">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
               Student Management
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-sm md:text-base text-gray-500 mt-1">
               Register and manage student records
             </p>
           </div>
-          <div className="flex items-center mt-4 md:mt-0 gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge className="bg-black text-white">
               {students.length} Students
             </Badge>
@@ -202,27 +202,25 @@ export default function StudentDashboard() {
                 className="border-black text-black hover:bg-gray-100"
               >
                 <FileUp className="h-4 w-4 mr-2" />
-                Imports
+                <span className="hidden sm:inline">Imports</span>
               </Button>
             </Link>
 
-            {/* Add Batch Assign Button */}
             {selectedStudents.length > 0 && (
               <Button
                 size="sm"
-                className="bg-blue-600 text-white hover:bg-blue-700"
+                className="bg-blue-600 text-white hover:bg-blue-700 w-full sm:w-auto mt-2 sm:mt-0"
                 onClick={() => setBatchAssignDialogOpen(true)}
               >
                 Assign {selectedStudents.length} Students
               </Button>
             )}
 
-            {/* Dialog Trigger Button */}
             <Dialog>
               <DialogTrigger asChild>
                 <Button
                   size="sm"
-                  className="bg-black text-white hover:bg-gray-800"
+                  className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto mt-2 sm:mt-0"
                 >
                   <UserPlus className="h-4 w-4 mr-2" />
                   Add Student
@@ -385,61 +383,62 @@ export default function StudentDashboard() {
         </header>
 
         <Tabs defaultValue="students" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="students">Students Directory</TabsTrigger>
-            <TabsTrigger value="import">CSV Import</TabsTrigger>
+          <TabsList className="mb-6 w-full flex">
+            <TabsTrigger value="students" className="flex-1">Students Directory</TabsTrigger>
+            <TabsTrigger value="import" className="flex-1">CSV Import</TabsTrigger>
           </TabsList>
 
           <TabsContent value="students">
-            {/* Student Directory */}
             <Card className="border shadow-sm">
               <CardHeader className="pb-3">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    <CardTitle className="text-xl font-semibold">
+                    <CardTitle className="text-lg md:text-xl font-semibold">
                       Students Directory
                     </CardTitle>
                   </div>
-                  <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-                    <div className="relative w-full md:w-64">
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="relative w-full">
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                       <Input
-                        className="pl-8"
+                        className="pl-8 w-full"
                         placeholder="Search students..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
                     </div>
-                    <Select
-                      value={anganwadiFilter}
-                      onValueChange={(val) => setAnganwadiFilter(val)}
-                    >
-                      <SelectTrigger className="md:w-48">
-                        <SelectValue placeholder="Filter by Anganwadi" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Anganwadis</SelectItem>
-                        {uniqueAnganwadis.map((anganwadi) => (
-                          <SelectItem key={anganwadi.id} value={anganwadi.id}>
-                            {anganwadi.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select
-                      value={sortByAnganwadi}
-                      onValueChange={(val) => setSortByAnganwadi(val)}
-                    >
-                      <SelectTrigger className="md:w-48">
-                        <SelectValue placeholder="Sort by Anganwadi" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="asc">Anganwadi (A → Z)</SelectItem>
-                        <SelectItem value="desc">Anganwadi (Z → A)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Select
+                        value={anganwadiFilter}
+                        onValueChange={(val) => setAnganwadiFilter(val)}
+                      >
+                        <SelectTrigger className="w-full sm:w-48">
+                          <SelectValue placeholder="Filter by Anganwadi" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Anganwadis</SelectItem>
+                          {uniqueAnganwadis.map((anganwadi) => (
+                            <SelectItem key={anganwadi.id} value={anganwadi.id}>
+                              {anganwadi.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={sortByAnganwadi}
+                        onValueChange={(val) => setSortByAnganwadi(val)}
+                      >
+                        <SelectTrigger className="w-full sm:w-48">
+                          <SelectValue placeholder="Sort by Anganwadi" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="asc">Anganwadi (A → Z)</SelectItem>
+                          <SelectItem value="desc">Anganwadi (Z → A)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
 
@@ -451,49 +450,37 @@ export default function StudentDashboard() {
                         type="checkbox"
                         id="select-all"
                         className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                        checked={
-                          selectedStudents.length === sortedStudents.length &&
-                          sortedStudents.length > 0
-                        }
+                        checked={selectedStudents.length === sortedStudents.length && sortedStudents.length > 0}
                         onChange={toggleSelectAll}
                       />
-                      <label
-                        htmlFor="select-all"
-                        className="ml-2 text-sm text-gray-600"
-                      >
+                      <label htmlFor="select-all" className="ml-2 text-sm text-gray-600">
                         Select All ({sortedStudents.length})
                       </label>
                     </div>
-
                     {selectedStudents.length > 0 && (
                       <span className="text-sm text-gray-500 ml-4">
-                        {selectedStudents.length} student
-                        {selectedStudents.length !== 1 ? "s" : ""} selected
+                        {selectedStudents.length} student{selectedStudents.length !== 1 ? "s" : ""} selected
                       </span>
                     )}
                   </div>
                 )}
               </CardHeader>
               <Separator />
-              <CardContent className="p-6">
+              <CardContent className="p-4 md:p-6">
                 {loading ? (
                   <div className="flex justify-center items-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-black" />
-                    <span className="ml-2 text-gray-600">
-                      Loading students...
-                    </span>
+                    <span className="ml-2 text-gray-600">Loading students...</span>
                   </div>
                 ) : error ? (
                   <div className="text-red-500 bg-red-50 border border-red-100 p-4 rounded-md">
                     {error}
                   </div>
                 ) : sortedStudents.length === 0 ? (
-                  <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                  <div className="text-center py-8 md:py-12 border-2 border-dashed rounded-lg">
                     {searchQuery ? (
                       <>
-                        <p className="text-gray-500">
-                          No students match your search.
-                        </p>
+                        <p className="text-gray-500">No students match your search.</p>
                         <Button
                           variant="link"
                           onClick={() => setSearchQuery("")}
@@ -505,143 +492,124 @@ export default function StudentDashboard() {
                     ) : (
                       <div className="text-gray-500">
                         <p>No students found.</p>
-                        <p className="text-sm mt-1">
-                          Add your first student using the button above.
-                        </p>
+                        <p className="text-sm mt-1">Add your first student using the button above.</p>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <ul className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                       {sortedStudents.map((student) => (
                         <li
                           key={student.id}
-                          className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-all"
+                          className="border rounded-lg p-3 sm:p-4 shadow-sm hover:shadow-md transition-all bg-white"
                         >
-                          <div className="flex justify-between items-center mb-2">
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                id={`student-${student.id}`}
-                                className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                                checked={selectedStudents.includes(student.id)}
-                                onChange={() =>
-                                  toggleStudentSelection(student.id)
-                                }
-                              />
-                              <h3 className="text-lg font-medium">
-                                {student.name}
-                              </h3>
+                          {/* Student Header */}
+                          <div className="flex flex-col gap-2 sm:gap-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-start gap-2 min-w-0 flex-1">
+                                <input
+                                  type="checkbox"
+                                  id={`student-${student.id}`}
+                                  className="h-4 w-4 mt-1 rounded border-gray-300 text-black focus:ring-black shrink-0"
+                                  checked={selectedStudents.includes(student.id)}
+                                  onChange={() => toggleStudentSelection(student.id)}
+                                />
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="text-base sm:text-lg font-medium truncate">
+                                    {student.name}
+                                  </h3>
+                                  <p className="text-sm text-gray-600 mt-0.5">
+                                    Gender: {student.gender || "Not specified"}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => removeStudent(student.id)}
+                                className="shrink-0 -mt-1"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
+                              </Button>
                             </div>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => removeStudent(student.id)}
-                            >
-                              <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
-                            </Button>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            Gender: {student.gender}
-                          </p>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className="text-sm text-gray-500">
-                              Status:
-                            </span>
-                            <Select
-                              value={(student.status || "").toUpperCase()}
-                              onValueChange={(value) => {
-                                updateStudent(student.id, { status: value });
-                              }}
-                            >
-                              <SelectTrigger className="w-28 h-8">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem
-                                  value="ACTIVE"
-                                  className="text-green-600"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4" />
-                                    <span>Active</span>
-                                  </div>
-                                </SelectItem>
-                                <SelectItem
-                                  value="INACTIVE"
-                                  className="text-red-600"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <XCircle className="w-4 h-4" />
-                                    <span>Inactive</span>
-                                  </div>
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
 
-                          {/* Anganwadi Assignment Section */}
-                          <div className="flex items-center justify-between mt-3 border-t pt-2">
-                            <span className="text-sm text-gray-500">
-                              Anganwadi:
-                            </span>
-                            <Select
-                              value={student.anganwadiId || "none"}
-                              onValueChange={(value) => {
-                                if (value && value !== "none") {
-                                  assignToAnganwadi(student.id, value);
-                                } else if (
-                                  value === "none" &&
-                                  student.anganwadiId
-                                ) {
-                                  // Unassign by setting anganwadiId to empty string
-                                  updateStudent(student.id, {
-                                    anganwadiId: "",
-                                  });
-                                }
-                              }}
-                            >
-                              <SelectTrigger className="w-40 h-8">
-                                <SelectValue placeholder="Assign Anganwadi" />
-                              </SelectTrigger>
-                              <SelectContent className="max-h-60">
-                                {student.anganwadiId && (
-                                  <SelectItem value="none">
-                                    <span className="text-gray-500">
-                                      Unassign
-                                    </span>
+                            {/* Status Section */}
+                            <div className="flex items-center justify-between gap-2 mt-1">
+                              <span className="text-sm text-gray-500">Status:</span>
+                              <Select
+                                value={(student.status || "").toUpperCase()}
+                                onValueChange={(value) => {
+                                  updateStudent(student.id, { status: value });
+                                }}
+                              >
+                                <SelectTrigger className="w-32 h-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="ACTIVE" className="text-green-600">
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle className="w-4 h-4" />
+                                      <span>Active</span>
+                                    </div>
                                   </SelectItem>
-                                )}
-                                {anganwadis.map((anganwadi) => (
-                                  <SelectItem
-                                    key={
-                                      anganwadi._id?.toString() || anganwadi.id
-                                    }
-                                    value={
-                                      anganwadi._id?.toString() || anganwadi.id
-                                    }
-                                  >
-                                    {anganwadi.name}
+                                  <SelectItem value="INACTIVE" className="text-red-600">
+                                    <div className="flex items-center gap-2">
+                                      <XCircle className="w-4 h-4" />
+                                      <span>Inactive</span>
+                                    </div>
                                   </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                                </SelectContent>
+                              </Select>
+                            </div>
 
-                          {student.anganwadiId && (
-                            <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                              <ChevronRight className="w-4 h-4" />
-                              {student.anganwadi?.name ? (
-                                <span>
-                                  Anganwadi: {student.anganwadi.name} (
-                                  {student.anganwadiId})
-                                </span>
-                              ) : (
-                                <span>Anganwadi ID: {student.anganwadiId}</span>
+                            {/* Anganwadi Section */}
+                            <div className="border-t mt-2 pt-3">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-sm text-gray-500">Anganwadi:</span>
+                                <Select
+                                  value={student.anganwadiId || "none"}
+                                  onValueChange={(value) => {
+                                    if (value && value !== "none") {
+                                      assignToAnganwadi(student.id, value);
+                                    } else if (value === "none" && student.anganwadiId) {
+                                      updateStudent(student.id, { anganwadiId: "" });
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className="w-36 sm:w-40 h-8">
+                                    <SelectValue placeholder="Assign" />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-60">
+                                    {student.anganwadiId && (
+                                      <SelectItem value="none">
+                                        <span className="text-gray-500">Unassign</span>
+                                      </SelectItem>
+                                    )}
+                                    {anganwadis.map((anganwadi) => (
+                                      <SelectItem
+                                        key={anganwadi._id?.toString() || anganwadi.id}
+                                        value={anganwadi._id?.toString() || anganwadi.id}
+                                      >
+                                        {anganwadi.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {student.anganwadiId && (
+                                <div className="flex items-center gap-2 mt-2">
+                                  <ChevronRight className="w-4 h-4 shrink-0 text-gray-400" />
+                                  <p className="text-sm text-gray-500 truncate flex-1">
+                                    {student.anganwadi?.name
+                                      ? `${student.anganwadi.name}`
+                                      : `ID: ${student.anganwadiId}`}
+                                  </p>
+                                </div>
                               )}
                             </div>
-                          )}
+                          </div>
                         </li>
                       ))}
                     </ul>

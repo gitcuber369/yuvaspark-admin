@@ -211,10 +211,10 @@ export default function GlobalAssessmentsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Global Assessments</h1>
-        <div className="flex gap-2">
+    <div className="container mx-auto py-4 px-4 sm:px-6 sm:py-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-2 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">Global Assessments</h1>
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Button 
             variant="outline" 
             size="icon"
@@ -223,18 +223,18 @@ export default function GlobalAssessmentsPage() {
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
           </Button>
-          <Button variant="outline" onClick={() => router.push("/admin/global-assessments/api-docs")}>
+          <Button variant="outline" className="flex-1 sm:flex-none" onClick={() => router.push("/admin/global-assessments/api-docs")}>
             <FileText className="mr-2 h-4 w-4" />
             API Documentation
           </Button>
-          <Button onClick={() => router.push("/admin/global-assessments/new")}>
+          <Button className="flex-1 sm:flex-none" onClick={() => router.push("/admin/global-assessments/new")}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Create New Assessment
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -244,28 +244,30 @@ export default function GlobalAssessmentsPage() {
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <Filter className="mr-2 h-4 w-4" />
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="DRAFT">Draft</SelectItem>
-            <SelectItem value="PUBLISHED">Published</SelectItem>
-            <SelectItem value="COMPLETED">Completed</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="date">Latest First</SelectItem>
-            <SelectItem value="name">Name</SelectItem>
-            <SelectItem value="completion">Completion</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <Filter className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="PUBLISHED">Published</SelectItem>
+              <SelectItem value="COMPLETED">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date">Latest First</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="completion">Completion</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {loading ? (
@@ -277,7 +279,7 @@ export default function GlobalAssessmentsPage() {
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
                   {[1, 2, 3].map((j) => (
                     <div key={j} className="h-12 bg-gray-200 rounded"></div>
                   ))}
@@ -292,12 +294,12 @@ export default function GlobalAssessmentsPage() {
         </div>
       ) : filteredAssessments.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-10">
+          <CardContent className="flex flex-col items-center justify-center py-8 sm:py-10">
             <AlertTriangle className="h-10 w-10 text-amber-500 mb-4" />
-            <h3 className="text-lg font-medium">
+            <h3 className="text-lg font-medium text-center">
               {assessments.length === 0 ? "No assessments found" : "No matching assessments"}
             </h3>
-            <p className="text-muted-foreground mt-2 text-center max-w-md">
+            <p className="text-muted-foreground mt-2 text-center max-w-md px-4">
               {assessments.length === 0 
                 ? "You haven't created any global assessments yet. Click the button above to create your first assessment."
                 : "Try adjusting your search or filters to find what you're looking for."}
@@ -305,22 +307,22 @@ export default function GlobalAssessmentsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-4 sm:gap-6">
           {filteredAssessments.map((assessment) => (
             <Card key={assessment.id} className="overflow-hidden">
               <CardHeader className="bg-muted/40">
-                <div className="flex justify-between items-start">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:items-center">
                   <div>
-                    <CardTitle>{assessment.name}</CardTitle>
-                    <CardDescription>{assessment.description}</CardDescription>
+                    <CardTitle className="text-lg sm:text-xl break-words">{assessment.name}</CardTitle>
+                    <CardDescription className="break-words">{assessment.description}</CardDescription>
                   </div>
-                  <div>{getStatusBadge(assessment.status)}</div>
+                  <div className="self-start">{getStatusBadge(assessment.status)}</div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <CardContent className="pt-4 sm:pt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
+                    <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium">Assessment Period</p>
                       <p className="text-sm text-muted-foreground">
@@ -329,7 +331,7 @@ export default function GlobalAssessmentsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <School className="h-5 w-5 text-muted-foreground" />
+                    <School className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium">Anganwadis</p>
                       <p className="text-sm text-muted-foreground">
@@ -338,16 +340,16 @@ export default function GlobalAssessmentsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                    <Users className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                    <div className="w-full">
                       <p className="text-sm font-medium">Students</p>
                       <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <div className="text-sm font-medium">
                             {assessment.stats.completedStudents} out of {assessment.stats.totalStudents} submitted
                           </div>
                           {assessment.stats.gradedStudents > 0 && (
-                            <Badge variant="outline">
+                            <Badge variant="outline" className="text-xs">
                               {assessment.stats.gradedStudents} graded
                             </Badge>
                           )}
@@ -373,7 +375,7 @@ export default function GlobalAssessmentsPage() {
 
                 <div className="space-y-3">
                   <div>
-                    <div className="flex justify-between mb-1 text-sm">
+                    <div className="flex flex-wrap justify-between mb-1 text-sm gap-2">
                       <div className="flex items-center gap-1">
                         <span>Anganwadi Completion</span>
                         <TooltipProvider>
@@ -395,7 +397,7 @@ export default function GlobalAssessmentsPage() {
                     />
                   </div>
                   <div>
-                    <div className="flex justify-between mb-1 text-sm">
+                    <div className="flex flex-col sm:flex-row justify-between mb-1 text-sm gap-2">
                       <div className="flex items-center gap-1">
                         <span>Student Completion</span>
                         <TooltipProvider>
@@ -409,7 +411,7 @@ export default function GlobalAssessmentsPage() {
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span>{assessment.stats.studentCompletionPercentage}%</span>
                         <span className="text-xs text-muted-foreground">
                           ({assessment.stats.completedStudents}/{assessment.stats.totalStudents})
@@ -438,16 +440,16 @@ export default function GlobalAssessmentsPage() {
 
                 <div className="mt-4 text-sm text-muted-foreground">
                   {assessment.status === "PUBLISHED" && assessment.stats.completedStudents < assessment.stats.totalStudents && (
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-amber-500" />
+                    <div className="flex items-start sm:items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-1 sm:mt-0" />
                       <span>
                         {assessment.stats.totalStudents - assessment.stats.completedStudents} students still need to complete their assessments
                       </span>
                     </div>
                   )}
                   {assessment.stats.completedStudents > assessment.stats.gradedStudents && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <AlertCircle className="h-4 w-4 text-blue-500" />
+                    <div className="flex items-start sm:items-center gap-2 mt-1">
+                      <AlertCircle className="h-4 w-4 text-blue-500 flex-shrink-0 mt-1 sm:mt-0" />
                       <span>
                         {assessment.stats.completedStudents - assessment.stats.gradedStudents} completed {assessment.stats.completedStudents - assessment.stats.gradedStudents === 1 ? 'assessment needs' : 'assessments need'} grading
                       </span>
@@ -455,19 +457,19 @@ export default function GlobalAssessmentsPage() {
                   )}
                 </div>
               </CardContent>
-              <CardFooter className="bg-muted/20 justify-between">
-                <Button variant="outline" onClick={() => router.push(`/admin/global-assessments/${assessment.id}`)}>
+              <CardFooter className="bg-muted/20 flex flex-col sm:flex-row gap-2 justify-between">
+                <Button variant="outline" className="w-full sm:w-auto" onClick={() => router.push(`/admin/global-assessments/${assessment.id}`)}>
                   <Settings className="mr-2 h-4 w-4" />
                   View Details
                 </Button>
                 {assessment.status === "DRAFT" && (
-                  <Button onClick={() => handlePublish(assessment.id)}>
+                  <Button className="w-full sm:w-auto" onClick={() => handlePublish(assessment.id)}>
                     <Check className="mr-2 h-4 w-4" />
                     Publish Assessment
                   </Button>
                 )}
                 {assessment.status === "PUBLISHED" && (
-                  <Button onClick={() => handleComplete(assessment.id)}>
+                  <Button className="w-full sm:w-auto" onClick={() => handleComplete(assessment.id)}>
                     <Check className="mr-2 h-4 w-4" />
                     Mark as Completed
                   </Button>

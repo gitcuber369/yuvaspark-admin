@@ -201,18 +201,18 @@ export default function CohortPage() {
   );
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center">
-          <Users className="mr-2 h-6 w-6" /> Cohort Management
+    <div className="container mx-auto px-4 py-4 md:py-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 className="text-xl md:text-2xl font-bold flex items-center">
+          <Users className="mr-2 h-5 md:h-6 w-5 md:w-6" /> Cohort Management
         </h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button className="flex items-center">
+            <Button className="w-full sm:w-auto flex items-center">
               <Plus className="mr-2 h-4 w-4" /> Add Cohort
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="max-w-[95vw] sm:max-w-md p-4 md:p-6">
             <DialogHeader>
               <DialogTitle>Create New Cohort</DialogTitle>
               <DialogDescription>
@@ -260,7 +260,7 @@ export default function CohortPage() {
                     {availableTeachers.map((teacher) => (
                       <div
                         key={teacher.id}
-                        className="flex items-center gap-2 p-1 hover:bg-gray-50"
+                        className="flex items-center gap-2 p-2 hover:bg-gray-50 border-b last:border-b-0"
                       >
                         <input
                           type="checkbox"
@@ -271,10 +271,14 @@ export default function CohortPage() {
                         />
                         <label
                           htmlFor={`teacher-${teacher.id}`}
-                          className="text-sm"
+                          className="text-sm flex-1 min-w-0"
                         >
-                          {teacher.name}{" "}
-                          {teacher.anganwadi && `(${teacher.anganwadi.name})`}
+                          <span className="block truncate">{teacher.name}</span>
+                          {teacher.anganwadi && (
+                            <span className="text-xs text-gray-500 block truncate">
+                              {teacher.anganwadi.name}
+                            </span>
+                          )}
                         </label>
                       </div>
                     ))}
@@ -284,7 +288,11 @@ export default function CohortPage() {
             </div>
 
             <DialogFooter>
-              <Button onClick={handleCreateCohort} disabled={isSubmitting}>
+              <Button 
+                onClick={handleCreateCohort} 
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -303,7 +311,7 @@ export default function CohortPage() {
         <CardHeader>
           <CardTitle>Cohorts</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
           {isLoading ? (
             <div className="flex justify-center items-center py-8">
               <Loader2 className="h-8 w-8 animate-spin" />
@@ -320,62 +328,95 @@ export default function CohortPage() {
               </Button>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Region</TableHead>
-                  <TableHead>Teachers</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {cohorts.map((cohort) => (
-                  <TableRow key={cohort.id}>
-                    <TableCell className="font-medium">{cohort.name}</TableCell>
-                    <TableCell>{cohort.region}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {cohort.teachers.length > 0 ? (
-                          cohort.teachers.map((teacher) => (
-                            <Badge
-                              key={teacher.id}
-                              variant="outline"
-                              className="bg-gray-100"
-                            >
-                              {teacher.name}
-                            </Badge>
-                          ))
-                        ) : (
-                          <span className="text-gray-500 text-sm">
-                            No teachers assigned
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => viewTeacherRankings(cohort.id)}
-                        >
-                          <Award className="h-4 w-4 mr-2" />
-                          Rankings
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteCohort(cohort.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="hidden sm:table-cell">Region</TableHead>
+                    <TableHead className="hidden md:table-cell">Teachers</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {cohorts.map((cohort) => (
+                    <TableRow key={cohort.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{cohort.name}</div>
+                          <div className="sm:hidden text-sm text-gray-500">
+                            {cohort.region}
+                          </div>
+                          <div className="md:hidden text-sm text-gray-500 mt-1">
+                            {cohort.teachers.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {cohort.teachers.map((teacher) => (
+                                  <Badge
+                                    key={teacher.id}
+                                    variant="outline"
+                                    className="bg-gray-100 text-xs"
+                                  >
+                                    {teacher.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-500 text-sm">
+                                No teachers
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {cohort.region}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <div className="flex flex-wrap gap-1">
+                          {cohort.teachers.length > 0 ? (
+                            cohort.teachers.map((teacher) => (
+                              <Badge
+                                key={teacher.id}
+                                variant="outline"
+                                className="bg-gray-100"
+                              >
+                                {teacher.name}
+                              </Badge>
+                            ))
+                          ) : (
+                            <span className="text-gray-500 text-sm">
+                              No teachers assigned
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex flex-col sm:flex-row justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => viewTeacherRankings(cohort.id)}
+                            className="w-full sm:w-auto text-xs sm:text-sm"
+                          >
+                            <Award className="h-4 w-4 mr-2" />
+                            <span className="hidden sm:inline">Rankings</span>
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteCohort(cohort.id)}
+                            className="w-full sm:w-auto text-xs sm:text-sm"
+                          >
+                            <Trash2 className="h-4 w-4 sm:mr-2" />
+                            <span className="hidden sm:inline">Delete</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
