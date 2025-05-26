@@ -126,7 +126,7 @@ export default function TeachersPage() {
 
   const handleDelete = async () => {
     if (!teacherToDelete) return;
-    
+
     setDeletingId(teacherToDelete.id);
     try {
       const response = await fetch(`${API_URL}teachers/${teacherToDelete.id}`, {
@@ -134,7 +134,7 @@ export default function TeachersPage() {
       });
 
       if (!response.ok) throw new Error("Failed to delete teacher");
-      
+
       toast.success("Teacher deleted successfully");
       fetchTeachers(); // Refresh the list
       setIsDeleteDialogOpen(false);
@@ -241,15 +241,34 @@ export default function TeachersPage() {
               title="Refresh list"
               className="shrink-0"
             >
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              />
             </Button>
-            <Button onClick={() => setIsAddDialogOpen(true)} className="whitespace-nowrap">
+            <Button
+              onClick={() => setIsAddDialogOpen(true)}
+              className="whitespace-nowrap"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Teacher
             </Button>
           </div>
         </div>
       </div>
+
+      <Card className="mb-6 bg-blue-50 border-blue-100">
+        <CardHeader>
+          <div className="space-y-2">
+            <p className="text-sm text-blue-600 font-medium">
+              Implementation Guide:
+            </p>
+            <p className="text-sm text-blue-600">
+              Only one teacher can be assigned to an anganwadi. Please ensure
+              you maintain this one-to-one relationship when assigning teachers.
+            </p>
+          </div>
+        </CardHeader>
+      </Card>
 
       <Card className="border border-gray-100 shadow-sm rounded-lg overflow-hidden">
         <CardHeader>
@@ -275,8 +294,12 @@ export default function TeachersPage() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Contact</TableHead>
-                    <TableHead className="hidden sm:table-cell">Anganwadi</TableHead>
-                    <TableHead className="hidden sm:table-cell">Cohort</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Anganwadi
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Cohort
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -290,9 +313,13 @@ export default function TeachersPage() {
                         </div>
                         <div className="sm:hidden text-sm text-gray-500">
                           {teacher.cohort?.name ? (
-                            <Badge variant="secondary" className="mt-1">{teacher.cohort.name}</Badge>
+                            <Badge variant="secondary" className="mt-1">
+                              {teacher.cohort.name}
+                            </Badge>
                           ) : (
-                            <Badge variant="outline" className="mt-1">No Cohort</Badge>
+                            <Badge variant="outline" className="mt-1">
+                              No Cohort
+                            </Badge>
                           )}
                         </div>
                       </TableCell>
@@ -314,7 +341,9 @@ export default function TeachersPage() {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
                         {teacher.cohort ? (
-                          <Badge variant="secondary">{teacher.cohort.name}</Badge>
+                          <Badge variant="secondary">
+                            {teacher.cohort.name}
+                          </Badge>
                         ) : (
                           <Badge variant="outline">No Cohort</Badge>
                         )}
@@ -469,8 +498,8 @@ export default function TeachersPage() {
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isAdding}
                 className="w-full sm:w-auto"
               >
