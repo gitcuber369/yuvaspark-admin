@@ -108,179 +108,185 @@ function AnganwadiClient({ id }: { id: string }) {
   }
 
   return (
-    <div className="container py-8 space-y-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/admin/anganwadi")}
-            className="hover:bg-muted"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to List
-          </Button>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Anganwadi Details
-          </h1>
-        </div>
-
-        <Button
-          onClick={() => setShowUpdateForm(true)}
-          className="bg-primary hover:bg-primary/90"
-        >
-          <Edit className="h-4 w-4 mr-2" />
-          Edit Details
-        </Button>
-      </div>
-
-      {/* Update Dialog */}
-      <Dialog open={showUpdateForm} onOpenChange={setShowUpdateForm}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogTitle className="text-xl font-semibold">
-            Update Anganwadi
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Update details or add students to this Anganwadi.
-          </DialogDescription>
-          <UpdateAnganwadiForm
-            anganwadiId={id}
-            onSuccess={handleUpdateSuccess}
-            onClose={() => setShowUpdateForm(false)}
-          />
-        </DialogContent>
-      </Dialog>
-
-      <Card className="shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center justify-between text-2xl">
-            <span className="font-bold">{anganwadi.name}</span>
-            <Badge variant="secondary" className="text-sm font-medium">
-              {anganwadi.district}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="flex items-center space-x-2 text-muted-foreground">
-            <MapPin className="h-4 w-4" />
-            <span className="text-sm">{anganwadi.location}</span>
+    <div className="min-h-screen bg-background">
+      <div className="p-4 md:container md:py-6 md:max-w-5xl md:mx-auto">
+        <div className="flex flex-col space-y-4">
+          {/* Header Section */}
+          <div className="flex flex-col space-y-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/admin/anganwadi")}
+              className="w-fit -ml-2 hover:bg-muted"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to List
+            </Button>
+            
+            <div className="flex flex-col space-y-4">
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+                Anganwadi Details
+              </h1>
+              <Button
+                onClick={() => setShowUpdateForm(true)}
+                className="w-full md:w-auto bg-primary hover:bg-primary/90"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Details
+              </Button>
+            </div>
           </div>
 
-          {/* Teacher Information */}
-          <Card className="border border-muted bg-muted/5">
-            <CardHeader className="py-4">
-              <CardTitle className="text-base flex items-center font-semibold">
-                <User className="h-4 w-4 mr-2 text-primary" />
-                Teacher Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="py-2">
-              {anganwadi.teacher ? (
-                <div className="flex items-center space-x-4">
-                  <Avatar className="h-12 w-12 border-2 border-primary/10">
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {anganwadi.teacher.name.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-base">
-                      {anganwadi.teacher.name}
-                    </p>
-                    <div className="flex items-center text-sm text-muted-foreground mt-1">
-                      <Phone className="h-3 w-3 mr-1" />
-                      {anganwadi.teacher.phone}
+          {/* Main Content */}
+          <div className="flex flex-col space-y-4">
+            {/* Basic Info Card */}
+            <Card>
+              <CardHeader className="space-y-2">
+                <CardTitle className="flex flex-col space-y-2">
+                  <span className="text-xl md:text-2xl font-bold break-words">
+                    {anganwadi.name}
+                  </span>
+                  <Badge variant="secondary" className="w-fit text-sm">
+                    {anganwadi.district}
+                  </Badge>
+                </CardTitle>
+                <div className="flex items-start space-x-2 text-muted-foreground">
+                  <MapPin className="h-4 w-4 flex-shrink-0 mt-1" />
+                  <span className="text-sm break-words">{anganwadi.location}</span>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Teacher Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center">
+                  <User className="h-4 w-4 mr-2 text-primary" />
+                  Teacher Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {anganwadi.teacher ? (
+                  <div className="flex flex-col space-y-4">
+                    <Avatar className="h-16 w-16 md:h-12 md:w-12 border-2 border-primary/10">
+                      <AvatarFallback className="bg-primary/10 text-primary text-lg md:text-base">
+                        {anganwadi.teacher.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                      <p className="font-medium text-base">{anganwadi.teacher.name}</p>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Phone className="h-3 w-3 mr-1" />
+                        {anganwadi.teacher.phone}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-muted-foreground">No teacher assigned</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowUpdateForm(true)}
-                    className="mt-2"
-                  >
-                    Assign Teacher
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <div className="text-center py-6">
+                    <p className="text-muted-foreground mb-4">No teacher assigned</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowUpdateForm(true)}
+                      className="w-full md:w-auto"
+                    >
+                      Assign Teacher
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-          {/* Students Information */}
-          <Card className="border border-muted bg-muted/5">
-            <CardHeader className="py-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center font-semibold">
-                  <Users className="h-4 w-4 mr-2 text-primary" />
-                  Students
-                </CardTitle>
-                <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className="font-medium">
-                    {anganwadi.students.length} students
-                  </Badge>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowUpdateForm(true)}
-                    className="hover:bg-primary hover:text-primary-foreground"
-                  >
-                    Manage Students
-                  </Button>
+            {/* Students Card */}
+            <Card>
+              <CardHeader>
+                <div className="space-y-4">
+                  <CardTitle className="text-base flex items-center">
+                    <Users className="h-4 w-4 mr-2 text-primary" />
+                    Students
+                  </CardTitle>
+                  <div className="flex flex-col space-y-2">
+                    <Badge variant="secondary" className="w-fit">
+                      {anganwadi.students.length} students
+                    </Badge>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowUpdateForm(true)}
+                      className="w-full md:w-auto"
+                    >
+                      Manage Students
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="py-2">
-              {anganwadi.students.length > 0 ? (
-                <div className="rounded-md border bg-background">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="hover:bg-muted/50">
-                        <TableHead className="w-24 font-medium">ID</TableHead>
-                        <TableHead className="font-medium">Name</TableHead>
-                        <TableHead className="font-medium">Gender</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {anganwadi.students.map((student) => (
-                        <TableRow
-                          key={student.id}
-                          className="hover:bg-muted/50"
-                        >
-                          <TableCell className="font-mono text-xs text-muted-foreground">
-                            {student.id.substring(0, 8)}...
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {student.name}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {student.gender || "Not specified"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground mb-4">
-                    No students assigned to this Anganwadi
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowUpdateForm(true)}
-                    className="hover:bg-primary hover:text-primary-foreground"
-                  >
-                    Add Students
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </CardContent>
-      </Card>
+              </CardHeader>
+              <CardContent className="-mx-6 md:mx-0">
+                {anganwadi.students.length > 0 ? (
+                  <div className="overflow-auto">
+                    <div className="min-w-[600px] md:w-full p-1">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[100px]">ID</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Gender</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {anganwadi.students.map((student) => (
+                            <TableRow key={student.id}>
+                              <TableCell className="font-mono text-xs text-muted-foreground">
+                                {student.id.substring(0, 6)}...
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {student.name}
+                              </TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {student.gender || "Not specified"}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-4">
+                      No students assigned to this Anganwadi
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowUpdateForm(true)}
+                      className="w-full md:w-auto"
+                    >
+                      Add Students
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Update Dialog */}
+        <Dialog open={showUpdateForm} onOpenChange={setShowUpdateForm}>
+          <DialogContent className="max-w-[calc(100%-2rem)] md:max-w-[600px] p-6">
+            <DialogTitle className="text-xl font-semibold">
+              Update Anganwadi
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Update details or add students to this Anganwadi.
+            </DialogDescription>
+            <UpdateAnganwadiForm
+              anganwadiId={id}
+              onSuccess={handleUpdateSuccess}
+              onClose={() => setShowUpdateForm(false)}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

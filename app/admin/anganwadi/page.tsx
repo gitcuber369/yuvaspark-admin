@@ -201,15 +201,17 @@ export default function AnganwadiPage() {
   };
 
   return (
-    <div className="p-8">
-      <Card className="mb-6">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-2xl">Anganwadi Centers</CardTitle>
+    <div className="p-4 md:p-8">
+      <Card className="mb-4 md:mb-6">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <CardTitle className="text-xl md:text-2xl">Anganwadi Centers</CardTitle>
           <Dialog>
             <DialogTrigger asChild>
-              <Button>{showForm ? "Close Form" : "Add New"}</Button>
+              <Button className="w-full sm:w-auto">
+                {showForm ? "Close Form" : "Add New"}
+              </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-[95vw] sm:max-w-[600px] p-4 md:p-6">
               <DialogTitle>Add New Anganwadi</DialogTitle>
               <DialogDescription>
                 Fill in the details below to add a new Anganwadi center.
@@ -222,7 +224,7 @@ export default function AnganwadiPage() {
 
       {/* Students Management Dialog */}
       <Dialog open={showStudentDialog} onOpenChange={setShowStudentDialog}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="max-w-[95vw] sm:max-w-[600px] p-4 md:p-6">
           <DialogTitle>Manage Students</DialogTitle>
           <DialogDescription>
             {selectedAnganwadi &&
@@ -241,45 +243,40 @@ export default function AnganwadiPage() {
                     selected={studentIds}
                     setSelected={setStudentIds}
                   />
-                  {selectedAnganwadi &&
-                    selectedAnganwadi.students &&
-                    selectedAnganwadi.students.length > 0 && (
-                      <div className="mt-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700"
-                          onClick={async () => {
-                            if (
-                              window.confirm(
-                                `Are you sure you want to remove all ${selectedAnganwadi.students.length} students from this Anganwadi?`
-                              )
-                            ) {
-                              try {
-                                await removeAllStudentsFromAnganwadi(
-                                  selectedAnganwadi.id
-                                );
-                                setStudentIds([]);
-                                alert("All students have been removed");
-                                fetchAnganwadis();
-                              } catch (error: any) {
-                                console.error(
-                                  "Error removing students:",
-                                  error
-                                );
-                                alert(
-                                  "Failed to remove students: " +
-                                    (error.response?.data?.error ||
-                                      error.message)
-                                );
-                              }
+                  {selectedAnganwadi?.students && selectedAnganwadi.students.length > 0 && (
+                    <div className="mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700 w-full sm:w-auto"
+                        onClick={async () => {
+                          if (!selectedAnganwadi) return;
+                          if (
+                            window.confirm(
+                              `Are you sure you want to remove all ${selectedAnganwadi.students.length} students from this Anganwadi?`
+                            )
+                          ) {
+                            try {
+                              await removeAllStudentsFromAnganwadi(
+                                selectedAnganwadi.id
+                              );
+                              setStudentIds([]);
+                              alert("All students have been removed");
+                              fetchAnganwadis();
+                            } catch (error: any) {
+                              console.error("Error removing students:", error);
+                              alert(
+                                "Failed to remove students: " +
+                                  (error.response?.data?.error || error.message)
+                              );
                             }
-                          }}
-                        >
-                          Remove All Students
-                        </Button>
-                      </div>
-                    )}
+                          }
+                        }}
+                      >
+                        Remove All Students
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Create New Students */}
@@ -382,90 +379,120 @@ export default function AnganwadiPage() {
         <CardHeader>
           <CardTitle>All Centers</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Taluk</TableHead>
-                <TableHead>District</TableHead>
-                <TableHead>Teacher</TableHead>
-                <TableHead>Students</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {anganwadis.length > 0 ? (
-                anganwadis.map((a) => (
-                  <TableRow
-                    key={a.id}
-                    className="cursor-pointer hover:bg-muted transition"
-                  >
-                    <TableCell
-                      onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+        <CardContent className="p-0 sm:p-6">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden md:table-cell">Taluk</TableHead>
+                  <TableHead className="hidden md:table-cell">District</TableHead>
+                  <TableHead className="hidden sm:table-cell">Teacher</TableHead>
+                  <TableHead className="hidden lg:table-cell">Students</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {anganwadis.length > 0 ? (
+                  anganwadis.map((a) => (
+                    <TableRow
+                      key={a.id}
+                      className="cursor-pointer hover:bg-muted transition"
                     >
-                      {a.name}
-                    </TableCell>
+                      <TableCell
+                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                      >
+                        <div>
+                          <div className="font-medium">{a.name}</div>
+                          <div className="md:hidden text-sm text-gray-500">
+                            {a.location}, {a.district}
+                          </div>
+                          <div className="sm:hidden text-sm text-gray-500">
+                            {a.teacher
+                              ? `${a.teacher.name} (${a.teacher.phone})`
+                              : "No teacher"}
+                          </div>
+                          <div className="lg:hidden text-sm text-gray-500">
+                            {a.students.length} students
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell
+                        className="hidden md:table-cell"
+                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                      >
+                        {a.location}
+                      </TableCell>
+                      <TableCell
+                        className="hidden md:table-cell"
+                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                      >
+                        {a.district}
+                      </TableCell>
+                      <TableCell
+                        className="hidden sm:table-cell"
+                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                      >
+                        {a.teacher
+                          ? `${a.teacher.name} (${a.teacher.phone})`
+                          : "Not assigned"}
+                      </TableCell>
+                      <TableCell
+                        className="hidden lg:table-cell"
+                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                      >
+                        {a.students.length > 0
+                          ? `${a.students.length} students`
+                          : "No students"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex flex-col sm:flex-row justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full sm:w-auto text-xs sm:text-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedAnganwadi(a);
+                              setShowStudentDialog(true);
+                            }}
+                          >
+                            Add Students
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="w-full sm:w-auto text-xs sm:text-sm"
+                            onClick={(e) => handleDelete(a.id, e)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
                     <TableCell
-                      onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                      colSpan={6}
+                      className="text-center text-muted-foreground p-8"
                     >
-                      {a.location}
-                    </TableCell>
-                    <TableCell
-                      onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
-                    >
-                      {a.district}
-                    </TableCell>
-                    <TableCell
-                      onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
-                    >
-                      {a.teacher
-                        ? `${a.teacher.name} (${a.teacher.phone})`
-                        : "Not assigned"}
-                    </TableCell>
-                    <TableCell
-                      onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
-                    >
-                      {a.students.length > 0
-                        ? a.students.map((s) => s.name).join(", ")
-                        : "No students"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex flex-col items-center gap-2">
+                        <p>No anganwadis found.</p>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedAnganwadi(a);
-                            setShowStudentDialog(true);
-                          }}
+                          onClick={() => setShowForm(true)}
                         >
-                          Add Students
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => handleDelete(a.id, e)}
-                        >
-                          Delete
+                          Add your first center
                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-muted-foreground"
-                  >
-                    No anganwadis found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

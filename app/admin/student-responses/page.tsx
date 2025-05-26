@@ -238,10 +238,10 @@ export default function StudentResponsesPage() {
   });
 
   return (
-    <div className="container mx-auto py-6">
-      <Card>
+    <div className="container mx-auto py-6 px-4 sm:px-6">
+      <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5" />
               <span>Student Responses</span>
@@ -264,53 +264,57 @@ export default function StudentResponsesPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 flex flex-wrap gap-4">
-            <div className="flex-1">
+          <div className="mb-4 flex flex-col sm:flex-row flex-wrap gap-4">
+            <div className="w-full sm:flex-1">
               <Input
                 placeholder="Search responses..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
+                className="w-full sm:max-w-sm"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <DatePicker
-                date={startDate}
-                setDate={setStartDate}
-              />
-              <DatePicker
-                date={endDate}
-                setDate={setEndDate}
-              />
-              <Select
-                value={correctFilter}
-                onValueChange={setCorrectFilter}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by correctness" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Responses</SelectItem>
-                  <SelectItem value="correct">Correct Only</SelectItem>
-                  <SelectItem value="incorrect">Incorrect Only</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={resetFilters}
-              >
-                <FilterX className="mr-2 h-4 w-4" />
-                Reset Filters
-              </Button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <DatePicker
+                  date={startDate}
+                  setDate={setStartDate}
+                />
+                <DatePicker
+                  date={endDate}
+                  setDate={setEndDate}
+                />
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Select
+                  value={correctFilter}
+                  onValueChange={setCorrectFilter}
+                >
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Filter by correctness" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Responses</SelectItem>
+                    <SelectItem value="correct">Correct Only</SelectItem>
+                    <SelectItem value="incorrect">Incorrect Only</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={resetFilters}
+                >
+                  <FilterX className="mr-2 h-4 w-4" />
+                  Reset
+                </Button>
+              </div>
             </div>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="all">All Responses</TabsTrigger>
-              <TabsTrigger value="scored">Scored Responses</TabsTrigger>
-              <TabsTrigger value="by-student">By Student</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full sm:w-auto">
+              <TabsTrigger value="all" className="flex-1 sm:flex-none">All Responses</TabsTrigger>
+              <TabsTrigger value="scored" className="flex-1 sm:flex-none">Scored Responses</TabsTrigger>
+              <TabsTrigger value="by-student" className="flex-1 sm:flex-none">By Student</TabsTrigger>
             </TabsList>
 
             <TabsContent value="by-student" className="mt-4">
@@ -318,7 +322,7 @@ export default function StudentResponsesPage() {
                 value={studentFilter}
                 onValueChange={setStudentFilter}
               >
-                <SelectTrigger className="w-[300px]">
+                <SelectTrigger className="w-full sm:w-[300px]">
                   <SelectValue placeholder="Select a student" />
                 </SelectTrigger>
                 <SelectContent>
@@ -347,63 +351,65 @@ export default function StudentResponsesPage() {
               No responses found matching your criteria
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Question</TableHead>
-                  <TableHead>Response</TableHead>
-                  <TableHead>Correct</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredResponses.map((response) => (
-                  <TableRow key={response.id}>
-                    <TableCell>{response.student?.name || "Unknown"}</TableCell>
-                    <TableCell>{response.question?.text || "Unknown"}</TableCell>
-                    <TableCell>
-                      {response.audioUrl ? (
-                        <audio controls className="w-full">
-                          <source src={response.audioUrl} type="audio/mpeg" />
-                        </audio>
-                      ) : (
-                        response.response
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {response.isCorrect ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-red-500" />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(response.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      {response.StudentResponseScore?.[0]?.score || "-"}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(response.id)}
-                        disabled={deletingResponseId === response.id}
-                      >
-                        {deletingResponseId === response.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto -mx-6 px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">Student</TableHead>
+                    <TableHead className="whitespace-nowrap">Question</TableHead>
+                    <TableHead className="whitespace-nowrap">Response</TableHead>
+                    <TableHead className="whitespace-nowrap">Correct</TableHead>
+                    <TableHead className="whitespace-nowrap">Date</TableHead>
+                    <TableHead className="whitespace-nowrap">Score</TableHead>
+                    <TableHead className="whitespace-nowrap">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredResponses.map((response) => (
+                    <TableRow key={response.id}>
+                      <TableCell className="whitespace-nowrap">{response.student?.name || "Unknown"}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{response.question?.text || "Unknown"}</TableCell>
+                      <TableCell>
+                        {response.audioUrl ? (
+                          <audio controls className="w-full max-w-[200px]">
+                            <source src={response.audioUrl} type="audio/mpeg" />
+                          </audio>
+                        ) : (
+                          <span className="max-w-[200px] block truncate">{response.response}</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {response.isCorrect ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-500" />
+                        )}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {formatDate(response.createdAt)}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {response.StudentResponseScore?.[0]?.score || "-"}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(response.id)}
+                          disabled={deletingResponseId === response.id}
+                        >
+                          {deletingResponseId === response.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

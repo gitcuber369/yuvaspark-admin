@@ -346,10 +346,10 @@ export default function QuestionAdminPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Question Management</h1>
-        <div className="flex gap-3">
+    <div className="max-w-7xl mx-auto p-2 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Question Management</h1>
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button>Add Question</Button>
@@ -629,29 +629,29 @@ export default function QuestionAdminPage() {
             onValueChange={setActiveTab}
             className="mb-6"
           >
-            <TabsList>
-              <TabsTrigger value="all">All Questions</TabsTrigger>
-              <TabsTrigger value="by-topic">By Topic</TabsTrigger>
+            <TabsList className="w-full sm:w-auto">
+              <TabsTrigger value="all" className="flex-1">All Questions</TabsTrigger>
+              <TabsTrigger value="by-topic" className="flex-1">By Topic</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="space-y-4">
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input
                   placeholder="Search questions..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="max-w-sm"
+                  className="w-full sm:max-w-sm"
                 />
               </div>
             </TabsContent>
 
             <TabsContent value="by-topic" className="space-y-4">
-              <div className="flex gap-4 items-center">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 <Select
                   value={selectedTopicId}
                   onValueChange={setSelectedTopicId}
                 >
-                  <SelectTrigger className="w-[200px]">
+                  <SelectTrigger className="w-full sm:w-[200px]">
                     <SelectValue placeholder="Select a topic" />
                   </SelectTrigger>
                   <SelectContent>
@@ -667,7 +667,7 @@ export default function QuestionAdminPage() {
                   placeholder="Search within topic..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="max-w-sm"
+                  className="w-full sm:max-w-sm"
                 />
               </div>
             </TabsContent>
@@ -687,66 +687,72 @@ export default function QuestionAdminPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[40%]">Question Text</TableHead>
-                    <TableHead>Topic</TableHead>
-                    <TableHead>Media</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {questions.map((q) => (
-                    <TableRow key={q.id}>
-                      <TableCell className="font-medium">{q.text}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {q.topic?.name || "Unknown Topic"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {q.imageUrl && (
-                            <a
-                              href={q.imageUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline"
-                            >
-                              View Image
-                            </a>
-                          )}
-                          {q.audioUrl && (
-                            <audio controls src={q.audioUrl} className="h-8" />
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewDetails(q.id)}
-                          >
-                            Preview
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              router.push(`/admin/questions/${q.id}`)
-                            }
-                          >
-                            View Details
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <div className="inline-block min-w-full align-middle">
+                <div className="overflow-hidden md:rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[200px]">Question Text</TableHead>
+                        <TableHead className="min-w-[100px]">Topic</TableHead>
+                        <TableHead className="min-w-[120px]">Media</TableHead>
+                        <TableHead className="text-right min-w-[160px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {questions.map((q) => (
+                        <TableRow key={q.id}>
+                          <TableCell className="font-medium">
+                            <div className="line-clamp-2">{q.text}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="max-w-[120px] truncate">
+                              {q.topic?.name || "Unknown Topic"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                              {q.imageUrl && (
+                                <a
+                                  href={q.imageUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:underline text-sm"
+                                >
+                                  View Image
+                                </a>
+                              )}
+                              {q.audioUrl && (
+                                <audio controls src={q.audioUrl} className="h-8 max-w-[150px]" />
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex flex-col sm:flex-row justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleViewDetails(q.id)}
+                                className="w-full sm:w-auto whitespace-nowrap"
+                              >
+                                Preview
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => router.push(`/admin/questions/${q.id}`)}
+                                className="w-full sm:w-auto whitespace-nowrap"
+                              >
+                                View Details
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>
@@ -760,8 +766,8 @@ export default function QuestionAdminPage() {
           </DialogHeader>
 
           {selectedQuestion && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">
                     Topic
@@ -825,7 +831,7 @@ export default function QuestionAdminPage() {
                   </div>
                 )}
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-2">
                     Image
@@ -866,7 +872,7 @@ export default function QuestionAdminPage() {
                   <h3 className="text-md font-semibold mb-3">
                     Response Statistics
                   </h3>
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
                     <div className="p-3 bg-muted rounded-md">
                       <h4 className="text-sm font-medium text-muted-foreground">
                         Total Responses

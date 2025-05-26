@@ -216,43 +216,46 @@ export default function TeachersPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="container mx-auto py-4 px-4 md:py-8 md:px-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Teachers</h1>
           <p className="text-sm text-gray-500">Manage and view all teachers</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="relative flex-1 sm:flex-initial">
             <Input
               placeholder="Search by name or phone..."
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-64"
+              className="w-full sm:w-64 pr-8"
             />
-            <Search className="h-4 w-4 text-gray-500" />
+            <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
           </div>
-          <Button
-            onClick={fetchTeachers}
-            disabled={loading}
-            variant="outline"
-            size="icon"
-            title="Refresh list"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          </Button>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Teacher
-          </Button>
+          <div className="flex gap-2 justify-end">
+            <Button
+              onClick={fetchTeachers}
+              disabled={loading}
+              variant="outline"
+              size="icon"
+              title="Refresh list"
+              className="shrink-0"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            </Button>
+            <Button onClick={() => setIsAddDialogOpen(true)} className="whitespace-nowrap">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Teacher
+            </Button>
+          </div>
         </div>
       </div>
 
-      <Card>
+      <Card className="border border-gray-100 shadow-sm rounded-lg overflow-hidden">
         <CardHeader>
           <CardTitle>All Teachers</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {loading ? (
             <div className="flex justify-center items-center py-8">
               <RefreshCw className="h-8 w-8 animate-spin" />
@@ -266,70 +269,83 @@ export default function TeachersPage() {
               </p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Anganwadi</TableHead>
-                  <TableHead>Cohort</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTeachers.map((teacher) => (
-                  <TableRow key={teacher.id}>
-                    <TableCell>
-                      <div className="font-medium">{teacher.name}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-gray-500" />
-                        <span>{teacher.phone}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {teacher.anganwadi ? (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-gray-500" />
-                          <span>{teacher.anganwadi.name}</span>
-                        </div>
-                      ) : (
-                        <Badge variant="outline">Not Assigned</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {teacher.cohort ? (
-                        <Badge variant="secondary">{teacher.cohort.name}</Badge>
-                      ) : (
-                        <Badge variant="outline">No Cohort</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        disabled={deletingId === teacher.id}
-                        onClick={() => {
-                          setTeacherToDelete(teacher);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        {deletingId === teacher.id ? "Deleting..." : "Delete"}
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead className="hidden sm:table-cell">Anganwadi</TableHead>
+                    <TableHead className="hidden sm:table-cell">Cohort</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredTeachers.map((teacher) => (
+                    <TableRow key={teacher.id}>
+                      <TableCell>
+                        <div className="font-medium">{teacher.name}</div>
+                        <div className="sm:hidden text-sm text-gray-500 mt-1">
+                          {teacher.anganwadi?.name || "No Anganwadi"}
+                        </div>
+                        <div className="sm:hidden text-sm text-gray-500">
+                          {teacher.cohort?.name ? (
+                            <Badge variant="secondary" className="mt-1">{teacher.cohort.name}</Badge>
+                          ) : (
+                            <Badge variant="outline" className="mt-1">No Cohort</Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-gray-500" />
+                          <span>{teacher.phone}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {teacher.anganwadi ? (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-gray-500" />
+                            <span>{teacher.anganwadi.name}</span>
+                          </div>
+                        ) : (
+                          <Badge variant="outline">Not Assigned</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {teacher.cohort ? (
+                          <Badge variant="secondary">{teacher.cohort.name}</Badge>
+                        ) : (
+                          <Badge variant="outline">No Cohort</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          disabled={deletingId === teacher.id}
+                          onClick={() => {
+                            setTeacherToDelete(teacher);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          className="w-full sm:w-auto"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          {deletingId === teacher.id ? "Deleting..." : "Delete"}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] mx-4">
           <DialogHeader>
             <DialogTitle>Delete Teacher</DialogTitle>
           </DialogHeader>
@@ -339,13 +355,14 @@ export default function TeachersPage() {
               action cannot be undone.
             </p>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
               onClick={() => {
                 setIsDeleteDialogOpen(false);
                 setTeacherToDelete(null);
               }}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -353,6 +370,7 @@ export default function TeachersPage() {
               variant="destructive"
               onClick={handleDelete}
               disabled={deletingId === teacherToDelete?.id}
+              className="w-full sm:w-auto"
             >
               {deletingId === teacherToDelete?.id ? "Deleting..." : "Delete"}
             </Button>
@@ -362,7 +380,7 @@ export default function TeachersPage() {
 
       {/* Add Teacher Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] mx-4">
           <DialogHeader>
             <DialogTitle>Add New Teacher</DialogTitle>
           </DialogHeader>
@@ -434,7 +452,7 @@ export default function TeachersPage() {
                 </Select>
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
               <Button
                 type="button"
                 variant="outline"
@@ -447,10 +465,15 @@ export default function TeachersPage() {
                     cohortId: "",
                   });
                 }}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isAdding}>
+              <Button 
+                type="submit" 
+                disabled={isAdding}
+                className="w-full sm:w-auto"
+              >
                 {isAdding ? "Adding..." : "Add Teacher"}
               </Button>
             </DialogFooter>
