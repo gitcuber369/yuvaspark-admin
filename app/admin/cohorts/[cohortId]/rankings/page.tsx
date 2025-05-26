@@ -146,9 +146,9 @@ export default function CohortTeacherRankingsPage() {
       : 100;
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+    <div className="container mx-auto px-4 py-4 md:py-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <Button
             variant="ghost"
             onClick={() => window.history.back()}
@@ -158,11 +158,15 @@ export default function CohortTeacherRankingsPage() {
             Back
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Teacher Rankings</h1>
+            <h1 className="text-xl md:text-2xl font-bold">Teacher Rankings</h1>
             <p className="text-sm text-gray-500">{cohortName}</p>
           </div>
         </div>
-        <Button onClick={fetchRankings} disabled={loading} className="gap-2">
+        <Button 
+          onClick={fetchRankings} 
+          disabled={loading} 
+          className="w-full sm:w-auto gap-2"
+        >
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           Refresh
         </Button>
@@ -172,7 +176,7 @@ export default function CohortTeacherRankingsPage() {
         <CardHeader>
           <CardTitle>Top Performing Teachers</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           {loading ? (
             <div className="flex justify-center items-center py-8">
               <RefreshCw className="h-8 w-8 animate-spin" />
@@ -184,7 +188,7 @@ export default function CohortTeacherRankingsPage() {
           ) : (
             <div className="space-y-6">
               {/* Top 3 Teachers Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {rankings.slice(0, 3).map((teacher, index) => (
                   <Card key={teacher.id} className="relative overflow-hidden">
                     <div
@@ -201,33 +205,33 @@ export default function CohortTeacherRankingsPage() {
                         <div className="flex justify-center mb-2">
                           {getRankBadge(index + 1)}
                         </div>
-                        <h3 className="text-lg font-semibold">
+                        <h3 className="text-base sm:text-lg font-semibold truncate px-2">
                           {teacher.name}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 truncate px-2">
                           {teacher.anganwadi?.name || "No Anganwadi"}
                         </p>
                         <div className="grid grid-cols-2 gap-4 mt-4">
                           <div>
-                            <p className="text-2xl font-bold">
+                            <p className="text-xl sm:text-2xl font-bold">
                               {teacher.stats.responseCount}
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-xs sm:text-sm text-gray-500">
                               Total Responses
                             </p>
                           </div>
                           <div>
-                            <p className="text-2xl font-bold">
+                            <p className="text-xl sm:text-2xl font-bold">
                               {teacher.stats.averageScore.toFixed(1)}%
                             </p>
-                            <p className="text-sm text-gray-500">Avg. Score</p>
+                            <p className="text-xs sm:text-sm text-gray-500">Avg. Score</p>
                           </div>
                         </div>
                         <div className="mt-2">
-                          <p className="text-sm text-gray-500">
+                          <p className="text-xs sm:text-sm text-gray-500">
                             {teacher.stats.totalStudents} Students
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-xs sm:text-sm text-gray-500">
                             {teacher.stats.responsesPerStudent.toFixed(1)}{" "}
                             responses/student
                           </p>
@@ -239,90 +243,98 @@ export default function CohortTeacherRankingsPage() {
               </div>
 
               {/* Rankings Table */}
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-16">Rank</TableHead>
-                    <TableHead>Teacher</TableHead>
-                    <TableHead>Anganwadi</TableHead>
-                    <TableHead className="text-right">Students</TableHead>
-                    <TableHead className="text-right">
-                      Total Responses
-                    </TableHead>
-                    <TableHead className="text-right">
-                      Responses/Student
-                    </TableHead>
-                    <TableHead className="text-right">Avg. Score</TableHead>
-                    <TableHead className="text-right">Performance</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rankings.map((teacher, index) => (
-                    <TableRow key={teacher.id}>
-                      <TableCell>{getRankBadge(index + 1)}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{teacher.name}</span>
-                          <span className="text-sm text-gray-500">
-                            {teacher.phone}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {teacher.anganwadi?.name || "Not assigned"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {teacher.stats.totalStudents}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="font-medium">
-                          {teacher.stats.responseCount}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="secondary">
-                          {teacher.stats.responsesPerStudent.toFixed(1)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="secondary">
-                          {teacher.stats.averageScore.toFixed(1)}%
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">
-                              Responses
-                            </span>
-                            <Progress
-                              value={
-                                (teacher.stats.responseCount /
-                                  highestResponseCount) *
-                                100
-                              }
-                              className="h-2 flex-1"
-                            />
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Score</span>
-                            <Progress
-                              value={
-                                (teacher.stats.averageScore /
-                                  highestAverageScore) *
-                                100
-                              }
-                              className="h-2 flex-1"
-                            />
-                          </div>
-                        </div>
-                      </TableCell>
+              <div className="overflow-x-auto -mx-3 sm:mx-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-16">Rank</TableHead>
+                      <TableHead>Teacher</TableHead>
+                      <TableHead className="hidden md:table-cell">Anganwadi</TableHead>
+                      <TableHead className="hidden sm:table-cell text-right">Students</TableHead>
+                      <TableHead className="text-right">Responses</TableHead>
+                      <TableHead className="hidden lg:table-cell text-right">
+                        Responses/Student
+                      </TableHead>
+                      <TableHead className="text-right">Score</TableHead>
+                      <TableHead className="hidden md:table-cell text-right">Performance</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {rankings.map((teacher, index) => (
+                      <TableRow key={teacher.id}>
+                        <TableCell>{getRankBadge(index + 1)}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col min-w-[140px]">
+                            <span className="font-medium truncate">{teacher.name}</span>
+                            <span className="text-xs text-gray-500 truncate">
+                              {teacher.phone}
+                            </span>
+                            <div className="md:hidden text-xs text-gray-500 mt-1">
+                              {teacher.anganwadi?.name || "No Anganwadi"}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <span className="truncate block max-w-[200px]">
+                            {teacher.anganwadi?.name || "Not assigned"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell text-right">
+                          {teacher.stats.totalStudents}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="font-medium">
+                            {teacher.stats.responseCount}
+                          </div>
+                          <div className="sm:hidden text-xs text-gray-500">
+                            ({teacher.stats.totalStudents} students)
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-right">
+                          <Badge variant="secondary">
+                            {teacher.stats.responsesPerStudent.toFixed(1)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant="secondary">
+                            {teacher.stats.averageScore.toFixed(1)}%
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 w-16">
+                                Responses
+                              </span>
+                              <Progress
+                                value={
+                                  (teacher.stats.responseCount /
+                                    highestResponseCount) *
+                                  100
+                                }
+                                className="h-2 flex-1"
+                              />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 w-16">Score</span>
+                              <Progress
+                                value={
+                                  (teacher.stats.averageScore /
+                                    highestAverageScore) *
+                                  100
+                                }
+                                className="h-2 flex-1"
+                              />
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
-              <div className="text-xs text-gray-500 text-center mt-4">
+              <div className="text-xs text-gray-500 text-center mt-4 px-4">
                 <p>
                   Teachers are ranked based on a combination of response count
                   (70%) and average score (30%). Higher rankings indicate better
