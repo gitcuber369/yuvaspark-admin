@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Loader2, 
-  FileText, 
-  RefreshCw, 
+import {
+  Loader2,
+  FileText,
+  RefreshCw,
   AlertCircle,
   ChevronLeft,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
@@ -43,14 +43,20 @@ export default function ImportsListPage() {
 
   const fetchImports = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await API.get(`/csv-import?page=${page}&limit=10`);
-      setImports(response.data.items);
-      setTotalPages(response.data.totalPages || 1);
-      setError(null);
+      if (response.data && Array.isArray(response.data.items)) {
+        setImports(response.data.items);
+        setTotalPages(response.data.totalPages || 1);
+      } else {
+        setImports([]);
+        setTotalPages(1);
+      }
     } catch (err: any) {
       console.error("Error fetching imports:", err);
       setError(err.response?.data?.error || "Failed to fetch imports");
+      setImports([]);
     } finally {
       setLoading(false);
     }
@@ -88,7 +94,7 @@ export default function ImportsListPage() {
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Button 
+          <Button
             size="sm"
             className="bg-black text-white hover:bg-gray-800"
             onClick={() => router.push("/admin/students")}
@@ -98,7 +104,7 @@ export default function ImportsListPage() {
         </div>
       </div>
 
-      {loading && imports.length === 0 ? (
+      {loading ? (
         <div className="flex justify-center items-center h-64">
           <Loader2 className="h-8 w-8 animate-spin" />
           <span className="ml-2">Loading imports...</span>
@@ -113,11 +119,13 @@ export default function ImportsListPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center h-64">
             <FileText className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No imports found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">
+              No imports found
+            </h3>
             <p className="text-gray-500">
               You haven't imported any CSV files yet.
             </p>
-            <Button 
+            <Button
               className="mt-4 bg-black text-white hover:bg-gray-800"
               onClick={() => router.push("/admin/students")}
             >
@@ -139,11 +147,21 @@ export default function ImportsListPage() {
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-50 text-left">
-                      <th className="p-3 text-sm font-medium text-gray-500">Filename</th>
-                      <th className="p-3 text-sm font-medium text-gray-500">Status</th>
-                      <th className="p-3 text-sm font-medium text-gray-500">Imported By</th>
-                      <th className="p-3 text-sm font-medium text-gray-500">Date</th>
-                      <th className="p-3 text-sm font-medium text-gray-500">Actions</th>
+                      <th className="p-3 text-sm font-medium text-gray-500">
+                        Filename
+                      </th>
+                      <th className="p-3 text-sm font-medium text-gray-500">
+                        Status
+                      </th>
+                      <th className="p-3 text-sm font-medium text-gray-500">
+                        Imported By
+                      </th>
+                      <th className="p-3 text-sm font-medium text-gray-500">
+                        Date
+                      </th>
+                      <th className="p-3 text-sm font-medium text-gray-500">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -216,4 +234,4 @@ export default function ImportsListPage() {
       )}
     </div>
   );
-} 
+}
