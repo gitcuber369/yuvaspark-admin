@@ -26,6 +26,11 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     name: "",
     location: "",
     district: "",
+    teacher: {
+      id: "",
+      name: "",
+      phone: ""
+    }
   });
 
   const [studentIds, setStudentIds] = useState<string[]>([]);
@@ -45,6 +50,11 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
             name: data.name || "",
             location: data.location || "",
             district: data.district || "",
+            teacher: {
+              id: data.teacher?.id || "",
+              name: data.teacher?.name || "",
+              phone: data.teacher?.phone || ""
+            }
           });
           // Set existing student IDs
           if (data.students && Array.isArray(data.students)) {
@@ -91,7 +101,8 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
 
     setLoading(true);
     try {
-      const res = await fetch(
+      // First update the anganwadi basic info and students
+      const anganwadiRes = await fetch(
         `${API_URL}anganwadis/${anganwadiId}`,
         {
           method: "PATCH",
@@ -106,15 +117,55 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
         }
       );
 
-      if (res.ok) {
-        onSuccess();
-        if (onClose) onClose();
-      } else {
-        console.error("Failed to update Anganwadi");
-        alert("Failed to update Anganwadi");
+      if (!anganwadiRes.ok) {
+        throw new Error("Failed to update Anganwadi");
       }
+
+      // Handle teacher update/creation
+      if (form.teacher.name && form.teacher.phone) {
+        if (form.teacher.id) {
+          // Update existing teacher
+          const teacherRes = await fetch(
+            `${API_URL}teachers/${form.teacher.id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: form.teacher.name,
+                phone: form.teacher.phone,
+              }),
+            }
+          );
+
+          if (!teacherRes.ok) {
+            throw new Error("Failed to update teacher information");
+          }
+        } else {
+          // Create new teacher
+          const teacherRes = await fetch(
+            `${API_URL}teachers`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: form.teacher.name,
+                phone: form.teacher.phone,
+                anganwadiId: anganwadiId,
+              }),
+            }
+          );
+
+          if (!teacherRes.ok) {
+            throw new Error("Failed to create new teacher");
+          }
+        }
+      }
+
+      onSuccess();
+      if (onClose) onClose();
     } catch (error) {
-      console.error("Error updating Anganwadi:", error);
+      console.error("Error updating:", error);
+      alert(error instanceof Error ? error.message : "Failed to update");
     } finally {
       setLoading(false);
     }
@@ -192,6 +243,49 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
                   className="w-full"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Teacher Details */}
+          <div>
+            <h3 className="text-lg font-medium pt-5 border-t mt-6 mb-3">
+              Teacher Details
+            </h3>
+            <div>
+              <label className="text-sm font-medium text-gray-700 block mb-1.5">
+                Teacher Name
+              </label>
+              <Input
+                placeholder="Full Name"
+                value={form.teacher.name}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    teacher: { ...form.teacher, name: e.target.value },
+                  })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="mt-3">
+              <label className="text-sm font-medium text-gray-700 block mb-1.5">
+                Teacher Phone
+              </label>
+              <Input
+                placeholder="Phone Number"
+                value={form.teacher.phone}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setForm({
+                      ...form,
+                      teacher: { ...form.teacher, phone: value },
+                    });
+                  }
+                }}
+                inputMode="numeric"
+                className="w-full"
+              />
             </div>
           </div>
 
