@@ -37,9 +37,7 @@ export default function DashboardLayout({
 
     return segments.map((segment) => {
       // Capitalize and replace hyphens with spaces
-      return (
-        segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")
-      );
+      return segment.charAt(0) + segment.slice(1).replace(/-/g, " ");
     });
   };
 

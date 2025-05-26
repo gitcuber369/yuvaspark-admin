@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,8 @@ export const metadata: Metadata = {
   title: "Yuva Spark Admin",
   description: "Yuva Spark Admin Dashboard for managing student responses",
   icons: {
-    icon: "/logo-yuvaspark.png",
-    apple: "/logo-yuvaspark.png",
+    icon: "/icon-logo.png",
+    apple: "/icon-logo.png",
   },
 };
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );

@@ -34,6 +34,7 @@ interface Topic {
 export default function TopicsPage() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -114,7 +115,8 @@ export default function TopicsPage() {
 
   const handleDelete = async () => {
     if (!selectedTopic) return;
-
+    
+    setIsDeleting(true);
     try {
       const response = await fetch(
         `https://api.dreamlaunch.studio/api/topics/${selectedTopic.id}`,
@@ -123,7 +125,14 @@ export default function TopicsPage() {
         }
       );
 
-      if (!response.ok) throw new Error("Failed to delete topic");
+      if (!response.ok) {
+        // Check if the topic has linked questions
+        if (selectedTopic.questions.length > 0) {
+          toast.error("This topic cannot be deleted because it has questions connected to it");
+          return;
+        }
+        throw new Error("Failed to delete topic");
+      }
 
       toast.success("Topic deleted successfully");
       setIsDeleteDialogOpen(false);
@@ -132,6 +141,8 @@ export default function TopicsPage() {
     } catch (error) {
       toast.error("Failed to delete topic");
       console.error(error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -291,11 +302,23 @@ export default function TopicsPage() {
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
+            <Button 
+              variant="destructive" 
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

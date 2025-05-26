@@ -630,8 +630,12 @@ export default function QuestionAdminPage() {
             className="mb-6"
           >
             <TabsList className="w-full sm:w-auto">
-              <TabsTrigger value="all" className="flex-1">All Questions</TabsTrigger>
-              <TabsTrigger value="by-topic" className="flex-1">By Topic</TabsTrigger>
+              <TabsTrigger value="all" className="flex-1">
+                All Questions
+              </TabsTrigger>
+              <TabsTrigger value="by-topic" className="flex-1">
+                By Topic
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="space-y-4">
@@ -693,10 +697,14 @@ export default function QuestionAdminPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="min-w-[200px]">Question Text</TableHead>
+                        <TableHead className="min-w-[200px]">
+                          Question Text
+                        </TableHead>
                         <TableHead className="min-w-[100px]">Topic</TableHead>
                         <TableHead className="min-w-[120px]">Media</TableHead>
-                        <TableHead className="text-right min-w-[160px]">Actions</TableHead>
+                        <TableHead className="text-right min-w-[160px]">
+                          Actions
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -706,7 +714,10 @@ export default function QuestionAdminPage() {
                             <div className="line-clamp-2">{q.text}</div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="max-w-[120px] truncate">
+                            <Badge
+                              variant="outline"
+                              className="max-w-[120px] truncate"
+                            >
                               {q.topic?.name || "Unknown Topic"}
                             </Badge>
                           </TableCell>
@@ -719,11 +730,15 @@ export default function QuestionAdminPage() {
                                   rel="noopener noreferrer"
                                   className="text-blue-500 hover:underline text-sm"
                                 >
-                                  View Image
+                                  Download Image
                                 </a>
                               )}
                               {q.audioUrl && (
-                                <audio controls src={q.audioUrl} className="h-8 max-w-[150px]" />
+                                <audio
+                                  controls
+                                  src={q.audioUrl}
+                                  className="h-8 max-w-[150px]"
+                                />
                               )}
                             </div>
                           </TableCell>
@@ -740,7 +755,9 @@ export default function QuestionAdminPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => router.push(`/admin/questions/${q.id}`)}
+                                onClick={() =>
+                                  router.push(`/admin/questions/${q.id}`)
+                                }
                                 className="w-full sm:w-auto whitespace-nowrap"
                               >
                                 View Details
