@@ -52,22 +52,22 @@ export default function ApiDocsPage() {
   );
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex items-center mb-6">
+    <div className="container mx-auto py-4 sm:py-6 px-4 sm:px-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
         <Button
           variant="ghost"
           onClick={() => router.push("/admin/global-assessments")}
-          className="mr-4"
+          className="w-full sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-xl sm:text-2xl font-bold">
           API Documentation for Mobile Integration
         </h1>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 sm:gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Overview</CardTitle>
@@ -77,7 +77,7 @@ export default function ApiDocsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>
+            <p className="text-sm sm:text-base">
               This documentation provides details on how to integrate mobile
               apps with the Global Assessment API. Teachers can submit student
               responses to global assessments through these endpoints.
@@ -85,13 +85,18 @@ export default function ApiDocsPage() {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="submission">
-          <TabsList>
-            <TabsTrigger value="submission">Student Submission</TabsTrigger>
-            <TabsTrigger value="assessments">List Assessments</TabsTrigger>
-            <TabsTrigger value="anganwadis">Anganwadi Details</TabsTrigger>
+        <Tabs defaultValue="submission" className="w-full">
+          <TabsList className="w-full sm:w-auto flex flex-wrap">
+            <TabsTrigger value="submission" className="flex-1 sm:flex-none">
+              Student Submission
+            </TabsTrigger>
+            <TabsTrigger value="assessments" className="flex-1 sm:flex-none">
+              List Assessments
+            </TabsTrigger>
+            <TabsTrigger value="anganwadis" className="flex-1 sm:flex-none">
+              Anganwadi Details
+            </TabsTrigger>
           </TabsList>
-
           <TabsContent value="submission">
             <Card>
               <CardHeader>
@@ -100,21 +105,28 @@ export default function ApiDocsPage() {
                   Submit a student's responses for a global assessment
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Endpoint</h3>
-                  <CodeBlock
-                    endpoint="submission-endpoint"
-                    code="POST /api/global-assessments/:assessmentId/student/:studentId"
-                    language="bash"
-                  />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">
+                    Endpoint
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <CodeBlock
+                      endpoint="submission-endpoint"
+                      code="POST /api/global-assessments/:assessmentId/student/:studentId"
+                      language="bash"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Request Body</h3>
-                  <CodeBlock
-                    endpoint="submission-body"
-                    code={`{
+                  <h3 className="text-base sm:text-lg font-medium mb-2">
+                    Request Body
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <CodeBlock
+                      endpoint="submission-body"
+                      code={`{
   "teacherId": "teacher-uuid", 
   "anganwadiId": "anganwadi-uuid",
   "responses": [
@@ -127,14 +139,18 @@ export default function ApiDocsPage() {
     // ... more responses
   ]
 }`}
-                  />
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Response</h3>
-                  <CodeBlock
-                    endpoint="submission-response"
-                    code={`{
+                  <h3 className="text-base sm:text-lg font-medium mb-2">
+                    Response
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <CodeBlock
+                      endpoint="submission-response"
+                      code={`{
   "message": "Student submission recorded successfully",
   "submission": {
     "id": "submission-uuid",
@@ -149,12 +165,15 @@ export default function ApiDocsPage() {
     ]
   }
 }`}
-                  />
+                    />
+                  </div>
                 </div>
 
                 <div className="bg-amber-50 p-4 rounded-md border border-amber-200">
-                  <h3 className="text-amber-800 font-medium">Important Note</h3>
-                  <p className="text-amber-700 text-sm mt-1">
+                  <h3 className="text-amber-800 font-medium text-sm sm:text-base">
+                    Important Note
+                  </h3>
+                  <p className="text-amber-700 text-xs sm:text-sm mt-1">
                     Student submissions are only created when teachers submit
                     responses through the mobile app. There are no pre-created
                     placeholders, so you must provide all required data in your
@@ -164,7 +183,6 @@ export default function ApiDocsPage() {
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="assessments">
             <Card>
               <CardHeader>
@@ -173,21 +191,28 @@ export default function ApiDocsPage() {
                   List all active global assessments available for an anganwadi
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Endpoint</h3>
-                  <CodeBlock
-                    endpoint="assessments-endpoint"
-                    code="GET /api/global-assessments/active?anganwadiId=:anganwadiId"
-                    language="bash"
-                  />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">
+                    Endpoint
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <CodeBlock
+                      endpoint="assessments-endpoint"
+                      code="GET /api/global-assessments/active?anganwadiId=:anganwadiId"
+                      language="bash"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Response</h3>
-                  <CodeBlock
-                    endpoint="assessments-response"
-                    code={`[
+                  <h3 className="text-base sm:text-lg font-medium mb-2">
+                    Response
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <CodeBlock
+                      endpoint="assessments-response"
+                      code={`[
   {
     "id": "assessment-uuid",
     "name": "Term 1 Assessment 2023",
@@ -213,13 +238,15 @@ export default function ApiDocsPage() {
   },
   // ... more assessments
 ]`}
-                  />
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
-
+                 
           <TabsContent value="anganwadis">
+                      
             <Card>
               <CardHeader>
                 <CardTitle>Get Anganwadi Details</CardTitle>
@@ -227,21 +254,28 @@ export default function ApiDocsPage() {
                   Get details about an anganwadi and its students
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Endpoint</h3>
-                  <CodeBlock
-                    endpoint="anganwadi-endpoint"
-                    code="GET /api/anganwadis/:anganwadiId"
-                    language="bash"
-                  />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">
+                    Endpoint
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <CodeBlock
+                      endpoint="anganwadi-endpoint"
+                      code="GET /api/anganwadis/:anganwadiId"
+                      language="bash"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Response</h3>
-                  <CodeBlock
-                    endpoint="anganwadi-response"
-                    code={`{
+                  <h3 className="text-base sm:text-lg font-medium mb-2">
+                    Response
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <CodeBlock
+                      endpoint="anganwadi-response"
+                      code={`{
   "id": "anganwadi-uuid",
   "name": "Anganwadi Center 1",
   "location": "Village 1, District A",
@@ -259,7 +293,8 @@ export default function ApiDocsPage() {
     // ... more students
   ]
 }`}
-                  />
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -268,12 +303,12 @@ export default function ApiDocsPage() {
 
         <Card className="bg-blue-50 border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-800">
+            <CardTitle className="text-blue-800 text-base sm:text-lg">
               Implementation Guide
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 text-blue-700">
+            <div className="space-y-4 text-blue-700 text-sm sm:text-base">
               <p>
                 <strong>Mobile App Implementation Steps:</strong>
               </p>
