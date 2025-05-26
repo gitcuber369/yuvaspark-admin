@@ -44,6 +44,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CsvImportForm from "@/components/CsvImportForm";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface Student {
   id: string;
@@ -73,8 +74,8 @@ export default function StudentDashboard() {
 
   const [newStudent, setNewStudent] = useState({
     name: "",
-    gender: "",
-    status: "",
+    gender: "MALE",
+    status: "ACTIVE",
     anganwadiId: "",
   });
 
@@ -92,13 +93,24 @@ export default function StudentDashboard() {
 
   const handleAddStudent = async () => {
     if (!newStudent.name) return;
-    await addStudent({
-      name: newStudent.name,
-      gender: newStudent.gender,
-      status: newStudent.status,
-      anganwadiId: newStudent.anganwadiId || undefined,
-    });
-    setNewStudent({ name: "", gender: "", status: "", anganwadiId: "" });
+    try {
+      await addStudent({
+        name: newStudent.name,
+        gender: newStudent.gender,
+        status: newStudent.status,
+        anganwadiId: newStudent.anganwadiId || undefined,
+      });
+      toast.success("Student added successfully");
+      setNewStudent({
+        name: "",
+        gender: "MALE",
+        status: "ACTIVE",
+        anganwadiId: "",
+      });
+    } catch (error) {
+      toast.error("Failed to add student");
+      console.error("Error adding student:", error);
+    }
   };
 
   // Get unique anganwadi IDs for filtering
@@ -139,16 +151,16 @@ export default function StudentDashboard() {
     if (!targetAnganwadiId || selectedStudents.length === 0) return;
 
     try {
-      // Use the batch assign function from the store
       await batchAssignToAnganwadi(selectedStudents, targetAnganwadiId);
-
-      // Reset selection state after successful assignment
+      toast.success(
+        `${selectedStudents.length} students assigned to anganwadi`
+      );
       setSelectedStudents([]);
       setBatchAssignDialogOpen(false);
       setTargetAnganwadiId("");
-    } catch (err: any) {
-      // Handle errors
-      console.error("Error batch assigning students:", err);
+    } catch (error) {
+      toast.error("Failed to assign students to anganwadi");
+      console.error("Error assigning students:", error);
     }
   };
 
@@ -170,6 +182,42 @@ export default function StudentDashboard() {
     }
   };
 
+  const handleRemoveStudent = async (studentId: string) => {
+    try {
+      await removeStudent(studentId);
+      toast.success("Student removed successfully");
+    } catch (error) {
+      toast.error("Failed to remove student");
+      console.error("Error removing student:", error);
+    }
+  };
+
+  const handleUpdateStudent = async (
+    studentId: string,
+    data: Partial<Student>
+  ) => {
+    try {
+      await updateStudent(studentId, data);
+      toast.success("Student updated successfully");
+    } catch (error) {
+      toast.error("Failed to update student");
+      console.error("Error updating student:", error);
+    }
+  };
+
+  const handleAssignToAnganwadi = async (
+    studentId: string,
+    anganwadiId: string
+  ) => {
+    try {
+      await assignToAnganwadi(studentId, anganwadiId);
+      toast.success("Student assigned to anganwadi");
+    } catch (error) {
+      toast.error("Failed to assign student to anganwadi");
+      console.error("Error assigning student:", error);
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen">
       <div className="container mx-auto px-4 py-4 md:p-6 space-y-4 md:space-y-6">
@@ -183,7 +231,7 @@ export default function StudentDashboard() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-black text-white">
+            <Badge className="bg-black text-white h-8 flex items-center">
               {students.length} Students
             </Badge>
             <Button
@@ -254,8 +302,9 @@ export default function StudentDashboard() {
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Male">Male</SelectItem>
-                        <SelectItem value="Female">Female</SelectItem>
+                        <SelectItem value="MALE">Male</SelectItem>
+                        <SelectItem value="FEMALE">Female</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -271,24 +320,37 @@ export default function StudentDashboard() {
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Inactive">Inactive</SelectItem>
+                        <SelectItem value="ACTIVE" className="text-green-600">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" />
+                            <span>Active</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="INACTIVE" className="text-red-600">
+                          <div className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4" />
+                            <span>Inactive</span>
+                          </div>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
                     <Label htmlFor="anganwadi">Anganwadi</Label>
                     <Select
-                      value={newStudent.anganwadiId}
+                      value={newStudent.anganwadiId || "none"}
                       onValueChange={(value) =>
-                        setNewStudent({ ...newStudent, anganwadiId: value })
+                        setNewStudent({
+                          ...newStudent,
+                          anganwadiId: value === "none" ? "" : value,
+                        })
                       }
                     >
                       <SelectTrigger id="anganwadi">
                         <SelectValue placeholder="Select anganwadi" />
                       </SelectTrigger>
                       <SelectContent className="max-h-60">
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {anganwadis.map((anganwadi) => (
                           <SelectItem
                             key={anganwadi._id?.toString() || anganwadi.id}
@@ -384,8 +446,12 @@ export default function StudentDashboard() {
 
         <Tabs defaultValue="students" className="w-full">
           <TabsList className="mb-6 w-full flex">
-            <TabsTrigger value="students" className="flex-1">Students Directory</TabsTrigger>
-            <TabsTrigger value="import" className="flex-1">CSV Import</TabsTrigger>
+            <TabsTrigger value="students" className="flex-1">
+              Students Directory
+            </TabsTrigger>
+            <TabsTrigger value="import" className="flex-1">
+              CSV Import
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="students">
@@ -435,7 +501,9 @@ export default function StudentDashboard() {
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
                           <SelectItem value="asc">Anganwadi (A → Z)</SelectItem>
-                          <SelectItem value="desc">Anganwadi (Z → A)</SelectItem>
+                          <SelectItem value="desc">
+                            Anganwadi (Z → A)
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -450,16 +518,23 @@ export default function StudentDashboard() {
                         type="checkbox"
                         id="select-all"
                         className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                        checked={selectedStudents.length === sortedStudents.length && sortedStudents.length > 0}
+                        checked={
+                          selectedStudents.length === sortedStudents.length &&
+                          sortedStudents.length > 0
+                        }
                         onChange={toggleSelectAll}
                       />
-                      <label htmlFor="select-all" className="ml-2 text-sm text-gray-600">
+                      <label
+                        htmlFor="select-all"
+                        className="ml-2 text-sm text-gray-600"
+                      >
                         Select All ({sortedStudents.length})
                       </label>
                     </div>
                     {selectedStudents.length > 0 && (
                       <span className="text-sm text-gray-500 ml-4">
-                        {selectedStudents.length} student{selectedStudents.length !== 1 ? "s" : ""} selected
+                        {selectedStudents.length} student
+                        {selectedStudents.length !== 1 ? "s" : ""} selected
                       </span>
                     )}
                   </div>
@@ -470,7 +545,9 @@ export default function StudentDashboard() {
                 {loading ? (
                   <div className="flex justify-center items-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-black" />
-                    <span className="ml-2 text-gray-600">Loading students...</span>
+                    <span className="ml-2 text-gray-600">
+                      Loading students...
+                    </span>
                   </div>
                 ) : error ? (
                   <div className="text-red-500 bg-red-50 border border-red-100 p-4 rounded-md">
@@ -480,7 +557,9 @@ export default function StudentDashboard() {
                   <div className="text-center py-8 md:py-12 border-2 border-dashed rounded-lg">
                     {searchQuery ? (
                       <>
-                        <p className="text-gray-500">No students match your search.</p>
+                        <p className="text-gray-500">
+                          No students match your search.
+                        </p>
                         <Button
                           variant="link"
                           onClick={() => setSearchQuery("")}
@@ -492,7 +571,9 @@ export default function StudentDashboard() {
                     ) : (
                       <div className="text-gray-500">
                         <p>No students found.</p>
-                        <p className="text-sm mt-1">Add your first student using the button above.</p>
+                        <p className="text-sm mt-1">
+                          Add your first student using the button above.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -512,8 +593,12 @@ export default function StudentDashboard() {
                                   type="checkbox"
                                   id={`student-${student.id}`}
                                   className="h-4 w-4 mt-1 rounded border-gray-300 text-black focus:ring-black shrink-0"
-                                  checked={selectedStudents.includes(student.id)}
-                                  onChange={() => toggleStudentSelection(student.id)}
+                                  checked={selectedStudents.includes(
+                                    student.id
+                                  )}
+                                  onChange={() =>
+                                    toggleStudentSelection(student.id)
+                                  }
                                 />
                                 <div className="min-w-0 flex-1">
                                   <h3 className="text-base sm:text-lg font-medium truncate">
@@ -527,7 +612,7 @@ export default function StudentDashboard() {
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                onClick={() => removeStudent(student.id)}
+                                onClick={() => handleRemoveStudent(student.id)}
                                 className="shrink-0 -mt-1"
                               >
                                 <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
@@ -536,24 +621,34 @@ export default function StudentDashboard() {
 
                             {/* Status Section */}
                             <div className="flex items-center justify-between gap-2 mt-1">
-                              <span className="text-sm text-gray-500">Status:</span>
+                              <span className="text-sm text-gray-500">
+                                Status:
+                              </span>
                               <Select
-                                value={(student.status || "").toUpperCase()}
+                                value={student.status || "INACTIVE"}
                                 onValueChange={(value) => {
-                                  updateStudent(student.id, { status: value });
+                                  handleUpdateStudent(student.id, {
+                                    status: value,
+                                  });
                                 }}
                               >
                                 <SelectTrigger className="w-32 h-8">
-                                  <SelectValue />
+                                  <SelectValue placeholder="Select status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="ACTIVE" className="text-green-600">
+                                  <SelectItem
+                                    value="ACTIVE"
+                                    className="text-green-600"
+                                  >
                                     <div className="flex items-center gap-2">
                                       <CheckCircle className="w-4 h-4" />
                                       <span>Active</span>
                                     </div>
                                   </SelectItem>
-                                  <SelectItem value="INACTIVE" className="text-red-600">
+                                  <SelectItem
+                                    value="INACTIVE"
+                                    className="text-red-600"
+                                  >
                                     <div className="flex items-center gap-2">
                                       <XCircle className="w-4 h-4" />
                                       <span>Inactive</span>
@@ -566,14 +661,24 @@ export default function StudentDashboard() {
                             {/* Anganwadi Section */}
                             <div className="border-t mt-2 pt-3">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-sm text-gray-500">Anganwadi:</span>
+                                <span className="text-sm text-gray-500">
+                                  Anganwadi:
+                                </span>
                                 <Select
                                   value={student.anganwadiId || "none"}
                                   onValueChange={(value) => {
                                     if (value && value !== "none") {
-                                      assignToAnganwadi(student.id, value);
-                                    } else if (value === "none" && student.anganwadiId) {
-                                      updateStudent(student.id, { anganwadiId: "" });
+                                      handleAssignToAnganwadi(
+                                        student.id,
+                                        value
+                                      );
+                                    } else if (
+                                      value === "none" &&
+                                      student.anganwadiId
+                                    ) {
+                                      handleUpdateStudent(student.id, {
+                                        anganwadiId: "",
+                                      });
                                     }
                                   }}
                                 >
@@ -583,13 +688,21 @@ export default function StudentDashboard() {
                                   <SelectContent className="max-h-60">
                                     {student.anganwadiId && (
                                       <SelectItem value="none">
-                                        <span className="text-gray-500">Unassign</span>
+                                        <span className="text-gray-500">
+                                          Unassign
+                                        </span>
                                       </SelectItem>
                                     )}
                                     {anganwadis.map((anganwadi) => (
                                       <SelectItem
-                                        key={anganwadi._id?.toString() || anganwadi.id}
-                                        value={anganwadi._id?.toString() || anganwadi.id}
+                                        key={
+                                          anganwadi._id?.toString() ||
+                                          anganwadi.id
+                                        }
+                                        value={
+                                          anganwadi._id?.toString() ||
+                                          anganwadi.id
+                                        }
                                       >
                                         {anganwadi.name}
                                       </SelectItem>
