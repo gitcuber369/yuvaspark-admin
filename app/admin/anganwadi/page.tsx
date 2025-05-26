@@ -37,6 +37,8 @@ import {
   removeAnganwadiDependencies,
   removeAllStudentsFromAnganwadi,
 } from "@/app/api/api";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface Anganwadi {
   id: string;
@@ -202,6 +204,14 @@ export default function AnganwadiPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Important Note</AlertTitle>
+        <AlertDescription>
+          Only one teacher can be assigned to each Anganwadi center. Please ensure proper teacher allocation.
+        </AlertDescription>
+      </Alert>
+
       <Card className="mb-4 md:mb-6">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <CardTitle className="text-xl md:text-2xl">Anganwadi Centers</CardTitle>

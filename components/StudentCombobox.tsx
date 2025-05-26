@@ -6,6 +6,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { X } from 'lucide-react';
 import { API_URL } from "@/lib/config";
+import { useDebounce } from 'use-debounce';
 
 interface Props {
   selected: string[];
@@ -19,6 +20,7 @@ interface Student {
 
 export default function StudentCombobox({ selected, setSelected }: Props) {
   const [query, setQuery] = useState('');
+  const [debouncedQuery] = useDebounce(query, 300);
   const [results, setResults] = useState<Student[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
 
@@ -44,22 +46,30 @@ export default function StudentCombobox({ selected, setSelected }: Props) {
     fetchSelectedStudents();
   }, [selected]);
 
-  const searchStudents = async (q: string) => {
-    if (q.length < 2) {
-      setResults([]);
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}students?search=${q}`);
-      if (res.ok) {
-        const data = await res.json();
-        setResults(data);
+  // Search effect that triggers when debounced query changes
+  useEffect(() => {
+    const searchStudents = async () => {
+      if (debouncedQuery.length < 2) {
+        setResults([]);
+        return;
       }
-    } catch (error) {
-      console.error("Error searching students:", error);
-    }
-  };
+
+      try {
+        const res = await fetch(`${API_URL}students?search=${encodeURIComponent(debouncedQuery)}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Filter out already selected students from results
+          const filteredData = data.filter((student: Student) => !selected.includes(student.id));
+          setResults(filteredData);
+        }
+      } catch (error) {
+        console.error("Error searching students:", error);
+        setResults([]);
+      }
+    };
+
+    searchStudents();
+  }, [debouncedQuery, selected]);
 
   const addStudent = (student: Student) => {
     if (!selected.includes(student.id)) {
@@ -78,7 +88,7 @@ export default function StudentCombobox({ selected, setSelected }: Props) {
       <Input
         placeholder="Search Students by Name..."
         value={query}
-        onChange={(e) => searchStudents(e.target.value)}
+        onChange={(e) => setQuery(e.target.value)}
         className="mb-2"
       />
       
