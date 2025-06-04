@@ -30,6 +30,7 @@ interface StudentResponseFilters {
   questionId?: string;
   startDate?: string;
   endDate?: string;
+  anganwadiId?: string;
 }
 
 interface StudentResponseStore {
@@ -113,6 +114,9 @@ export const useStudentResponseStore = create<StudentResponseStore>((set, get) =
       }
       if (filters.endDate) {
         queryParams.append('endDate', filters.endDate);
+      }
+      if (filters.anganwadiId) {
+        queryParams.append('anganwadiId', filters.anganwadiId);
       }
       
       let url = `${API_URL}student-responses/scored`;
