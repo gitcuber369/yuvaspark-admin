@@ -171,7 +171,7 @@ export const assignToAnganwadi = async ({
   anganwadiId: string;
   studentId: string;
 }) => {
-  const res = await API.post("/anganwadis/assign", {
+  const res = await API.post("anganwadis/assign", {
     anganwadiId,
     studentId,
   });
@@ -190,7 +190,7 @@ export const createStudent = async ({
   status?: string;
   anganwadiId?: string;
 }) => {
-  const res = await API.post("/students", {
+  const res = await API.post("students", {
     name,
     gender,
     status,
@@ -201,13 +201,13 @@ export const createStudent = async ({
 
 // ✅ Get All Students
 export const getAllStudents = async () => {
-  const res = await API.get("/students");
+  const res = await API.get("students");
   return res.data;
 };
 
 // ✅ Delete a Student by ID
 export const deleteStudent = async (id: string) => {
-  const res = await API.delete(`/students/${id}`);
+  const res = await API.delete(`students/${id}`);
   return res.data;
 };
 
@@ -219,7 +219,7 @@ export const assignStudentToAnganwadi = async ({
   studentId: string;
   anganwadiId: string;
 }) => {
-  const res = await API.patch("/students/assign-anganwadi", {
+  const res = await API.patch("students/assign-anganwadi", {
     studentId,
     anganwadiId,
   });
@@ -228,7 +228,7 @@ export const assignStudentToAnganwadi = async ({
 
 // ✅ Get Students by Anganwadi ID (GET)
 export const getStudentsByAnganwadi = async (anganwadiId: string) => {
-  const res = await API.get(`/students/anganwadi/${anganwadiId}`);
+  const res = await API.get(`students/anganwadi/${anganwadiId}`);
   return res.data;
 };
 
