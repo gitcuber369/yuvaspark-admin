@@ -48,7 +48,7 @@ interface Question {
   audioUrl: string;
   topicId: string;
   answerOptions?: string[];
-  correctAnswer?: number | null;
+  correctAnswers?: number[];
   topic?: {
     id: string;
     name: string;
@@ -72,7 +72,7 @@ interface BatchQuestionInput {
   image: File | null;
   audio: File | null;
   answerOptions: string[];
-  correctAnswer: number | null;
+  correctAnswers: number[];
 }
 
 export default function QuestionAdminPage() {
@@ -93,7 +93,7 @@ export default function QuestionAdminPage() {
     "",
     "",
   ]); // 4 empty options
-  const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
+  const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
   const [open, setOpen] = useState(false);
 
   // For question details
@@ -111,7 +111,7 @@ export default function QuestionAdminPage() {
       image: null,
       audio: null,
       answerOptions: ["", "", "", ""],
-      correctAnswer: null,
+      correctAnswers: [],
     },
   ]);
 
@@ -185,14 +185,12 @@ export default function QuestionAdminPage() {
       formData.append(`answerOptions[${index}]`, option);
     });
 
-    // Add correctAnswer if selected and valid
-    if (
-      correctAnswer !== null &&
-      correctAnswer >= 0 &&
-      correctAnswer < filteredOptions.length
-    ) {
-      formData.append("correctAnswer", correctAnswer.toString());
-    }
+    // Add correctAnswers array
+    correctAnswers.forEach((answer) => {
+      if (answer >= 0 && answer < filteredOptions.length) {
+        formData.append("correctAnswers[]", answer.toString());
+      }
+    });
 
     try {
       await createQuestion(formData);
@@ -201,7 +199,7 @@ export default function QuestionAdminPage() {
       setImage(null);
       setAudio(null);
       setAnswerOptions(["", "", "", ""]);
-      setCorrectAnswer(null);
+      setCorrectAnswers([]);
       setOpen(false);
 
       // Refresh questions
@@ -262,14 +260,12 @@ export default function QuestionAdminPage() {
           formData.append(`answerOptions[${index}]`, option);
         });
 
-        // Add correctAnswer if selected and valid
-        if (
-          question.correctAnswer !== null &&
-          question.correctAnswer >= 0 &&
-          question.correctAnswer < filteredOptions.length
-        ) {
-          formData.append("correctAnswer", question.correctAnswer.toString());
-        }
+        // Add correctAnswers array
+        question.correctAnswers.forEach((answer) => {
+          if (answer >= 0 && answer < filteredOptions.length) {
+            formData.append("correctAnswers[]", answer.toString());
+          }
+        });
 
         await createQuestion(formData);
       }
@@ -282,7 +278,7 @@ export default function QuestionAdminPage() {
           image: null,
           audio: null,
           answerOptions: ["", "", "", ""],
-          correctAnswer: null,
+          correctAnswers: [],
         },
       ]);
       setBatchOpen(false);
@@ -324,7 +320,7 @@ export default function QuestionAdminPage() {
         image: null,
         audio: null,
         answerOptions: ["", "", "", ""],
-        correctAnswer: null,
+        correctAnswers: [],
       },
     ]);
   };
@@ -392,9 +388,20 @@ export default function QuestionAdminPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <Label>Answer Options (up to 4)</Label>
+                  <Label>Answer Options</Label>
                   {answerOptions.map((option, index) => (
-                    <div key={index} className="flex gap-2 items-center">
+                    <div key={index} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`correct-${index}`}
+                        checked={correctAnswers.includes(index)}
+                        onCheckedChange={(checked) => {
+                          setCorrectAnswers(
+                            checked
+                              ? [...correctAnswers, index]
+                              : correctAnswers.filter((i) => i !== index)
+                          );
+                        }}
+                      />
                       <Input
                         value={option}
                         onChange={(e) => {
@@ -402,23 +409,8 @@ export default function QuestionAdminPage() {
                           newOptions[index] = e.target.value;
                           setAnswerOptions(newOptions);
                         }}
-                        placeholder={`Answer option ${index + 1}`}
+                        placeholder={`Option ${index + 1}`}
                       />
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id={`correctAnswer-${index}`}
-                          name="correctAnswer"
-                          checked={correctAnswer === index}
-                          onChange={() => setCorrectAnswer(index)}
-                        />
-                        <Label
-                          htmlFor={`correctAnswer-${index}`}
-                          className="text-sm cursor-pointer"
-                        >
-                          Correct
-                        </Label>
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -438,8 +430,18 @@ export default function QuestionAdminPage() {
                   <Input
                     id="audio"
                     type="file"
-                    accept="audio/*"
-                    onChange={(e) => setAudio(e.target.files?.[0] || null)}
+                    accept="audio/mp3"
+                    onChange={(e) => {
+                      const audioFile = e.target.files?.[0];
+                      if (audioFile) {
+                        console.log("Audio file path:", audioFile.name);
+                        console.log(
+                          "Audio file extension:",
+                          audioFile.name.split(".").pop()
+                        );
+                      }
+                      setAudio(audioFile || null);
+                    }}
                   />
                 </div>
 
@@ -512,12 +514,30 @@ export default function QuestionAdminPage() {
                     </div>
 
                     <div className="space-y-4">
-                      <Label>Answer Options (up to 4)</Label>
+                      <Label>Answer Options</Label>
                       {question.answerOptions.map((option, optionIndex) => (
                         <div
                           key={optionIndex}
-                          className="flex gap-2 items-center"
+                          className="flex items-center gap-2"
                         >
+                          <Checkbox
+                            id={`question-${index}-correct-${optionIndex}`}
+                            checked={question.correctAnswers?.includes(
+                              optionIndex
+                            )}
+                            onCheckedChange={(checked) => {
+                              const newAnswers = checked
+                                ? [...question.correctAnswers, optionIndex]
+                                : question.correctAnswers?.filter(
+                                    (i) => i !== optionIndex
+                                  );
+                              updateBatchQuestion(
+                                index,
+                                "correctAnswers",
+                                newAnswers
+                              );
+                            }}
+                          />
                           <Input
                             value={option}
                             onChange={(e) => {
@@ -529,29 +549,8 @@ export default function QuestionAdminPage() {
                                 newOptions
                               );
                             }}
-                            placeholder={`Answer option ${optionIndex + 1}`}
+                            placeholder={`Option ${optionIndex + 1}`}
                           />
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              id={`question-${index}-correctAnswer-${optionIndex}`}
-                              name={`question-${index}-correctAnswer`}
-                              checked={question.correctAnswer === optionIndex}
-                              onChange={() =>
-                                updateBatchQuestion(
-                                  index,
-                                  "correctAnswer",
-                                  optionIndex
-                                )
-                              }
-                            />
-                            <Label
-                              htmlFor={`question-${index}-correctAnswer-${optionIndex}`}
-                              className="text-sm cursor-pointer"
-                            >
-                              Correct
-                            </Label>
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -581,13 +580,21 @@ export default function QuestionAdminPage() {
                       <Input
                         type="file"
                         accept="audio/*"
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const audioFile = e.target.files?.[0];
+                          if (audioFile) {
+                            console.log("Audio file path:", audioFile.name);
+                            console.log(
+                              "Audio file extension:",
+                              audioFile.name.split(".").pop()
+                            );
+                          }
                           updateBatchQuestion(
                             index,
                             "audio",
-                            e.target.files?.[0] || null
-                          )
-                        }
+                            audioFile || null
+                          );
+                        }}
                       />
                       {question.audio && (
                         <p className="text-sm text-green-600">
@@ -818,13 +825,15 @@ export default function QuestionAdminPage() {
                         <div
                           key={index}
                           className={`p-2 rounded-md ${
-                            selectedQuestion.correctAnswer === index
+                            selectedQuestion.correctAnswers?.includes(index)
                               ? "bg-green-100 border border-green-300"
                               : "bg-gray-50 border border-gray-200"
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            {selectedQuestion.correctAnswer === index && (
+                            {selectedQuestion.correctAnswers?.includes(
+                              index
+                            ) && (
                               <Badge
                                 variant="outline"
                                 className="bg-green-500 text-white"
@@ -834,7 +843,7 @@ export default function QuestionAdminPage() {
                             )}
                             <p
                               className={
-                                selectedQuestion.correctAnswer === index
+                                selectedQuestion.correctAnswers?.includes(index)
                                   ? "font-medium"
                                   : ""
                               }

@@ -390,119 +390,121 @@ export default function AnganwadiPage() {
           <CardTitle>All Centers</CardTitle>
         </CardHeader>
         <CardContent className="p-0 sm:p-6">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden md:table-cell">Taluk</TableHead>
-                  <TableHead className="hidden md:table-cell">District</TableHead>
-                  <TableHead className="hidden sm:table-cell">Teacher</TableHead>
-                  <TableHead className="hidden lg:table-cell">Students</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {anganwadis.length > 0 ? (
-                  anganwadis.map((a) => (
-                    <TableRow
-                      key={a.id}
-                      className="cursor-pointer hover:bg-muted transition"
-                    >
-                      <TableCell
-                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+          <ScrollArea className="h-[600px]">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="hidden md:table-cell">Taluk</TableHead>
+                    <TableHead className="hidden md:table-cell">District</TableHead>
+                    <TableHead className="hidden sm:table-cell">Teacher</TableHead>
+                    <TableHead className="hidden lg:table-cell">Students</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {anganwadis.length > 0 ? (
+                    anganwadis.map((a) => (
+                      <TableRow
+                        key={a.id}
+                        className="cursor-pointer hover:bg-muted transition"
                       >
-                        <div>
-                          <div className="font-medium">{a.name}</div>
-                          <div className="md:hidden text-sm text-gray-500">
-                            {a.location}, {a.district}
+                        <TableCell
+                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                        >
+                          <div>
+                            <div className="font-medium">{a.name}</div>
+                            <div className="md:hidden text-sm text-gray-500">
+                              {a.location}, {a.district}
+                            </div>
+                            <div className="sm:hidden text-sm text-gray-500">
+                              {a.teacher
+                                ? `${a.teacher.name} (${a.teacher.phone})`
+                                : "No teacher"}
+                            </div>
+                            <div className="lg:hidden text-sm text-gray-500">
+                              {a.students.length} students
+                            </div>
                           </div>
-                          <div className="sm:hidden text-sm text-gray-500">
-                            {a.teacher
-                              ? `${a.teacher.name} (${a.teacher.phone})`
-                              : "No teacher"}
+                        </TableCell>
+                        <TableCell
+                          className="hidden md:table-cell"
+                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                        >
+                          {a.location}
+                        </TableCell>
+                        <TableCell
+                          className="hidden md:table-cell"
+                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                        >
+                          {a.district}
+                        </TableCell>
+                        <TableCell
+                          className="hidden sm:table-cell"
+                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                        >
+                          {a.teacher
+                            ? `${a.teacher.name} (${a.teacher.phone})`
+                            : "Not assigned"}
+                        </TableCell>
+                        <TableCell
+                          className="hidden lg:table-cell"
+                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                        >
+                          {a.students.length > 0
+                            ? `${a.students.length} students`
+                            : "No students"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex flex-col sm:flex-row justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full sm:w-auto text-xs sm:text-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedAnganwadi(a);
+                                setShowStudentDialog(true);
+                              }}
+                            >
+                              Add Students
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="w-full sm:w-auto text-xs sm:text-sm"
+                              onClick={(e) => handleDelete(a.id, e)}
+                            >
+                              Delete
+                            </Button>
                           </div>
-                          <div className="lg:hidden text-sm text-gray-500">
-                            {a.students.length} students
-                          </div>
-                        </div>
-                      </TableCell>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
                       <TableCell
-                        className="hidden md:table-cell"
-                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                        colSpan={6}
+                        className="text-center text-muted-foreground p-8"
                       >
-                        {a.location}
-                      </TableCell>
-                      <TableCell
-                        className="hidden md:table-cell"
-                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
-                      >
-                        {a.district}
-                      </TableCell>
-                      <TableCell
-                        className="hidden sm:table-cell"
-                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
-                      >
-                        {a.teacher
-                          ? `${a.teacher.name} (${a.teacher.phone})`
-                          : "Not assigned"}
-                      </TableCell>
-                      <TableCell
-                        className="hidden lg:table-cell"
-                        onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
-                      >
-                        {a.students.length > 0
-                          ? `${a.students.length} students`
-                          : "No students"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex flex-col sm:flex-row justify-end gap-2">
+                        <div className="flex flex-col items-center gap-2">
+                          <p>No anganwadis found.</p>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="w-full sm:w-auto text-xs sm:text-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedAnganwadi(a);
-                              setShowStudentDialog(true);
-                            }}
+                            onClick={() => setShowForm(true)}
                           >
-                            Add Students
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="w-full sm:w-auto text-xs sm:text-sm"
-                            onClick={(e) => handleDelete(a.id, e)}
-                          >
-                            Delete
+                            Add your first center
                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center text-muted-foreground p-8"
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <p>No anganwadis found.</p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowForm(true)}
-                        >
-                          Add your first center
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </ScrollArea>
         </CardContent>
       </Card>
     </div>

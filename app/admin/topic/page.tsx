@@ -46,7 +46,7 @@ export default function TopicsPage() {
 
   const fetchTopics = async () => {
     try {
-      const response = await fetch("https://api.dreamlaunch.studio/api/topics");
+      const response = await fetch("http://localhost:3000/api/topics");
       if (!response.ok) throw new Error("Failed to fetch topics");
       const data = await response.json();
       setTopics(data);
@@ -65,14 +65,11 @@ export default function TopicsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "https://api.dreamlaunch.studio/api/topics",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/topics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) throw new Error("Failed to create topic");
 
@@ -92,7 +89,7 @@ export default function TopicsPage() {
 
     try {
       const response = await fetch(
-        `https://api.dreamlaunch.studio/api/topics/${selectedTopic.id}`,
+        `http://localhost:3000/api/topics/${selectedTopic.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -115,11 +112,11 @@ export default function TopicsPage() {
 
   const handleDelete = async () => {
     if (!selectedTopic) return;
-    
+
     setIsDeleting(true);
     try {
       const response = await fetch(
-        `https://api.dreamlaunch.studio/api/topics/${selectedTopic.id}`,
+        `http://localhost:3000/api/topics/${selectedTopic.id}`,
         {
           method: "DELETE",
         }
@@ -128,7 +125,9 @@ export default function TopicsPage() {
       if (!response.ok) {
         // Check if the topic has linked questions
         if (selectedTopic.questions.length > 0) {
-          toast.error("This topic cannot be deleted because it has questions connected to it");
+          toast.error(
+            "This topic cannot be deleted because it has questions connected to it"
+          );
           return;
         }
         throw new Error("Failed to delete topic");
@@ -306,8 +305,8 @@ export default function TopicsPage() {
             >
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
             >

@@ -17,7 +17,7 @@ interface Question {
   audioUrl: string;
   topicId: string;
   answerOptions?: string[];
-  correctAnswer?: number | null;
+  correctAnswers?: number[];
   topic?: {
     id: string;
     name: string;
@@ -163,18 +163,18 @@ export default function QuestionDetailPage({ params }: PageProps) {
                     <div
                       key={index}
                       className={`p-3 rounded-md ${
-                        question.correctAnswer === index
+                        question.correctAnswers?.includes(index)
                           ? "bg-green-100 border border-green-300"
                           : "bg-gray-50 border border-gray-200"
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        {question.correctAnswer === index && (
+                        {question.correctAnswers?.includes(index) && (
                           <Badge className="bg-green-500">Correct Answer</Badge>
                         )}
                         <p
                           className={
-                            question.correctAnswer === index
+                            question.correctAnswers?.includes(index)
                               ? "font-medium"
                               : ""
                           }
