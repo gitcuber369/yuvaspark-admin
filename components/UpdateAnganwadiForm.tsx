@@ -21,7 +21,11 @@ interface Props {
   onClose?: () => void;
 }
 
-export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) => {
+export const UpdateAnganwadiForm = ({
+  anganwadiId,
+  onSuccess,
+  onClose,
+}: Props) => {
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -29,8 +33,8 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     teacher: {
       id: "",
       name: "",
-      phone: ""
-    }
+      phone: "",
+    },
   });
 
   const [studentIds, setStudentIds] = useState<string[]>([]);
@@ -53,8 +57,8 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
             teacher: {
               id: data.teacher?.id || "",
               name: data.teacher?.name || "",
-              phone: data.teacher?.phone || ""
-            }
+              phone: data.teacher?.phone || "",
+            },
           });
           // Set existing student IDs
           if (data.students && Array.isArray(data.students)) {
@@ -102,20 +106,17 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
     setLoading(true);
     try {
       // First update the anganwadi basic info and students
-      const anganwadiRes = await fetch(
-        `${API_URL}anganwadis/${anganwadiId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: form.name,
-            location: form.location,
-            district: form.district,
-            studentIds,
-            students: validNewStudents,
-          }),
-        }
-      );
+      const anganwadiRes = await fetch(`${API_URL}anganwadis/${anganwadiId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          location: form.location,
+          district: form.district,
+          studentIds,
+          students: validNewStudents,
+        }),
+      });
 
       if (!anganwadiRes.ok) {
         throw new Error("Failed to update Anganwadi");
@@ -142,18 +143,15 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
           }
         } else {
           // Create new teacher
-          const teacherRes = await fetch(
-            `${API_URL}teachers`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                name: form.teacher.name,
-                phone: form.teacher.phone,
-                anganwadiId: anganwadiId,
-              }),
-            }
-          );
+          const teacherRes = await fetch(`${API_URL}teachers`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: form.teacher.name,
+              phone: form.teacher.phone,
+              anganwadiId: anganwadiId,
+            }),
+          });
 
           if (!teacherRes.ok) {
             throw new Error("Failed to create new teacher");
@@ -228,7 +226,9 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
                 <Input
                   placeholder="Village/Area"
                   value={form.location}
-                  onChange={(e) => setForm({ ...form, location: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, location: e.target.value })
+                  }
                   className="w-full"
                 />
               </div>
@@ -239,7 +239,9 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
                 <Input
                   placeholder="District Name"
                   value={form.district}
-                  onChange={(e) => setForm({ ...form, district: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, district: e.target.value })
+                  }
                   className="w-full"
                 />
               </div>
@@ -291,7 +293,9 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
 
           {/* Connect Existing Students */}
           <div className="pt-4 border-t">
-            <h3 className="text-lg font-medium mb-3">Connect Existing Students</h3>
+            <h3 className="text-lg font-medium mb-3">
+              Connect Existing Students
+            </h3>
             <StudentCombobox
               selected={studentIds}
               setSelected={setStudentIds}
@@ -304,10 +308,7 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
             <ScrollArea className="h-72 w-full rounded-md border p-4 mb-4">
               <div className="space-y-4">
                 {students.map((student, index) => (
-                  <div
-                    key={index}
-                    className="space-y-3 p-4 border rounded-md"
-                  >
+                  <div key={index} className="space-y-3 p-4 border rounded-md">
                     <div className="flex justify-between items-center mb-2">
                       <p className="text-sm font-medium text-gray-600">
                         New Student {index + 1}
@@ -398,4 +399,4 @@ export const UpdateAnganwadiForm = ({ anganwadiId, onSuccess, onClose }: Props) 
       </CardContent>
     </Card>
   );
-}; 
+};

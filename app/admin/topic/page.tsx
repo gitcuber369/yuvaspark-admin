@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { API_URL } from "@/lib/config";
 
 interface Topic {
   id: string;
@@ -46,7 +47,7 @@ export default function TopicsPage() {
 
   const fetchTopics = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/topics");
+      const response = await fetch(`${API_URL}topics`);
       if (!response.ok) throw new Error("Failed to fetch topics");
       const data = await response.json();
       setTopics(data);
@@ -65,7 +66,7 @@ export default function TopicsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/api/topics", {
+      const response = await fetch(`${API_URL}topics`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -89,7 +90,7 @@ export default function TopicsPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/topics/${selectedTopic.id}`,
+        `${API_URL}topics/${selectedTopic.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -116,7 +117,7 @@ export default function TopicsPage() {
     setIsDeleting(true);
     try {
       const response = await fetch(
-        `http://localhost:3000/api/topics/${selectedTopic.id}`,
+        `${API_URL}topics/${selectedTopic.id}`,
         {
           method: "DELETE",
         }
