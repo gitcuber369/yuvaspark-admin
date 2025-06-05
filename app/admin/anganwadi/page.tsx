@@ -39,6 +39,7 @@ import {
 } from "@/app/api/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 interface Anganwadi {
   id: string;
@@ -60,11 +61,18 @@ export default function AnganwadiPage() {
   const [students, setStudents] = useState([{ name: "", gender: "" }]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
   const fetchAnganwadis = async () => {
-    const res = await fetch(`https://api.dreamlaunch.studio/api/anganwadis`);
-    const data = await res.json();
-    setAnganwadis(data);
+    try {
+      const res = await fetch(`https://api.gitcuber.studio/api/anganwadis`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch anganwadis');
+      }
+      const data = await res.json();
+      setAnganwadis(data);
+    } catch (error) {
+      console.error('Error fetching anganwadis:', error);
+      toast.error('Failed to load anganwadis');
+    }
   };
 
   useEffect(() => {
@@ -181,17 +189,14 @@ export default function AnganwadiPage() {
     });
 
     setLoading(true);
-    const res = await fetch(
-      `https://api.dreamlaunch.studio/api/anganwadis/${selectedAnganwadi.id}`,
-      {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          studentIds,
-          students: validNewStudents,
-        }),
-      }
-    );
+    const res = await fetch(`https://api.gitcuber.studio/api/anganwadis/${selectedAnganwadi.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studentIds,
+        students: validNewStudents,
+      }),
+    });
     setLoading(false);
 
     if (res.ok) {
@@ -208,13 +213,16 @@ export default function AnganwadiPage() {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Important Note</AlertTitle>
         <AlertDescription>
-          Only one teacher can be assigned to each Anganwadi center. Please ensure proper teacher allocation.
+          Only one teacher can be assigned to each Anganwadi center. Please
+          ensure proper teacher allocation.
         </AlertDescription>
       </Alert>
 
       <Card className="mb-4 md:mb-6">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <CardTitle className="text-xl md:text-2xl">Anganwadi Centers</CardTitle>
+          <CardTitle className="text-xl md:text-2xl">
+            Anganwadi Centers
+          </CardTitle>
           <Dialog>
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto">
@@ -253,40 +261,45 @@ export default function AnganwadiPage() {
                     selected={studentIds}
                     setSelected={setStudentIds}
                   />
-                  {selectedAnganwadi?.students && selectedAnganwadi.students.length > 0 && (
-                    <div className="mt-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700 w-full sm:w-auto"
-                        onClick={async () => {
-                          if (!selectedAnganwadi) return;
-                          if (
-                            window.confirm(
-                              `Are you sure you want to remove all ${selectedAnganwadi.students.length} students from this Anganwadi?`
-                            )
-                          ) {
-                            try {
-                              await removeAllStudentsFromAnganwadi(
-                                selectedAnganwadi.id
-                              );
-                              setStudentIds([]);
-                              alert("All students have been removed");
-                              fetchAnganwadis();
-                            } catch (error: any) {
-                              console.error("Error removing students:", error);
-                              alert(
-                                "Failed to remove students: " +
-                                  (error.response?.data?.error || error.message)
-                              );
+                  {selectedAnganwadi?.students &&
+                    selectedAnganwadi.students.length > 0 && (
+                      <div className="mt-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700 w-full sm:w-auto"
+                          onClick={async () => {
+                            if (!selectedAnganwadi) return;
+                            if (
+                              window.confirm(
+                                `Are you sure you want to remove all ${selectedAnganwadi.students.length} students from this Anganwadi?`
+                              )
+                            ) {
+                              try {
+                                await removeAllStudentsFromAnganwadi(
+                                  selectedAnganwadi.id
+                                );
+                                setStudentIds([]);
+                                alert("All students have been removed");
+                                fetchAnganwadis();
+                              } catch (error: any) {
+                                console.error(
+                                  "Error removing students:",
+                                  error
+                                );
+                                alert(
+                                  "Failed to remove students: " +
+                                    (error.response?.data?.error ||
+                                      error.message)
+                                );
+                              }
                             }
-                          }
-                        }}
-                      >
-                        Remove All Students
-                      </Button>
-                    </div>
-                  )}
+                          }}
+                        >
+                          Remove All Students
+                        </Button>
+                      </div>
+                    )}
                 </div>
 
                 {/* Create New Students */}
@@ -396,10 +409,18 @@ export default function AnganwadiPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead className="hidden md:table-cell">Taluk</TableHead>
-                    <TableHead className="hidden md:table-cell">District</TableHead>
-                    <TableHead className="hidden sm:table-cell">Teacher</TableHead>
-                    <TableHead className="hidden lg:table-cell">Students</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Taluk
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      District
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Teacher
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Students
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -411,7 +432,9 @@ export default function AnganwadiPage() {
                         className="cursor-pointer hover:bg-muted transition"
                       >
                         <TableCell
-                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                          onClick={() =>
+                            router.push(`/admin/anganwadi/${a.id}`)
+                          }
                         >
                           <div>
                             <div className="font-medium">{a.name}</div>
@@ -430,19 +453,25 @@ export default function AnganwadiPage() {
                         </TableCell>
                         <TableCell
                           className="hidden md:table-cell"
-                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                          onClick={() =>
+                            router.push(`/admin/anganwadi/${a.id}`)
+                          }
                         >
                           {a.location}
                         </TableCell>
                         <TableCell
                           className="hidden md:table-cell"
-                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                          onClick={() =>
+                            router.push(`/admin/anganwadi/${a.id}`)
+                          }
                         >
                           {a.district}
                         </TableCell>
                         <TableCell
                           className="hidden sm:table-cell"
-                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                          onClick={() =>
+                            router.push(`/admin/anganwadi/${a.id}`)
+                          }
                         >
                           {a.teacher
                             ? `${a.teacher.name} (${a.teacher.phone})`
@@ -450,7 +479,9 @@ export default function AnganwadiPage() {
                         </TableCell>
                         <TableCell
                           className="hidden lg:table-cell"
-                          onClick={() => router.push(`/admin/anganwadi/${a.id}`)}
+                          onClick={() =>
+                            router.push(`/admin/anganwadi/${a.id}`)
+                          }
                         >
                           {a.students.length > 0
                             ? `${a.students.length} students`

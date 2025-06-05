@@ -24,6 +24,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { API_URL } from "@/lib/config";
 
 interface Anganwadi {
   _id: string;
@@ -50,7 +51,7 @@ function AnganwadiClient({ id }: { id: string }) {
     try {
       setLoading(true);
       const res = await fetch(
-        `https://api.dreamlaunch.studio/api/anganwadis/${id}`,
+        `${API_URL}anganwadis/${id}`,
         {
           cache: "no-store",
         }
