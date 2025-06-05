@@ -1,4 +1,4 @@
 // API Configuration
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.dreamlaunch.studio/api/";
+export const API_URL = "http://localhost:3000/api/";
 
-// Other configuration constants can be added here 
+// Other configuration constants can be added here

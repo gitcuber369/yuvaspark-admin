@@ -20,9 +20,9 @@ import { InfoIcon, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function CSVImportGuide() {
-  const sampleData = `name,gender,status,cohortId,anganwadiId
-Rahul Kumar,MALE,ACTIVE,550e8400-e29b-41d4-a716-446655440000,a67e8400-e29b-41d4-a716-446655440001
-Priya Singh,FEMALE,ACTIVE,550e8400-e29b-41d4-a716-446655440000,a67e8400-e29b-41d4-a716-446655440001`;
+  const sampleData = `name,gender,status,anganwadiId
+Rahul Kumar,MALE,ACTIVE,a67e8400-e29b-41d4-a716-446655440001
+Priya Singh,FEMALE,ACTIVE,a67e8400-e29b-41d4-a716-446655440001`;
 
   const downloadSampleCSV = () => {
     const blob = new Blob([sampleData], { type: "text/csv" });
@@ -100,12 +100,6 @@ Priya Singh,FEMALE,ACTIVE,550e8400-e29b-41d4-a716-446655440000,a67e8400-e29b-41d
                   <TableCell>No (defaults to "ACTIVE")</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-mono">cohortId</TableCell>
-                  <TableCell>UUID of the student's cohort</TableCell>
-                  <TableCell>UUID format</TableCell>
-                  <TableCell>No</TableCell>
-                </TableRow>
-                <TableRow>
                   <TableCell className="font-mono">anganwadiId</TableCell>
                   <TableCell>UUID of the associated Anganwadi</TableCell>
                   <TableCell>UUID format</TableCell>
@@ -126,7 +120,7 @@ Priya Singh,FEMALE,ACTIVE,550e8400-e29b-41d4-a716-446655440000,a67e8400-e29b-41d
               </li>
               <li>Gender must be either "MALE" or "FEMALE"</li>
               <li>Status field defaults to "ACTIVE" if not provided</li>
-              <li>CohortId and AnganwadiId must be valid UUIDs</li>
+              <li>AnganwadiId must be a valid UUID</li>
               <li>Maximum file size: 10MB</li>
               <li>UTF-8 encoding is required</li>
               <li>The system will automatically generate:</li>
@@ -155,8 +149,8 @@ Priya Singh,FEMALE,ACTIVE,550e8400-e29b-41d4-a716-446655440000,a67e8400-e29b-41d
               <AlertDescription className="mt-2">
                 <ul className="list-disc pl-6 space-y-1">
                   <li>
-                    Make sure the cohortId and anganwadiId values exist in your
-                    database before importing
+                    Make sure the anganwadiId values exist in your database
+                    before importing
                   </li>
                   <li>
                     The import will create student records with relationships to

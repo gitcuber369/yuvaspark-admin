@@ -48,7 +48,7 @@ const adminNav = [
   { title: "Topics", icon: PanelTopInactive, url: "/admin/topic" },
   { title: "Questions", icon: MessagesSquare, url: "/admin/questions" },
   {
-    title: "Global Assessments",
+    title: "Assessment sessions",
     icon: ClipboardList,
     url: "/admin/global-assessments",
   },
