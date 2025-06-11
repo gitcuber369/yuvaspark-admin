@@ -578,154 +578,144 @@ export default function StudentDashboard() {
                     )}
                   </div>
                 ) : (
-                  <div className="max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    <ul className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                      {sortedStudents.map((student) => (
-                        <li
-                          key={student.id}
-                          className="border rounded-lg p-3 sm:p-4 shadow-sm hover:shadow-md transition-all bg-white"
-                        >
-                          {/* Student Header */}
-                          <div className="flex flex-col gap-2 sm:gap-3">
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-start gap-2 min-w-0 flex-1">
+                  <div className="relative border rounded-lg">
+                    <div className="overflow-x-auto">
+                      <table className="w-full max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 text-sm text-left">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                          <tr>
+                            <th className="p-4">
+                              <div className="flex items-center">
                                 <input
                                   type="checkbox"
-                                  id={`student-${student.id}`}
-                                  className="h-4 w-4 mt-1 rounded border-gray-300 text-black focus:ring-black shrink-0"
-                                  checked={selectedStudents.includes(
-                                    student.id
-                                  )}
-                                  onChange={() =>
-                                    toggleStudentSelection(student.id)
+                                  className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                                  checked={
+                                    selectedStudents.length === sortedStudents.length &&
+                                    sortedStudents.length > 0
                                   }
+                                  onChange={toggleSelectAll}
                                 />
-                                <div className="min-w-0 flex-1">
-                                  <h3 className="text-base sm:text-lg font-medium truncate">
-                                    {student.name}
-                                  </h3>
-                                  <p className="text-sm text-gray-600 mt-0.5">
-                                    Gender: {student.gender || "Not specified"}
-                                  </p>
-                                </div>
                               </div>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleRemoveStudent(student.id)}
-                                className="shrink-0 -mt-1"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700" />
-                              </Button>
-                            </div>
-
-                            {/* Status Section */}
-                            <div className="flex items-center justify-between gap-2 mt-1">
-                              <span className="text-sm text-gray-500">
-                                Status:
-                              </span>
-                              <Select
-                                value={student.status || "INACTIVE"}
-                                onValueChange={(value) => {
-                                  handleUpdateStudent(student.id, {
-                                    status: value,
-                                  });
-                                }}
-                              >
-                                <SelectTrigger className="w-32 h-8">
-                                  <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem
-                                    value="ACTIVE"
-                                    className="text-green-600"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <CheckCircle className="w-4 h-4" />
-                                      <span>Active</span>
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem
-                                    value="INACTIVE"
-                                    className="text-red-600"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <XCircle className="w-4 h-4" />
-                                      <span>Inactive</span>
-                                    </div>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            {/* Anganwadi Section */}
-                            <div className="border-t mt-2 pt-3">
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="text-sm text-gray-500">
-                                  Anganwadi:
-                                </span>
+                            </th>
+                            <th className="px-6 py-3">Name</th>
+                            <th className="px-6 py-3">Gender</th>
+                            <th className="px-6 py-3">Status</th>
+                            <th className="px-6 py-3">Anganwadi</th>
+                            <th className="px-6 py-3">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {sortedStudents.map((student) => (
+                            <tr key={student.id} className="bg-white border-b hover:bg-gray-50">
+                              <td className="w-4 p-4">
+                                <div className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                                    checked={selectedStudents.includes(student.id)}
+                                    onChange={() => toggleStudentSelection(student.id)}
+                                  />
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 font-medium text-gray-900">
+                                {student.name}
+                              </td>
+                              <td className="px-6 py-4">
+                                {student.gender || "Not specified"}
+                              </td>
+                              <td className="px-6 py-4">
+                                <Select
+                                  value={student.status || "INACTIVE"}
+                                  onValueChange={(value) => {
+                                    handleUpdateStudent(student.id, {
+                                      status: value,
+                                    });
+                                  }}
+                                >
+                                  <SelectTrigger className="w-32 h-8">
+                                    <SelectValue placeholder="Select status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="ACTIVE" className="text-green-600">
+                                      <div className="flex items-center gap-2">
+                                        <CheckCircle className="w-4 h-4" />
+                                        <span>Active</span>
+                                      </div>
+                                    </SelectItem>
+                                    <SelectItem value="INACTIVE" className="text-red-600">
+                                      <div className="flex items-center gap-2">
+                                        <XCircle className="w-4 h-4" />
+                                        <span>Inactive</span>
+                                      </div>
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </td>
+                              <td className="px-6 py-4">
                                 <Select
                                   value={student.anganwadiId || "none"}
                                   onValueChange={(value) => {
                                     if (value && value !== "none") {
-                                      handleAssignToAnganwadi(
-                                        student.id,
-                                        value
-                                      );
-                                    } else if (
-                                      value === "none" &&
-                                      student.anganwadiId
-                                    ) {
+                                      handleAssignToAnganwadi(student.id, value);
+                                    } else if (value === "none" && student.anganwadiId) {
                                       handleUpdateStudent(student.id, {
                                         anganwadiId: "",
                                       });
                                     }
                                   }}
                                 >
-                                  <SelectTrigger className="w-36 sm:w-40 h-8">
+                                  <SelectTrigger className="w-40 h-8">
                                     <SelectValue placeholder="Assign" />
                                   </SelectTrigger>
                                   <SelectContent className="max-h-60">
                                     {student.anganwadiId && (
                                       <SelectItem value="none">
-                                        <span className="text-gray-500">
-                                          Unassign
-                                        </span>
+                                        <span className="text-gray-500">Unassign</span>
                                       </SelectItem>
                                     )}
                                     {anganwadis.map((anganwadi) => (
                                       <SelectItem
-                                        key={
-                                          anganwadi._id?.toString() ||
-                                          anganwadi.id
-                                        }
-                                        value={
-                                          anganwadi._id?.toString() ||
-                                          anganwadi.id
-                                        }
+                                        key={anganwadi._id?.toString() || anganwadi.id}
+                                        value={anganwadi._id?.toString() || anganwadi.id}
                                       >
                                         {anganwadi.name}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
-                              </div>
-
-                              {student.anganwadiId && (
-                                <div className="flex items-center gap-2 mt-2">
-                                  <ChevronRight className="w-4 h-4 shrink-0 text-gray-400" />
-                                  <p className="text-sm text-gray-500 truncate flex-1">
-                                    {student.anganwadi?.name
-                                      ? `${student.anganwadi.name}`
-                                      : `ID: ${student.anganwadiId}`}
+                                {student.anganwadiId && student.anganwadi?.name && (
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {student.anganwadi.name}
                                   </p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                                )}
+                              </td>
+                              <td className="px-6 py-4">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleRemoveStudent(student.id)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <style jsx>{`
+                      .overflow-x-auto {
+                        height: calc(100vh - 400px);
+                        min-height: 400px;
+                        overflow-y: auto;
+                      }
+                      thead {
+                        position: sticky;
+                        top: 0;
+                        z-index: 10;
+                        background-color: #f9fafb;
+                      }
+                    `}</style>
                   </div>
                 )}
               </CardContent>
