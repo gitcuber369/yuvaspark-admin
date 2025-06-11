@@ -243,17 +243,6 @@ export default function StudentDashboard() {
               Refresh
             </Button>
 
-            <Link href="/admin/imports">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-black text-black hover:bg-gray-100"
-              >
-                <FileUp className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Imports</span>
-              </Button>
-            </Link>
-
             {selectedStudents.length > 0 && (
               <Button
                 size="sm"
@@ -589,7 +578,8 @@ export default function StudentDashboard() {
                                   type="checkbox"
                                   className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
                                   checked={
-                                    selectedStudents.length === sortedStudents.length &&
+                                    selectedStudents.length ===
+                                      sortedStudents.length &&
                                     sortedStudents.length > 0
                                   }
                                   onChange={toggleSelectAll}
@@ -605,14 +595,21 @@ export default function StudentDashboard() {
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {sortedStudents.map((student) => (
-                            <tr key={student.id} className="bg-white border-b hover:bg-gray-50">
+                            <tr
+                              key={student.id}
+                              className="bg-white border-b hover:bg-gray-50"
+                            >
                               <td className="w-4 p-4">
                                 <div className="flex items-center">
                                   <input
                                     type="checkbox"
                                     className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                                    checked={selectedStudents.includes(student.id)}
-                                    onChange={() => toggleStudentSelection(student.id)}
+                                    checked={selectedStudents.includes(
+                                      student.id
+                                    )}
+                                    onChange={() =>
+                                      toggleStudentSelection(student.id)
+                                    }
                                   />
                                 </div>
                               </td>
@@ -635,13 +632,19 @@ export default function StudentDashboard() {
                                     <SelectValue placeholder="Select status" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="ACTIVE" className="text-green-600">
+                                    <SelectItem
+                                      value="ACTIVE"
+                                      className="text-green-600"
+                                    >
                                       <div className="flex items-center gap-2">
                                         <CheckCircle className="w-4 h-4" />
                                         <span>Active</span>
                                       </div>
                                     </SelectItem>
-                                    <SelectItem value="INACTIVE" className="text-red-600">
+                                    <SelectItem
+                                      value="INACTIVE"
+                                      className="text-red-600"
+                                    >
                                       <div className="flex items-center gap-2">
                                         <XCircle className="w-4 h-4" />
                                         <span>Inactive</span>
@@ -655,8 +658,14 @@ export default function StudentDashboard() {
                                   value={student.anganwadiId || "none"}
                                   onValueChange={(value) => {
                                     if (value && value !== "none") {
-                                      handleAssignToAnganwadi(student.id, value);
-                                    } else if (value === "none" && student.anganwadiId) {
+                                      handleAssignToAnganwadi(
+                                        student.id,
+                                        value
+                                      );
+                                    } else if (
+                                      value === "none" &&
+                                      student.anganwadiId
+                                    ) {
                                       handleUpdateStudent(student.id, {
                                         anganwadiId: "",
                                       });
@@ -669,30 +678,41 @@ export default function StudentDashboard() {
                                   <SelectContent className="max-h-60">
                                     {student.anganwadiId && (
                                       <SelectItem value="none">
-                                        <span className="text-gray-500">Unassign</span>
+                                        <span className="text-gray-500">
+                                          Unassign
+                                        </span>
                                       </SelectItem>
                                     )}
                                     {anganwadis.map((anganwadi) => (
                                       <SelectItem
-                                        key={anganwadi._id?.toString() || anganwadi.id}
-                                        value={anganwadi._id?.toString() || anganwadi.id}
+                                        key={
+                                          anganwadi._id?.toString() ||
+                                          anganwadi.id
+                                        }
+                                        value={
+                                          anganwadi._id?.toString() ||
+                                          anganwadi.id
+                                        }
                                       >
                                         {anganwadi.name}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                {student.anganwadiId && student.anganwadi?.name && (
-                                  <p className="text-xs text-gray-500 mt-1">
-                                    {student.anganwadi.name}
-                                  </p>
-                                )}
+                                {student.anganwadiId &&
+                                  student.anganwadi?.name && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      {student.anganwadi.name}
+                                    </p>
+                                  )}
                               </td>
                               <td className="px-6 py-4">
                                 <Button
                                   size="icon"
                                   variant="ghost"
-                                  onClick={() => handleRemoveStudent(student.id)}
+                                  onClick={() =>
+                                    handleRemoveStudent(student.id)
+                                  }
                                   className="text-red-500 hover:text-red-700"
                                 >
                                   <Trash2 className="w-4 h-4" />
